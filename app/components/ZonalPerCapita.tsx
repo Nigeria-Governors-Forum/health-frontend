@@ -120,7 +120,7 @@ const ZonalPerBarChart: React.FC<StateBarChartProps> = ({
             <LabelList
               dataKey="per_capita"
               position="top"
-              formatter={(label: React.ReactNode) => {
+              formatter={(label) => {
                 if (typeof label === "number") {
                   return "₦" + formatNumber(Number(label.toFixed(0)));
                 }

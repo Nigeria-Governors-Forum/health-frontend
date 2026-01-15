@@ -111,7 +111,7 @@ export const NominatimMap: React.FC<NominatimMapProps> = ({
               type: "Feature",
               geometry: searchResult.geojson,
               properties: {},
-            }}
+            } as any}
             style={{
               color: "blue",
               fillColor: "blue",

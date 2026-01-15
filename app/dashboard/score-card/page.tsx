@@ -1,8 +1,8 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
-import ScorecardTable, { ScorecardRow } from "@/app/components/scoreCard";
-import NationalScorecardTable from "@/app/components/nationalScoreCard";
+import ScorecardTable, { ScorecardRow } from "@/app/components/ScoreCard";
+import NationalScorecardTable from "@/app/components/NationalScoreCard";
 import { useTopbarFilters } from "@/app/context/TopbarFiltersContext";
 import LoadingScreen from "@/app/components/LoadingScreen";
 import { Endpoints, httpClient } from "@/app/api-client/src";

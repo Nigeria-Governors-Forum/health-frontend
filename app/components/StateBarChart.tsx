@@ -124,7 +124,7 @@ const StateBarChart: React.FC<StateBarChartProps> = ({
             <LabelList
               dataKey="rate_graph"
               position="top"
-              formatter={(label: React.ReactNode) => {
+              formatter={(label) => {
                 if (typeof label === "number") {
                   return formatCurrency(label, currencySymbol);
                 }

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { formatNumber } from "../hooks/TopbarFiltersContext";
+import { formatNumber } from "../context/TopbarFiltersContext";
 
 export type Status = "safe" | "normal" | "hard" | "unknown";
 

@@ -79,13 +79,13 @@ export default function DataCard({
               ))}
             </Pie>
             <Tooltip
-              formatter={(value: number, _name, props: any) => {
+              formatter={(value: number | undefined, _name, props: any) => {
                 const total = data.reduce(
                   (acc: number, d: any) => acc + d.value,
                   0
                 );
                 const percent =
-                  total > 0 ? ((value / total) * 100).toFixed(0) : 0;
+                  total > 0 && value ? ((value / total) * 100).toFixed(0) : 0;
                 return [`${value} (${percent}%)`, props.payload.name];
               }}
             />

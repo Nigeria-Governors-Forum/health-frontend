@@ -68,7 +68,7 @@ const PerCapitaExpenditureChart: React.FC<PerCapitaExpenditureChartProps> = ({
             <LabelList
               dataKey="value"
               position="top"
-              formatter={(label: React.ReactNode) => {
+              formatter={(label) => {
                 if (typeof label === "number") {
                   return `${currencySymbol}${label.toLocaleString()}`;
                 }

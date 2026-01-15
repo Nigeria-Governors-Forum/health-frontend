@@ -55,7 +55,8 @@ export default function CustomBarChart({
           />
           <Tooltip
             labelFormatter={(label: string) => `State: ${label}`}
-            formatter={(val: number) => [`${val}%`, "Total"]}
+            // formatter={(val: number) => [`${val}%`, "Total"]}
+            formatter={(val: number | undefined) => [`${val ?? 0}%`, "Total"]}
           />
 
           {/* ✅ Reference Line */}

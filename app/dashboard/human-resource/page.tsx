@@ -11,7 +11,7 @@ import MapView from "@/app/components/MapWrapper";
 import { useTopbarFilters } from "@/app/context/TopbarFiltersContext";
 import LoadingScreen from "@/app/components/LoadingScreen";
 import { Endpoints, httpClient } from "@/app/api-client/src";
-import PopulationSummaryTable, { LgaRow } from "@/app/components/populationSummaryTable";
+import PopulationSummaryTable, { LgaRow } from "@/app/components/PopulationSummaryTable";
 
 interface HumanResourcePageProps {
   state?: string;
