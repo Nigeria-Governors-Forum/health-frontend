@@ -1,11 +1,11 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
-import ScorecardTable, { ScorecardRow } from "@repo/ui/scoreCard";
-import NationalScorecardTable from "@repo/ui/nationalScoreCard";
-import { useTopbarFilters } from "@repo/ui/hooks/TopbarFiltersContext";
-import LoadingScreen from "@repo/ui/loadingScreen";
 import toast from "react-hot-toast";
-import { Endpoints, httpClient } from "../../../api-client/src";
+import ScorecardTable, { ScorecardRow } from "@/app/components/scoreCard";
+import NationalScorecardTable from "@/app/components/nationalScoreCard";
+import { useTopbarFilters } from "@/app/context/TopbarFiltersContext";
+import LoadingScreen from "@/app/components/LoadingScreen";
+import { Endpoints, httpClient } from "@/app/api-client/src";
 
 interface ScoreCardProps {
   state: string;
@@ -65,6 +65,7 @@ const ScoreCard = () => {
           : `${Endpoints.scorecard.summary}/${stateParam}/${selectedYear}/${selectedCategory}`;
 
       const stats = await httpClient.get(url);
+      // @ts-ignore
       setStateData(stats?.data);
     } catch (error) {
       toast.error("Failed to load scorecard data");

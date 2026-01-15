@@ -1,14 +1,14 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import MapView from "../../components/MapWrapper";
 import CustomBarChart from "../../components/CustomBarChart";
 import { getZoneByState } from "nigerian-geopolitical-zones";
-import { useTopbarFilters } from "@repo/ui/hooks/TopbarFiltersContext";
-import { Endpoints, httpClient } from "../../../api-client/src";
 import toast from "react-hot-toast";
-import LoadingScreen from "@repo/ui/loadingScreen";
 import ZonalPerBarChart from "../../components/ZonalPerCapita";
+import MapView from "@/app/components/MapWrapper";
+import { useTopbarFilters } from "@/app/context/TopbarFiltersContext";
+import LoadingScreen from "@/app/components/LoadingScreen";
+import { Endpoints, httpClient } from "@/app/api-client/src";
 
 const ZonalHealthFinance = () => {
   const [loading, setLoading] = useState(false);
@@ -33,7 +33,8 @@ const ZonalHealthFinance = () => {
       const stats = await httpClient.get(
         `${Endpoints.healthFinance.zone}/${selectedZone}/${stateParam}/${selectedYear}`
       );
-      console.log(stats);
+      // console.log(stats);
+      // @ts-ignore
       setStateData(stats?.data);
     } catch (error) {
       console.error("Error fetching data:", error);

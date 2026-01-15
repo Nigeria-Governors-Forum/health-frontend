@@ -13,11 +13,11 @@ import {
 import MapView from "@/app/components/MapWrapper";
 import { Endpoints, httpClient } from "@/app/api-client/src";
 import toast from "react-hot-toast";
-import { useTopbarFilters } from "../../context/TopbarFiltersContext";
 import { formatNumber } from "../page";
 import LoadingScreen from "@/app/components/LoadingScreen";
 import DemographyCard from "@/app/components/DemographyCard";
 import LgaSummaryTable, { LgaLookup } from "@/app/components/LgaSummaryTable";
+import { useTopbarFilters } from "@/app/context/TopbarFiltersContext";
 
 const DemographyPage = () => {
   const [loading, setLoading] = useState(false);

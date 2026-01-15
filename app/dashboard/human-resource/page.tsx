@@ -1,18 +1,17 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import DemographyCard from "@repo/ui/demographyCard";
-import PopulationSummaryTable, {
-  LgaRow,
-} from "@repo/ui/populationSummaryTable";
+
 import { FaHospitalUser, FaUsers } from "react-icons/fa";
-import MapView from "../../components/MapWrapper";
-import { useTopbarFilters } from "@repo/ui/hooks/TopbarFiltersContext";
 import toast from "react-hot-toast";
-import { Endpoints, httpClient } from "../../../api-client/src";
-import LoadingScreen from "@repo/ui/loadingScreen";
 import { formatNumber } from "../page";
 import HealthCard, { SummaryRow } from "../../components/HealthCard";
+import DemographyCard from "@/app/components/DemographyCard";
+import MapView from "@/app/components/MapWrapper";
+import { useTopbarFilters } from "@/app/context/TopbarFiltersContext";
+import LoadingScreen from "@/app/components/LoadingScreen";
+import { Endpoints, httpClient } from "@/app/api-client/src";
+import PopulationSummaryTable, { LgaRow } from "@/app/components/populationSummaryTable";
 
 interface HumanResourcePageProps {
   state?: string;
@@ -44,7 +43,8 @@ const HumanResource = () => {
       const stats = await httpClient.get(
         `${Endpoints.humanResource.summary}/${stateParam}/${selectedYear}`
       );
-      console.log(stats);
+      // console.log(stats);
+      // @ts-ignore
       setStateData(stats?.data);
 
     } catch (error) {

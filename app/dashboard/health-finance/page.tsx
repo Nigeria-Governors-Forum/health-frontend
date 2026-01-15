@@ -1,14 +1,14 @@
 "use client";
 
-import LgaPerCapitaBarChart from "@repo/ui/lgaPerCapita";
-import ComparisonBarChart from "@repo/ui/barchart";
-import RechartMetricCard from "@repo/ui/rechartMetricCard";
-import { useTopbarFilters } from "@repo/ui/hooks/TopbarFiltersContext";
 import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
-import { Endpoints, httpClient } from "../../../api-client/src";
-import LoadingScreen from "@repo/ui/loadingScreen";
 import { formatNumber } from "../page";
+import ComparisonBarChart from "@/app/components/ComparisonBarChart";
+import LoadingScreen from "@/app/components/LoadingScreen";
+import { useTopbarFilters } from "@/app/context/TopbarFiltersContext";
+import { Endpoints, httpClient } from "@/app/api-client/src";
+import LgaPerCapitaBarChart from "@/app/components/LgaPerCapita";
+import RechartMetricCard from "@/app/components/RechartMetricCard";
 
 const HealthFinance = () => {
   const [loading, setLoading] = useState(false);
@@ -33,7 +33,8 @@ const HealthFinance = () => {
       const stats = await httpClient.get(
         `${Endpoints.healthFinance.summary}/${stateParam}/${selectedYear}`
       );
-      console.log(stats);
+      // console.log(stats);
+      // @ts-ignore
       setStateData(stats?.data);
 
       toast.success(`Welcome, ${selectedState} - ${selectedYear}!`);

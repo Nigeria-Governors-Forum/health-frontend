@@ -5,11 +5,11 @@ import MapView from "../../components/MapWrapper";
 import DataCard from "../../components/PieChartUi";
 import toast from "react-hot-toast";
 import { formatNumber } from "../page";
-import { useTopbarFilters } from "@/app/hooks/TopbarFiltersContext";
 import { Endpoints, httpClient } from "@/app/api-client/src";
 import LoadingScreen from "@/app/components/LoadingScreen";
 import SummaryTable, { SummaryRow } from "@/app/components/SummaryTable";
 import HorizontalServiceProvisionBarChart from "@/app/components/HorizontalServiceProvisionBarChart";
+import { useTopbarFilters } from "@/app/context/TopbarFiltersContext";
 
 interface HealthFacilityPageProps {
   title?: string;

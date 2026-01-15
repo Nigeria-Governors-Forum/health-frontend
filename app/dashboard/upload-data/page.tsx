@@ -1,8 +1,9 @@
 "use client";
 
+import { connectSSE } from "@/app/api-client/src";
 import { useEffect, useState } from "react";
 import { FaUpload, FaSpinner } from "react-icons/fa";
-import { connectSSE } from "../../../api-client/src";
+// import { connectSSE } from "../../../api-client/src";
 
 const UploadPage = () => {
   const [file, setFile] = useState<File | null>(null);

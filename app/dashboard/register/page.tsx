@@ -2,10 +2,11 @@
 
 import { useState } from "react";
 import { FaUserPlus, FaSpinner } from "react-icons/fa";
+// @ts-ignore
 import State from "naija-state-local-government";
-import { Endpoints, httpClient } from "../../../api-client/src";
-import LoadingScreen from "@repo/ui/loadingScreen";
 import toast from "react-hot-toast";
+import { Endpoints, httpClient } from "@/app/api-client/src";
+import LoadingScreen from "@/app/components/LoadingScreen";
 
 const RegisterPage = () => {
   const [form, setForm] = useState({

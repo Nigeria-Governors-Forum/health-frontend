@@ -27,7 +27,7 @@ const ZoneHealthCard: React.FC<SelectCardProps> = ({
         id={`select-${title}`}
         value={defaultValue}
         onChange={(e) => onChange(e.target.value)}
-        className="ui:px-3 ui:py-1 ui:border ui:rounded-md ui:border-green-400 ui:bg-white ui:text-green-700"
+        className="px-3 py-1 border rounded-md border-green-400 bg-white text-green-700"
       >
         <option value="">Select...</option>
         {options.map((opt) => (

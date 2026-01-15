@@ -1,14 +1,14 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import MapView from "../../components/MapWrapper";
 import ZoneHealthCard from "../../components/ZoneHealthCard";
 import { getZoneByState } from "nigerian-geopolitical-zones";
-import { useTopbarFilters } from "@repo/ui/hooks/TopbarFiltersContext";
-import { Endpoints, httpClient } from "../../../api-client/src";
 import toast from "react-hot-toast";
-import LoadingScreen from "@repo/ui/loadingScreen";
 import StateBarChart from "../../components/StateBarChart";
+import MapView from "@/app/components/MapWrapper";
+import { useTopbarFilters } from "@/app/context/TopbarFiltersContext";
+import LoadingScreen from "@/app/components/LoadingScreen";
+import { Endpoints, httpClient } from "@/app/api-client/src";
 
 const ZonalHealthFacility = () => {
   const [loading, setLoading] = useState(false);
@@ -23,13 +23,14 @@ const ZonalHealthFacility = () => {
       selectedState === "Federal Capital Territory"
         ? "FCT"
         : selectedState === "Nassarawa"
-          ? "Nasarawa"
-          : selectedState;
+        ? "Nasarawa"
+        : selectedState;
     try {
       const stats = await httpClient.get(
         `${Endpoints.healthFacilities.zone}/${selectedZone}/${stateParam}/${selectedYear}`
       );
-      console.log(stats);
+      // console.log(stats);
+      // @ts-ignore
       setStateData(stats?.data);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -38,7 +39,6 @@ const ZonalHealthFacility = () => {
       setLoading(false);
     }
   };
-
 
   useEffect(() => {
     if (!selectedState) return;
@@ -86,7 +86,7 @@ const ZonalHealthFacility = () => {
             <StateBarChart
               title="Zonal Comparison"
               data={sampleData}
-              className="bg-white rounded-2xl shadow p-4 h-[500px]"
+              className="bg-white rounded-2xl shadow p-4 h-125"
             />
           </div>
 

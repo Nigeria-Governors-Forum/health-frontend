@@ -18,7 +18,8 @@
     "react-icons": "^5.5.0",
     "react-leaflet": "^5.0.0",
     "recharts": "^3.6.0",
-    "topojson-client": "^3.1.0"
+    "topojson-client": "^3.1.0",
+        "nigerian-geopolitical-zones": "^1.1.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
