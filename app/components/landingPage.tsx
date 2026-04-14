@@ -3,7 +3,8 @@
 import Image from "next/image";
 import React from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import LoadingScreen from "./loadingScreen";
+import LoadingScreen from "./LoadingScreen";
+
 
 export interface LandingPageProps {
   text?: string;
@@ -110,11 +111,10 @@ const LandingPage: React.FC<LandingPageProps> = ({
               <button
                 type="submit"
                 disabled={loading}
-                className={`ui:w-full ui:py-2 ui:rounded ui:font-semibold ui:transition ui:duration-200 ui:cursor-pointer ${
-                  loading
+                className={`ui:w-full ui:py-2 ui:rounded ui:font-semibold ui:transition ui:duration-200 ui:cursor-pointer ${loading
                     ? "ui:bg-green-300 ui:cursor-not-allowed"
                     : "ui:bg-green-600 ui:hover:bg-green-700 ui:text-white"
-                }`}
+                  }`}
               >
                 {loading ? "Processing..." : submitLabel}
               </button>
