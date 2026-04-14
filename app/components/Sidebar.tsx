@@ -166,6 +166,12 @@ export const navItem: NavItem[] = [
     label: "Audit",
     roles: ["audit", "admin"],
   },
+  {
+    href: "/dashboard",
+    icon: <FaMoneyCheck />,
+    label: "Gender desk",
+    roles: ["user", "acct", "audit", "admin"],
+  },
 ];
 
 interface SidebarProps {
@@ -213,13 +219,12 @@ const Sidebar: React.FC<SidebarProps> = ({
     setMobileOpen(false);
   }, [setMobileOpen]);
 
-
   const filteredNav = navItems
     .map((item) => {
       if (item.children) {
         // filter children by role
         const allowedChildren = item.children.filter((child) =>
-          child.roles.includes(role!)
+          child.roles.includes(role!),
         );
 
         // keep parent only if it has visible children
@@ -239,7 +244,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       if (href === "/dashboard") return pathname === href;
       return pathname.startsWith(href);
     },
-    [pathname]
+    [pathname],
   );
 
   const handleLogout = useCallback(() => {
@@ -275,7 +280,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           "fixed top-0 left-0 h-screen bg-[#06923E] text-white p-4 z-40 flex flex-col justify-between transition-all duration-300",
           collapsed ? "w-20" : "w-64",
           mobileOpen ? "translate-x-0" : "-translate-x-full",
-          "md:translate-x-0"
+          "md:translate-x-0",
         )}
       >
         <div>
@@ -298,7 +303,7 @@ const Sidebar: React.FC<SidebarProps> = ({
               priority
               className={cn(
                 "object-contain transition-all duration-300 h-auto",
-                collapsed ? "w-10" : "w-36"
+                collapsed ? "w-10" : "w-36",
               )}
             />
           </div>

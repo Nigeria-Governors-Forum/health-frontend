@@ -73,7 +73,7 @@ export default function Home() {
         setShowPassword={setShowPassword}
         usernameLabel="Username"
         passwordLabel="Passcode"
-        submitLabel="Sign In"
+        submitLabel="SIGN IN"
         copyRight={true}
       />
     </>
