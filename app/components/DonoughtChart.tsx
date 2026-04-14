@@ -12,8 +12,8 @@ type DonutChartProps = {
 export default function DonutChart({
   title,
   data,
-  innerRadius = 60,
-  outerRadius = 80,
+  innerRadius = 80,
+  outerRadius = 100,
 }: DonutChartProps) {
   return (
     <div className="bg-white shadow-md rounded-xl p-6 text-center text-black">
@@ -22,19 +22,20 @@ export default function DonutChart({
       <PieChart width={250} height={250}>
         <Pie
           data={data}
-          dataKey="value"
-          nameKey="name"
-          cx="50%"
-          cy="50%"
           innerRadius={innerRadius}
           outerRadius={outerRadius}
-          paddingAngle={1}
+          cornerRadius="50%"
+          paddingAngle={5}
+          dataKey="value"
+          nameKey="name"
+          isAnimationActive={true}
+
         >
           {data.map((entry, index) => (
             <Cell key={`cell-${index}`} fill={entry.color} />
           ))}
         </Pie>
-         <Tooltip
+        <Tooltip
           formatter={(value, name) => [`${value}%`, name]}
           contentStyle={{
             backgroundColor: "white",

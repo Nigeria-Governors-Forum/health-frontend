@@ -58,7 +58,7 @@ const DemographyCard: React.FC<DemographyCardProps> = ({
   subtitle,
 }) => {
   return (
-    <div className="bg-white rounded-xl border-2 border-[#D6D6D6] p-4 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col gap-3">
+    <div className="bg-white rounded-xl border border-[#D6D6D6] p-4 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col gap-3">
 
       {/* Top Row */}
       <div className="flex items-center gap-3">

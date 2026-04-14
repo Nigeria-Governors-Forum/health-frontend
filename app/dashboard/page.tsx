@@ -321,11 +321,6 @@ export default function DashboardHome() {
             trend="up"
             comparisonText="vs last year"
           />
-          {/* <DemographyCard
-            title="Partners mapping"
-            subtitle={formatNumber(stateData?.partners_mapping || "N/A")}
-            icon={<FaMoneyCheck size={24} color="#16a34a" />}
-          /> */}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
