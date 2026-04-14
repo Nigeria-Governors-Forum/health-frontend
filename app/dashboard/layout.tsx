@@ -70,7 +70,7 @@ export default function DashboardLayout({
   useEffect(() => {
     const token =
       typeof window !== "undefined" ? sessionStorage.getItem("token") : null;
-      // localStorage.getItem("token");
+    // localStorage.getItem("token");
     if (!token) {
       router.replace("/");
     }
@@ -130,7 +130,7 @@ function TopbarWithFilters({
   return (
     <Topbar
       collapsed={collapsed}
-      headerHeight="h-28"
+      headerHeight="h-38"
       logos={stateLogos}
       state={State.states()}
       onToggleSidebar={onToggleSidebar}

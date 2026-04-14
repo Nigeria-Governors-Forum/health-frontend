@@ -2,8 +2,7 @@
 
 import Image from "next/image";
 import React from "react";
-import { FaEye, FaEyeSlash, FaLock } from "react-icons/fa";
-import LoadingScreen from "../components/LoadingScreen";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 export interface LandingPageProps {
   text?: string;

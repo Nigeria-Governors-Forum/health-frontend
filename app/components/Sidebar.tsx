@@ -5,11 +5,6 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   FaTachometerAlt,
-  FaUniversity,
-  FaWallet,
-  FaMoneyBillWave,
-  FaListAlt,
-  FaClipboardCheck,
   FaChevronLeft,
   FaChevronRight,
   FaMoneyCheck,
@@ -19,7 +14,6 @@ import {
 } from "react-icons/fa";
 import { usePathname } from "next/navigation";
 import ConfirmPrompt from "./ConfirmPrompt";
-// import { useTopbarFilters } from "./hooks/TopbarFiltersContext";
 
 const cn = (...classes: (string | undefined | false)[]) =>
   classes.filter(Boolean).join(" ");
@@ -32,10 +26,14 @@ export interface NavItem {
   children?: NavItem[]; // ✅ add nested items
 }
 
+export const HealthIcon: any = "/svg/healthIcon.svg";
+export const AgricIcon: any = "/svg/agricIcon.svg";
+export const EducationIcon: any = "/svg/eduIcon.svg";
+
 export const navItem: NavItem[] = [
   {
     label: "Health",
-    icon: <FaTachometerAlt />,
+    icon: HealthIcon,
     roles: ["user", "h-admin", "s-admin"],
     children: [
       {
@@ -98,79 +96,20 @@ export const navItem: NavItem[] = [
         label: "Register User",
         roles: ["h-admin", "s-admin", "s-admin"],
       },
-      // {
-      //   href: "/dashboard",
-      //   icon: <FaMoneyCheck />,
-      //   label: "Access & Utilization",
-      //   roles: ["user", "acct", "audit", "admin"],
-      // },
-      // {
-      //   href: "/dashboard",
-      //   icon: <FaMoneyCheck />,
-      //   label: "Health Outcome",
-      //   roles: ["user", "acct", "audit", "admin"],
-      // },
-      // {
-      //   href: "/dashboard",
-      //   icon: <FaMoneyCheck />,
-      //   label: "Partner Mapping",
-      //   roles: ["user", "acct", "audit", "admin"],
-      // },
-      // {
-      //   href: "/dashboard",
-      //   icon: <FaMoneyCheck />,
-      //   label: "Flagship Project",
-      //   roles: ["user", "acct", "audit", "admin"],
-      // },
     ],
   },
   {
-    href: "https://ngf-frontend-agric.vercel.app/",
-    icon: <FaUniversity />,
+    // href: "https://ngf-frontend-agric.vercel.app/",
+    href: "https://asc.education.gov.ng/dhis/dhis-web-commons/security/login.action",
+    icon: AgricIcon,
     label: "Agriculture",
     roles: ["user", "acct", "audit", "h-admin", "s-admin"],
   },
   {
     href: "https://ngf-frontend-agric.vercel.app/",
-    icon: <FaUniversity />,
+    icon: EducationIcon,
     label: "Education",
     roles: ["user", "acct", "audit", "h-admin", "s-admin"],
-  },
-  {
-    href: "/dashboard/account",
-    icon: <FaWallet />,
-    label: "Accounts",
-    roles: ["acct"],
-  },
-  {
-    href: "/dashboard/currency",
-    icon: <FaMoneyBillWave />,
-    label: "Currencies",
-    roles: ["acct"],
-  },
-  {
-    href: "/dashboard/category",
-    icon: <FaListAlt />,
-    label: "Categories",
-    roles: ["acct"],
-  },
-  {
-    href: "/dashboard/transaction",
-    icon: <FaClipboardCheck />,
-    label: "Transaction",
-    roles: ["acct", "audit", "admin"],
-  },
-  {
-    href: "/dashboard/audit",
-    icon: <FaClipboardCheck />,
-    label: "Audit",
-    roles: ["audit", "admin"],
-  },
-  {
-    href: "/dashboard",
-    icon: <FaMoneyCheck />,
-    label: "Gender desk",
-    roles: ["user", "acct", "audit", "admin"],
   },
 ];
 
@@ -206,7 +145,7 @@ const Sidebar: React.FC<SidebarProps> = ({
     // Replace with real auth lookup
     const user = sessionStorage.getItem("user");
     const parsedUser = JSON.parse(user ?? "{}");
-    console.log("role", parsedUser.role);
+    // console.log("role", parsedUser.role);
 
     setRole(parsedUser.role);
   }, []);
@@ -277,7 +216,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       <div
         aria-label="Sidebar"
         className={cn(
-          "fixed top-0 left-0 h-screen bg-[#06923E] text-white p-4 z-40 flex flex-col justify-between transition-all duration-300",
+          "fixed top-0 left-0 h-screen bg-white text-black p-4 z-40 flex flex-col justify-between transition-all duration-300",
           collapsed ? "w-20" : "w-64",
           mobileOpen ? "translate-x-0" : "-translate-x-full",
           "md:translate-x-0",
@@ -288,7 +227,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           <button
             aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
             onClick={() => setCollapsed(!collapsed)}
-            className="hidden md:flex items-center justify-center absolute top-4 right-[-16px] bg-[#06923E] border border-white rounded-full w-8 h-8 z-50 shadow"
+            className="hidden md:flex items-center justify-center absolute top-4 right-[-16px] text-white bg-[#06923E] border border-white rounded-full w-8 h-8 z-50 shadow"
           >
             {collapsed ? <FaChevronRight /> : <FaChevronLeft />}
           </button>
@@ -298,8 +237,8 @@ const Sidebar: React.FC<SidebarProps> = ({
             <Image
               src="/logo.png"
               alt="NGF Logo"
-              width={collapsed ? 50 : 180}
-              height={collapsed ? 50 : 60}
+              width={collapsed ? 70 : 180}
+              height={collapsed ? 70 : 60}
               priority
               className={cn(
                 "object-contain transition-all duration-300 h-auto",
@@ -316,10 +255,24 @@ const Sidebar: React.FC<SidebarProps> = ({
                   {/* Parent item */}
                   <button
                     onClick={() => toggleExpand(item.label)}
-                    className="w-full flex items-center justify-between p-2 rounded hover:bg-[#009B72]"
+                    className="w-full flex items-center justify-between p-2 rounded hover:bg-[#00A141] hover:text-white cursor-pointer "
                   >
                     <div className="flex items-center space-x-2">
-                      <span>{item.icon}</span>
+                      {typeof item.icon === "string" ? (
+                        <Image
+                          src={item.icon}
+                          alt={item.label}
+                          width={collapsed ? 20 : 24}
+                          height={collapsed ? 20 : 24}
+                          priority
+                          className={cn(
+                            "object-contain transition-all duration-300 h-auto text-black brightness-0 hover:invert ",
+                            collapsed ? "w-5" : "w-6",
+                          )}
+                        />
+                      ) : (
+                        <span>{item.icon as React.ReactNode}</span>
+                      )}
                       {!collapsed && <span>{item.label}</span>}
                     </div>
                     {!collapsed && (
@@ -341,12 +294,22 @@ const Sidebar: React.FC<SidebarProps> = ({
                           <Link
                             key={child.label}
                             href={child.href!}
-                            className={`p-2 rounded flex items-center space-x-2 hover:bg-[#009B72] ${
-                              isActive ? "bg-[#009B72] text-white" : ""
-                            }`}
+                            className={`p-2 rounded flex items-center space-x-2 hover:bg-[#00A141] hover:text-white ${isActive ? "bg-[#00A141] text-white" : ""
+                              }`}
                             onClick={closeMobile}
                           >
-                            <span>{child.icon}</span>
+                            {typeof child.icon === "string" ? (
+                              <Image
+                                src={child.icon}
+                                alt={child.label}
+                                width={20}
+                                height={20}
+                                priority
+                                className="object-contain transition-all duration-300 h-auto w-5"
+                              />
+                            ) : (
+                              <span>{child.icon as React.ReactNode}</span>
+                            )}
                             <span>{child.label}</span>
                           </Link>
                         );
@@ -361,14 +324,28 @@ const Sidebar: React.FC<SidebarProps> = ({
             const isActive = pathname === item.href;
             return (
               <Link
+                target="_blank"
                 key={item.label}
                 href={item.href!}
-                className={`p-2 rounded flex items-center space-x-2 hover:bg-[#009B72] ${
-                  isActive ? "bg-[#009B72] text-white" : ""
-                }`}
+                className={`p-2 rounded flex items-center space-x-2 hover:bg-[#009B72] hover:text-white ${isActive ? "bg-[#009B72] text-white" : ""
+                  }`}
                 onClick={closeMobile}
               >
-                <span>{item.icon}</span>
+                {typeof item.icon === "string" ? (
+                  <Image
+                    src={item.icon}
+                    alt={item.label}
+                    width={collapsed ? 20 : 24}
+                    height={collapsed ? 20 : 24}
+                    priority
+                    className={cn(
+                      "object-contain transition-all duration-300 h-auto",
+                      collapsed ? "w-5" : "w-6",
+                    )}
+                  />
+                ) : (
+                  <span>{item.icon as React.ReactNode}</span>
+                )}
                 {!collapsed && <span>{item.label}</span>}
               </Link>
             );
@@ -379,7 +356,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         <div className="mt-4 border-t border-white/30 pt-4">
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-2 px-2 py-2 rounded transition-colors duration-200 hover:bg-white/10 outline-none"
+            className="w-full flex items-center gap-2 px-2 py-2 rounded transition-colors duration-200 cursor-pointer hover:bg-[#00A141] hover:text-white outline-none"
             aria-label="Logout"
           >
             <FaSignOutAlt className="text-xl" />
