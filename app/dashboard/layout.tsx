@@ -104,7 +104,7 @@ export default function DashboardLayout({
         </div>
 
         {/* Main area */}
-        <div className="flex flex-col flex-1 transition-all duration-300 ease-in-out md:ml-[var(--sidebar-width)]">
+        <div className="flex bg-[#ecf1ec] flex-col flex-1 transition-all duration-300 ease-in-out md:ml-(--sidebar-width)">
           <TopbarFiltersProvider>
             <TopbarWithFilters
               collapsed={collapsed}

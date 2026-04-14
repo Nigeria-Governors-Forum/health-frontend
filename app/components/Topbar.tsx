@@ -263,8 +263,15 @@ const Topbar: React.FC<TopbarProps> = ({
 
         {/* RIGHT: User */}
         <div className="flex items-center gap-3">
-          <div className="bg-green-600 text-white text-lg px-3 py-1 rounded-full">
-            {selectedState || "Gombe"}
+
+          <div className="flex items-center gap-2 bg-green-600 text-white text-lg px-3 py-1 rounded-full">
+            <Image
+              src={'/svg/globe.svg'}
+              alt={selectedState}
+              width={24}
+              height={24}
+              className="object-contain invert brightness-0"
+            /> {selectedState || "Gombe"}
           </div>
 
           <div className="w-10 h-10 rounded-full bg-gray-300 overflow-hidden" />
@@ -279,6 +286,13 @@ const Topbar: React.FC<TopbarProps> = ({
 
           {/* State Pill */}
           <div className="flex items-center gap-2 bg-white border rounded-full px-3 py-1 text-xl shadow-sm">
+            <Image
+              src={'/svg/globe.svg'}
+              alt={selectedState}
+              width={24}
+              height={24}
+              className="object-contain"
+            />
             <span className="text-gray-600">{selectedState || "Gombe"}</span>
           </div>
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { FaMapMarked, FaMoneyCheck, FaPersonBooth } from "react-icons/fa";
+import { FaGlobe, FaMapMarked, FaMoneyCheck, FaPersonBooth } from "react-icons/fa";
 import DonutChart from "../components/DonoughtChart";
 import MultiLineChart from "../components/LineChart";
 import { useEffect, useState } from "react";
@@ -257,45 +257,69 @@ export default function DashboardHome() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <DemographyCard
             title="State Population"
-            subtitle={formatNumber(stateData?.total_population || "N/A") as any}
-            icon={<FaPersonBooth size={24} color="#16a34a" />}
+            value={formatNumber(stateData?.total_population || "N/A") as any}
+            icon={<FaGlobe size={24} color="#16a34a" />}
+            percentage="100%"
+            trend="up"
+            comparisonText="vs last year"
           />
           <DemographyCard
             title="Land mass"
-            subtitle={formatNumber(stateData?.land_mass || "N/A") as any}
+            value={formatNumber(stateData?.land_mass || "N/A") as any}
             icon={<FaMapMarked size={24} color="#16a34a" />}
+            percentage="100%"
+            trend="up"
+            comparisonText="vs last year"
           />
           <DemographyCard
             title="Political wards"
-            subtitle={formatNumber(stateData?.political_wards || "N/A") as any}
+            value={formatNumber(stateData?.political_wards || "N/A") as any}
             icon={<FaMapMarked size={24} color="#16a34a" />}
+            percentage="100%"
+            trend="up"
+            comparisonText="vs last year"
           />
           <DemographyCard
             title="Health Facility"
-            subtitle={
+            value={
               formatNumber(stateData?.health_facilities || "N/A") as any
             }
             icon={<FaMapMarked size={24} color="#16a34a" />}
+            percentage="100%"
+            trend="down"
+            comparisonText="vs last year"
           />
           <DemographyCard
             title="Health workers"
-            subtitle={formatNumber(stateData?.hRH_Professions || "N/A")}
+            value={formatNumber(stateData?.hRH_Professions || "N/A")}
             icon={<FaMapMarked size={24} color="#16a34a" />}
+            percentage="100%"
+            trend="up"
+            comparisonText="vs last year"
           />
           <DemographyCard
             title="Health Training Institutions"
-            subtitle={formatNumber(stateData?.hRH || "N/A")}
+            value={formatNumber(stateData?.hRH || "N/A")}
             icon={<FaMapMarked size={24} color="#16a34a" />}
+            percentage="100%"
+            trend="up"
+            comparisonText="vs last year"
           />
           <DemographyCard
             title="LGAs"
-            subtitle={formatNumber(stateData?.no_of_lgas || "N/A")}
+            value={formatNumber(stateData?.no_of_lgas || "N/A")}
             icon={<FaMapMarked size={24} color="#16a34a" />}
+            percentage="100%"
+            trend="up"
+            comparisonText="vs last year"
           />
           <DemographyCard
             title="Health Allocation"
-            subtitle={formatNumber(stateData?.partners_mapping || "N/A")}
+            value={formatNumber(stateData?.partners_mapping || "N/A")}
             icon={<FaMoneyCheck size={24} color="#16a34a" />}
+            percentage="100%"
+            trend="up"
+            comparisonText="vs last year"
           />
           {/* <DemographyCard
             title="Partners mapping"

@@ -166,7 +166,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
     //   {loading && <LoadingScreen fullscreen={fullscreen} text="Please wait..." />}
     // </>
 
-    <div className="min-h-screen flex items-center justify-center bg-[#f0faf0]">
+    <div className="min-h-screen flex items-center justify-center bg-[#ffffff]">
       <div className="w-full bg-[#002810] overflow-hidden shadow-xl grid grid-cols-1 md:grid-cols-2 relative min-h-[600px] md:min-h-[900px]">
 
         {/* LEFT SECTION (Background on mobile) */}
