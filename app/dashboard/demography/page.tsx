@@ -60,58 +60,59 @@ const DemographyPage = () => {
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
           <DemographyCard
             title="Year Created"
-            subtitle={stateData?.year_created || "N/A"}
+            value={stateData?.year_created || "N/A"}
             icon={<FaRegCalendar size={24} color="#16a34a" />}
+
           />
           <DemographyCard
             title="Land Mass"
-            subtitle={formatNumber(Number(stateData?.land_mass)) || "N/A"}
+            value={formatNumber(Number(stateData?.land_mass)) || "N/A"}
             icon={<FaLandmark size={24} color="#16a34a" />}
           />
           <DemographyCard
             title="LGAs"
-            subtitle={formatNumber(Number(stateData?.no_of_lgas)) || "N/A"}
+            value={formatNumber(Number(stateData?.no_of_lgas)) || "N/A"}
             icon={<FaLandmark size={24} color="#16a34a" />}
           />
           <DemographyCard
             title="Political Wards"
-            subtitle={formatNumber(Number(stateData?.political_wards)) || "N/A"}
+            value={formatNumber(Number(stateData?.political_wards)) || "N/A"}
             icon={<FaLandmark size={24} color="#16a34a" />}
           />
           <DemographyCard
             title="Health Facilities"
-            subtitle={
+            value={
               formatNumber(Number(stateData?.health_facilities)) || "N/A"
             }
             icon={<FaRegHospital size={24} color="#16a34a" />}
           />
           <DemographyCard
             title="Total Population"
-            subtitle={
+            value={
               formatNumber(Number(stateData?.total_population)) || "N/A"
             }
             icon={<FaUsers size={24} color="#16a34a" />}
           />
           <DemographyCard
             title="Under 1 Population"
-            subtitle={formatNumber(Number(stateData?.under_1)) || "N/A"}
+            value={formatNumber(Number(stateData?.under_1)) || "N/A"}
             icon={<FaUsersCog size={24} color="#16a34a" />}
           />
           <DemographyCard
             title="Under 5 Population"
-            subtitle={formatNumber(Number(stateData?.under_5)) || "N/A"}
+            value={formatNumber(Number(stateData?.under_5)) || "N/A"}
             icon={<FaUsers size={24} color="#16a34a" />}
           />
 
           <DemographyCard
             title="Women of Child Bearing Age"
             icon={<FaUserNurse size={24} color="#16a34a" />}
-            subtitle={formatNumber(Number(stateData?.wcba)) || "N/A"}
+            value={formatNumber(Number(stateData?.wcba)) || "N/A"}
           />
 
           <DemographyCard
             title="Pregnant Women"
-            subtitle={formatNumber(Number(stateData?.pregnant_women)) || "N/A"}
+            value={formatNumber(Number(stateData?.pregnant_women)) || "N/A"}
             icon={<FaChild size={24} color="#16a34a" />}
           />
         </div>

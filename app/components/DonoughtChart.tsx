@@ -19,7 +19,7 @@ export default function DonutChart({
     <div className="bg-white shadow-md rounded-xl p-6 text-center text-black">
       <h2 className="text-lg font-semibold text-green-700 mb-4">{title}</h2>
 
-      <PieChart width={250} height={250}>
+      <PieChart width={250} height={250} >
         <Pie
           data={data}
           innerRadius={innerRadius}

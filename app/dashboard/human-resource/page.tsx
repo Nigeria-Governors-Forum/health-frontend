@@ -68,12 +68,12 @@ const HumanResource = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <DemographyCard
             title="Total Health Workforce"
-            subtitle={formatNumber(Number(stateData?.hRH_Professions)) || "N/A"}
+            value={formatNumber(Number(stateData?.hRH_Professions)) || "N/A"}
             icon={<FaUsers size={24} color="#16a34a" />}
           />
           <DemographyCard
             title="Total Health Training Institutions"
-            subtitle={formatNumber(Number(stateData?.hRH)) || "N/A"}
+            value={formatNumber(Number(stateData?.hRH)) || "N/A"}
             icon={<FaHospitalUser size={24} color="#16a34a" />}
           />
           <HealthCard
