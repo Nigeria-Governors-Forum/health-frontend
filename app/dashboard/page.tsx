@@ -11,6 +11,8 @@ import DemographyCard from "../components/DemographyCard";
 import LoadingScreen from "../components/LoadingScreen";
 import MapView from "../components/MapWrapper";
 import { useTopbarFilters } from "../context/TopbarFiltersContext";
+import Test from "../components/Test";
+import { NigeriaMap } from "@some19ice/nigeria-geo-viz/react";
 
 export const formatNumber = (num: number): string => {
   return num.toLocaleString("en-US");
@@ -19,7 +21,8 @@ export const formatNumber = (num: number): string => {
 export default function DashboardHome() {
   const [loading, setLoading] = useState(false);
   const { selectedState, selectedYear } = useTopbarFilters();
-  // console.log('selected state', selectedState);
+  console.log('selected state', selectedState);
+
 
   const [stateData, setStateData] = useState<any>();
 
@@ -323,29 +326,43 @@ export default function DashboardHome() {
           />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <DonutChart title="Health Insurance Coverage" data={chartData} />
           <MultiLineChart
             title="Maternal & Child Health Trends"
             data={data}
             lines={lines}
           />
-          <MapView
-            mapClassName={`h-96 w-full rounded-xl shadow`}
-            showCard={true}
-            total={stateData?.demography_LGA.length || "N/A"}
-            h2r={stateData?.totalHardToReach || "N/A"}
+
+          <NigeriaMap
+            width={800}
+            height={600}
+            onStateClick={(stateId) => console.log('Clicked:', stateId)}
+            choroplethData={{
+              [selectedState.toLowerCase()]: 100,
+            }}
+            // theme={{
+            //   backgroundColor: '#F0FDF4',   // very light green background
+            //   defaultFill: '#D1FAE5',       // soft green (states default)
+            //   strokeColor: '#065F46',       // deep green borders
+            //   hoverFill: '#10B981',         // emerald hover
+            //   selectedFill: '#047857',      // darker green when selected
+            //   labelColor: '#064E3B',        // dark readable text
+            // }}
+            theme={{
+              backgroundColor: '#F8FAFC',
+              defaultFill: '#DCFCE7',
+              strokeColor: '#166534',
+              hoverFill: '#22C55E',
+              selectedFill: '#15803D',
+              labelColor: '#14532D',
+            }}
+
           />
 
-          {/* <MapView
-            mapClassName={`h-96 w-full rounded-xl shadow`}
-            showCard={true}
-            geojson={mapGeo}
-            total={stateData?.demography_LGA?.length}
-            h2r={stateData?.total_Hard_To_Reach}
-          /> */}
+          {/* <Test /> */}
         </div>
-        <NominatimMap highlightQuery={selectedState} />
+        {/* <NominatimMap highlightQuery={selectedState} /> */}
       </div>
     </>
   );

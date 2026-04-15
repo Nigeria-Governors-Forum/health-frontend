@@ -9,6 +9,8 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@some19ice/nigeria-geo-core": "^0.1.4",
+    "@some19ice/nigeria-geo-viz": "^0.1.4",
     "leaflet": "^1.9.4",
     "naija-state-local-government": "^1.1.2",
     "next": "16.1.2",
