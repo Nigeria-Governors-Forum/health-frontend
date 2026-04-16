@@ -249,9 +249,9 @@ export default function DashboardHome() {
   ];
 
   const lines = [
-    { key: "anc", name: "4th ANC", color: "#1D9BF0" }, // blue
-    { key: "stunting", name: "Stunting", color: "#1E3A8A" }, // dark blue
-    { key: "zeroDose", name: "Zero Dose", color: "#F97316" }, // orange
+    { key: "anc", name: "4th ANC", color: "#155DFC" },
+    { key: "stunting", name: "Stunting", color: "#F98600" },
+    { key: "zeroDose", name: "Zero Dose", color: "#7600CD" },
   ];
 
   const earth = "/svg/earth.svg";
@@ -412,6 +412,13 @@ export default function DashboardHome() {
           />
 
           {/* <Test /> */}
+        </div>
+        <div className="flex justify-center">
+
+          <button onClick={() => console.log(mapGeo)}
+            className="text-[#00A141] px-8 py-2 border border-[#00A141] text-lg font-semibold rounded-full cursor-pointer">
+            View Zonal/National Comparison
+          </button>
         </div>
         {/* <NominatimMap highlightQuery={selectedState} /> */}
       </div>
