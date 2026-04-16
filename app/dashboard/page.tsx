@@ -1,19 +1,17 @@
 "use client";
 
-import { FaGlobe, FaMapMarked, FaMoneyCheck, FaPersonBooth } from "react-icons/fa";
 import DonutChart from "../components/DonoughtChart";
 import MultiLineChart from "../components/LineChart";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import NominatimMap from "../components/NominaWrapper";
 import { Endpoints, httpClient } from "../api-client/src";
 import DemographyCard from "../components/DemographyCard";
 import LoadingScreen from "../components/LoadingScreen";
-import MapView from "../components/MapWrapper";
 import { useTopbarFilters } from "../context/TopbarFiltersContext";
 import Test from "../components/Test";
 import { NigeriaMap } from "@some19ice/nigeria-geo-viz/react";
 import Image from "next/image";
+import ToggleSwitch from "../components/ToggleSwitch";
 
 export const formatNumber = (num: number): string => {
   return num.toLocaleString("en-US");
@@ -24,149 +22,8 @@ export default function DashboardHome() {
   const { selectedState, selectedYear } = useTopbarFilters();
   console.log('selected state', selectedState);
 
-
   const [stateData, setStateData] = useState<any>();
 
-  const [rawTopoOrGeo, setRawTopoOrGeo] = useState<any>(null);
-  const [mapGeo, setMapGeo] = useState<any>(null);
-
-  const stateAlias: Record<string, string> = {
-    fct: "federalcapitalterritory",
-    federalcapitalterritory: "federalcapitalterritory",
-    adamawa: "adamawa",
-    abia: "abia",
-    lagos: "lagos",
-    // Add more if your shapefile uses "xyz state"
-  };
-
-  const normalize = (s?: string) =>
-    (s ?? "")
-      .toString()
-      .toLowerCase()
-      .replace(/[^a-z0-9]/g, "");
-
-  useEffect(() => {
-    const loadShape = async () => {
-      try {
-        const res = await fetch("/Nigeria_shapefile.json"); // put file in /public
-        const json = await res.json();
-
-        if (json?.features?.length) {
-          console.log(
-            "🔎 Example feature properties:",
-            json.features[0].properties
-          );
-        }
-        // if Topology, convert to GeoJSON (take the first object)
-        if (json?.type === "Topology") {
-          // @ts-ignore
-          const topojson = await import("topojson-client");
-          const objName = Object.keys(json.objects)[0];
-          const geo = (topojson as any).feature(json, json.objects[objName]);
-          setRawTopoOrGeo(geo);
-        } else {
-          setRawTopoOrGeo(json);
-        }
-      } catch (err) {
-        console.error("Could not load shapefile:", err);
-      }
-    };
-
-    loadShape();
-  }, []);
-
-  useEffect(() => {
-    if (!rawTopoOrGeo || !stateData || !selectedState) return;
-
-    // 🔹 Normalize helper
-    const normalize = (s?: string) =>
-      (s ?? "")
-        .toString()
-        .toLowerCase()
-        .replace(/[^a-z0-9]/g, "");
-
-    // 🔹 Handle alias
-    const stateAlias: Record<string, string> = {
-      fct: "federalcapitalterritory",
-      federalcapitalterritory: "federalcapitalterritory",
-      // add more if you see mismatches
-    };
-
-    const rawNorm = normalize(
-      selectedState === "Federal Capital Territory" ? "FCT" : selectedState
-    );
-    const stateNorm = stateAlias[rawNorm] || rawNorm;
-
-    // console.log("🟢 Selected state (raw):", selectedState);
-    // console.log("🟢 After normalize:", rawNorm);
-    // console.log("🟢 After alias:", stateNorm);
-
-    // 🔹 Debug shapefile states
-    if (rawTopoOrGeo?.features?.length) {
-      const uniqueStates = [
-        ...new Set(rawTopoOrGeo.features.map((f: any) => f.properties?.NAME_1)),
-      ];
-      // console.log("📍 All shapefile states (NAME_1):", uniqueStates);
-    }
-
-    // 🔹 Build LGA lookup from API
-    const dem = stateData.demography_LGA ?? [];
-    const lgaLookup = dem.reduce((acc: Record<string, any>, item: any) => {
-      const key = normalize(item.lga);
-      acc[key] = {
-        population: item.lga_population,
-        hardToReach: item.hard_to_reach_lgas === "Yes",
-        name: item.lga,
-      };
-      return acc;
-    }, {});
-
-    // 🔹 Filter shapefile features for this state
-    const stateFeatures = (rawTopoOrGeo.features || []).filter((f: any) => {
-      let nameProp = f.properties?.NAME_1 ?? f.properties?.state ?? "";
-      const cleaned = nameProp.replace(/state$/i, "");
-      const nameNorm = normalize(cleaned);
-
-      const isMatch =
-        nameNorm.includes(stateNorm) || stateNorm.includes(nameNorm);
-
-      if (isMatch) {
-        // console.log(`✅ MATCHED shapefile state:`, nameProp, "→", nameNorm);
-      } else {
-        // console.log(`❌ NOT matched:`, nameProp, "→", nameNorm);
-      }
-
-      return isMatch;
-    });
-
-    // console.log("✅ Total matched features:", stateFeatures.length);
-
-    // 🔹 Enrich with population + status
-    const enrichedFeatures = stateFeatures.map((f: any) => {
-      const lgaProp =
-        f.properties?.NAME_2 ?? f.properties?.LGA ?? f.properties?.NAME ?? "";
-      const key = normalize(lgaProp);
-      const info = lgaLookup[key];
-
-      if (!info) {
-        // console.log(`⚠️ No LGA data match for:`, lgaProp, "→", key);
-      }
-
-      return {
-        ...f,
-        properties: {
-          ...f.properties,
-          status: info ? (info.hardToReach ? "bad" : "good") : "unknown",
-          population: info?.population ?? null,
-          lga: info?.name ?? lgaProp,
-        },
-      };
-    });
-
-    // console.log("✨ Enriched features:", enrichedFeatures.length);
-
-    setMapGeo({ type: "FeatureCollection", features: enrichedFeatures });
-  }, [rawTopoOrGeo, stateData, selectedState]);
 
   const fetchData = async () => {
     if (!selectedState || !selectedYear) return;
@@ -262,6 +119,12 @@ export default function DashboardHome() {
   const healthTraining = "/svg/healthTraining.svg";
   const lga = "/svg/lga.svg";
   const healthAllocation = "/svg/healthAllocation.svg";
+  const info = "/svg/info.svg";
+
+  const onToggle = () => {
+    console.log("toggled");
+  };
+
 
   return (
 
@@ -385,37 +248,59 @@ export default function DashboardHome() {
             lines={lines}
           />
 
-          <NigeriaMap
-            width={800}
-            height={600}
-            onStateClick={(stateId) => console.log('Clicked:', stateId)}
-            choroplethData={{
-              [selectedState.toLowerCase()]: 100,
-            }}
-            // theme={{
-            //   backgroundColor: '#F0FDF4',   // very light green background
-            //   defaultFill: '#D1FAE5',       // soft green (states default)
-            //   strokeColor: '#065F46',       // deep green borders
-            //   hoverFill: '#10B981',         // emerald hover
-            //   selectedFill: '#047857',      // darker green when selected
-            //   labelColor: '#064E3B',        // dark readable text
-            // }}
-            theme={{
-              backgroundColor: '#F8FAFC',
-              defaultFill: '#DCFCE7',
-              strokeColor: '#166534',
-              hoverFill: '#22C55E',
-              selectedFill: '#15803D',
-              labelColor: '#14532D',
-            }}
-
-          />
+          <div className="space-y-2">
+            <p className="text-lg font-semibold text-center text-[#07923F] mb-1 flex items-center justify-center gap-2">Population By Accessibility
+              <Image
+                src={info}
+                alt="Health Facilities"
+                width={24}
+                height={24}
+              />
+            </p>
+            <div className="bg-white rounded-xl shadow-md p-4 w-auto mb-4">
+              <div className="flex justify-between">
+                <h2 className="text-lg font-semibold text-[#07923F] mb-3 text-center flex items-center gap-2">
+                  Population By Accessibility
+                  <Image
+                    src={info}
+                    alt="Health Facilities"
+                    width={24}
+                    height={24}
+                  />
+                </h2>
+                <ToggleSwitch initial={true} onToggle={() => onToggle} />
+              </div>
+              <div className="flex justify-between text-sm gap-4 text-gray-700">
+                <span className="text-blue-600 font-medium">Total: {stateData?.no_of_lgas || "N/A"}</span>
+                <span className="text-green-600 font-medium">Safe: {stateData?.no_of_lgas - stateData?.total_Hard_To_Reach || "N/A"}</span>
+                <span className="text-red-600 font-medium">
+                  Hard to reach: {stateData?.total_Hard_To_Reach || "N/A"}
+                </span>
+              </div>
+            </div>
+            <NigeriaMap
+              width={700}
+              height={600}
+              onStateClick={(stateId) => console.log('Clicked:', stateId)}
+              choroplethData={{
+                [selectedState.toLowerCase()]: 100,
+              }}
+              theme={{
+                backgroundColor: '#F8FAFC',
+                defaultFill: '#DCFCE7',
+                strokeColor: '#166534',
+                hoverFill: '#22C55E',
+                selectedFill: '#15803D',
+                labelColor: '#14532D',
+              }}
+            />
+          </div>
 
           {/* <Test /> */}
         </div>
         <div className="flex justify-center">
 
-          <button onClick={() => console.log(mapGeo)}
+          <button onClick={() => console.log("hello")}
             className="text-[#00A141] px-8 py-2 border border-[#00A141] text-lg font-semibold rounded-full cursor-pointer">
             View Zonal/National Comparison
           </button>

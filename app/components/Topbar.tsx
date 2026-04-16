@@ -248,97 +248,189 @@ const Topbar: React.FC<TopbarProps> = ({
     // </>
 
 
-    <div className="w-full bg-[#F5F7FA] border-b px-4 py-3">
+    // <div className="w-full bg-[#F5F7FA] border-b px-4 py-3">
+    //   {/* Top Row */}
+    //   <div className="flex items-center justify-between flex-wrap gap-3">
 
-      {/* Top Row */}
-      <div className="flex items-center justify-between flex-wrap gap-3">
+    //     {/* LEFT: Title + Date */}
+    //     <div>
+    //       <h1 className="text-xl font-bold text-[#333] px-4 py-2">
+    //         {pathname === "/dashboard" ? "Dashboard" : topBarTitle}
+    //       </h1>
+    //       <p className="text-lg text-black px-4 py-2">{currentDate}</p>
+    //     </div>
 
-        {/* LEFT: Title + Date */}
+    //     {/* RIGHT: User */}
+    //     <div className="flex items-center gap-3">
+
+    //       <div className="flex items-center gap-2 bg-green-600 text-white text-lg px-3 py-1 rounded-full">
+    //         <Image
+    //           src={'/svg/globe.svg'}
+    //           alt={selectedState}
+    //           width={24}
+    //           height={24}
+    //           className="object-contain invert brightness-0"
+    //         /> {selectedState || "Gombe"}
+    //       </div>
+
+    //       <div className="w-10 h-10 rounded-full bg-gray-300 overflow-hidden" />
+    //     </div>
+    //   </div>
+
+    //   <div className="flex items-center justify-between flex-wrap gap-3">
+    //     <p className="text-black">Health Facilities</p>
+    //     <p className="text-black">Health Facilities</p>
+    //   </div>
+
+    //   {/* Bottom Row */}
+    //   <div className="flex items-center justify-between mt-3 flex-wrap gap-3 pb-4">
+
+    //     {/* LEFT FILTERS */}
+    //     <div className="flex items-center gap-2">
+
+    //       {/* State Pill */}
+    //       <div className="flex items-center gap-2 bg-white border rounded-full px-3 py-1 text-xl shadow-sm">
+    //         <Image
+    //           src={'/svg/globe.svg'}
+    //           alt={selectedState}
+    //           width={24}
+    //           height={24}
+    //           className="object-contain"
+    //         />
+    //         <span className="text-gray-600">{selectedState || "Gombe"}</span>
+    //       </div>
+
+    //       {/* Filter Button */}
+    //       <select
+    //         value={selectedState}
+    //         onChange={(e) => {
+    //           const value = e.target.value;
+    //           setSelectedState(value);
+    //           onStateChange?.(value);
+    //         }}
+    //         className="bg-[#333333] text-white text-lg px-3 py-2 rounded-full cursor-pointer"
+    //       >
+    //         <option value="">Filter By State</option>
+    //         {state.map((item) => (
+    //           <option key={item} value={item}>
+    //             {item}
+    //           </option>
+    //         ))}
+    //       </select>
+    //     </div>
+
+    //     {/* RIGHT FILTERS */}
+    //     <div className="flex items-center gap-2">
+
+    //       {/* Year Pill */}
+    //       <div className="flex items-center gap-2 bg-white border rounded-full px-3 py-1 text-lg shadow-sm">
+    //         <span className="text-gray-600">{selectedYear}</span>
+    //       </div>
+
+    //       {/* Filter Button */}
+    //       <select
+    //         value={selectedYear}
+    //         onChange={(e) => {
+    //           const value = Number(e.target.value);
+    //           setSelectedYear(value);
+    //           onYearChange?.(value);
+    //         }}
+    //         className="bg-[#333333] text-white text-lg px-3 py-2 rounded-full cursor-pointer"
+    //       >
+    //         {years.map((year) => (
+    //           <option key={year} value={year}>
+    //             {year}
+    //           </option>
+    //         ))}
+    //       </select>
+    //     </div>
+    //   </div>
+    // </div>
+
+
+    <div className="w-full bg-[#F5F7FA] border-b px-4 py-4">
+
+      {/* GRID CONTAINER */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+
+        {/* COLUMN 1 — Title + Date */}
         <div>
-          <h1 className="text-xl font-bold text-[#333] px-4 py-2">
-            {pathname === "/dashboard" ? "Dashboard" : topBarTitle}
-          </h1>
-          <p className="text-lg text-black px-4 py-2">{currentDate}</p>
+          <div className="flex gap-2 flex-wrap justify-start">
+
+            {/* State */}
+            <select
+              value={selectedState}
+              onChange={(e) => {
+                const value = e.target.value;
+                setSelectedState(value);
+                onStateChange?.(value);
+              }}
+              className="bg-[#dadcde] text-black border border-[#dadcde] text-sm px-3 py-2 rounded-full cursor-pointer"
+            >
+              <option value="">Filter By State</option>
+              {state.map((item) => (
+                <option key={item} value={item}>
+                  {item}
+                </option>
+              ))}
+            </select>
+
+            {/* Year */}
+            <select
+              value={selectedYear}
+              onChange={(e) => {
+                const value = Number(e.target.value);
+                setSelectedYear(value);
+                onYearChange?.(value);
+              }}
+              className="bg-[#dadcde] text-black border border-[#dadcde] text-sm px-3 py-2 rounded-full cursor-pointer"
+            >
+              {years.map((year) => (
+                <option key={year} value={year}>
+                  {year}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
-        {/* RIGHT: User */}
-        <div className="flex items-center gap-3">
+        {/* COLUMN 2 — CENTER INFO */}
+        <div className="flex flex-col items-center justify-center text-center">
+          <p className="text-black font-bold text-xl">Welcome to  {selectedState} State {topBarTitle}</p>
+          <p className="text-lg text-black">{currentDate}</p>
 
-          <div className="flex items-center gap-2 bg-green-600 text-white text-lg px-3 py-1 rounded-full">
-            <Image
-              src={'/svg/globe.svg'}
-              alt={selectedState}
-              width={24}
-              height={24}
-              className="object-contain invert brightness-0"
-            /> {selectedState || "Gombe"}
-          </div>
-
-          <div className="w-10 h-10 rounded-full bg-gray-300 overflow-hidden" />
-        </div>
-      </div>
-
-      {/* Bottom Row */}
-      <div className="flex items-center justify-between mt-3 flex-wrap gap-3 pb-4">
-
-        {/* LEFT FILTERS */}
-        <div className="flex items-center gap-2">
-
-          {/* State Pill */}
-          <div className="flex items-center gap-2 bg-white border rounded-full px-3 py-1 text-xl shadow-sm">
-            <Image
-              src={'/svg/globe.svg'}
-              alt={selectedState}
-              width={24}
-              height={24}
-              className="object-contain"
-            />
-            <span className="text-gray-600">{selectedState || "Gombe"}</span>
-          </div>
-
-          {/* Filter Button */}
-          <select
-            value={selectedState}
-            onChange={(e) => {
-              const value = e.target.value;
-              setSelectedState(value);
-              onStateChange?.(value);
-            }}
-            className="bg-[#333333] text-white text-lg px-3 py-2 rounded-full cursor-pointer"
-          >
-            <option value="">Filter By State</option>
-            {state.map((item) => (
-              <option key={item} value={item}>
-                {item}
-              </option>
-            ))}
-          </select>
         </div>
 
-        {/* RIGHT FILTERS */}
-        <div className="flex items-center gap-2">
+        {/* COLUMN 3 — User + Filters */}
+        <div className="flex flex-col items-end gap-3">
 
-          {/* Year Pill */}
-          <div className="flex items-center gap-2 bg-white border rounded-full px-3 py-1 text-lg shadow-sm">
-            <span className="text-gray-600">{selectedYear}</span>
+          {/* User */}
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 bg-green-600 text-white text-sm px-3 py-1 rounded-full">
+              <Image
+                src={'/svg/globe.svg'}
+                alt={selectedState}
+                width={20}
+                height={20}
+                className="object-contain invert brightness-0"
+              />
+              {selectedState || "Gombe"}
+            </div>
+
+            {StateLogo && (
+              <div className="w-12 h-12 relative bg-gray-300 rounded-2xl my-4">
+                <Image
+                  src={(StateLogo as any).src ?? StateLogo}
+                  alt={selectedState}
+                  fill
+                  className="object-contain"
+                />
+              </div>
+            )}
           </div>
 
-          {/* Filter Button */}
-          <select
-            value={selectedYear}
-            onChange={(e) => {
-              const value = Number(e.target.value);
-              setSelectedYear(value);
-              onYearChange?.(value);
-            }}
-            className="bg-[#333333] text-white text-lg px-3 py-2 rounded-full cursor-pointer"
-          >
-            {years.map((year) => (
-              <option key={year} value={year}>
-                {year}
-              </option>
-            ))}
-          </select>
+          {/* Filters */}
+
         </div>
       </div>
     </div>
