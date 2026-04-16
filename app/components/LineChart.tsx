@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import {
   LineChart,
   Line,
@@ -18,10 +19,18 @@ type LineChartProps = {
   lines: { key: string; name: string; color: string }[];
 };
 
-export default function MultiLineChart({ title, data, lines }: LineChartProps) {  
+export default function MultiLineChart({ title, data, lines }: LineChartProps) {
+  const Info = "/svg/info.svg";
   return (
     <div className="bg-white shadow-md rounded-xl p-6 w-full">
-      <h2 className="text-lg font-semibold text-gray-800 mb-4">{title}</h2>
+      <h2 className="text-lg font-semibold text-[#07923F] mb-4 flex items-center gap-2">{title}
+        <Image
+          src={Info}
+          alt="Info"
+          width={20}
+          height={20}
+        />
+      </h2>
 
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={data} margin={{ top: 20, right: 40, left: 0, bottom: 20 }}>

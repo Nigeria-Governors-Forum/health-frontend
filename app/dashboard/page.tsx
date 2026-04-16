@@ -13,6 +13,7 @@ import MapView from "../components/MapWrapper";
 import { useTopbarFilters } from "../context/TopbarFiltersContext";
 import Test from "../components/Test";
 import { NigeriaMap } from "@some19ice/nigeria-geo-viz/react";
+import Image from "next/image";
 
 export const formatNumber = (num: number): string => {
   return num.toLocaleString("en-US");
@@ -200,12 +201,12 @@ export default function DashboardHome() {
   }, [selectedState, selectedYear]);
 
   const chartData = [
-    { name: "Covered", value: stateData?.insurance_coverage, color: "#008000" }, // green
+    { name: "Covered", value: stateData?.insurance_coverage, color: "#114ACA" },
     {
       name: "Uncovered",
       value: 100 - (stateData?.insurance_coverage || 0),
-      color: "#FF3B30",
-    }, // red
+      color: "#BE123C",
+    },
   ];
 
   const data = [
@@ -253,7 +254,17 @@ export default function DashboardHome() {
     { key: "zeroDose", name: "Zero Dose", color: "#F97316" }, // orange
   ];
 
+  const earth = "/svg/earth.svg";
+  const land = "/svg/land.svg";
+  const politics = "/svg/politics.svg";
+  const healthFacilities = "/svg/healthFacilities.svg";
+  const healthWorkers = "/svg/healthWorkers.svg";
+  const healthTraining = "/svg/healthTraining.svg";
+  const lga = "/svg/lga.svg";
+  const healthAllocation = "/svg/healthAllocation.svg";
+
   return (
+
     <>
       {loading && <LoadingScreen text="Please wait..." />}
       <div className="space-y-8 min-h-screen">
@@ -261,7 +272,12 @@ export default function DashboardHome() {
           <DemographyCard
             title="State Population"
             value={formatNumber(stateData?.total_population || "N/A") as any}
-            icon={<FaGlobe size={24} color="#16a34a" />}
+            icon={<Image
+              src={earth}
+              alt="Earth"
+              width={24}
+              height={24}
+            />}
             percentage="100%"
             trend="up"
             comparisonText="vs last year"
@@ -269,7 +285,12 @@ export default function DashboardHome() {
           <DemographyCard
             title="Land mass"
             value={formatNumber(stateData?.land_mass || "N/A") as any}
-            icon={<FaMapMarked size={24} color="#16a34a" />}
+            icon={<Image
+              src={land}
+              alt="Land"
+              width={24}
+              height={24}
+            />}
             percentage="100%"
             trend="up"
             comparisonText="vs last year"
@@ -277,7 +298,12 @@ export default function DashboardHome() {
           <DemographyCard
             title="Political wards"
             value={formatNumber(stateData?.political_wards || "N/A") as any}
-            icon={<FaMapMarked size={24} color="#16a34a" />}
+            icon={<Image
+              src={politics}
+              alt="Politics"
+              width={24}
+              height={24}
+            />}
             percentage="100%"
             trend="up"
             comparisonText="vs last year"
@@ -287,7 +313,12 @@ export default function DashboardHome() {
             value={
               formatNumber(stateData?.health_facilities || "N/A") as any
             }
-            icon={<FaMapMarked size={24} color="#16a34a" />}
+            icon={<Image
+              src={healthFacilities}
+              alt="Health Facilities"
+              width={24}
+              height={24}
+            />}
             percentage="100%"
             trend="down"
             comparisonText="vs last year"
@@ -295,7 +326,12 @@ export default function DashboardHome() {
           <DemographyCard
             title="Health workers"
             value={formatNumber(stateData?.hRH_Professions || "N/A")}
-            icon={<FaMapMarked size={24} color="#16a34a" />}
+            icon={<Image
+              src={healthWorkers}
+              alt="Health Workers"
+              width={24}
+              height={24}
+            />}
             percentage="100%"
             trend="up"
             comparisonText="vs last year"
@@ -303,7 +339,12 @@ export default function DashboardHome() {
           <DemographyCard
             title="Health Training Institutions"
             value={formatNumber(stateData?.hRH || "N/A")}
-            icon={<FaMapMarked size={24} color="#16a34a" />}
+            icon={<Image
+              src={healthTraining}
+              alt="Health Training"
+              width={24}
+              height={24}
+            />}
             percentage="100%"
             trend="up"
             comparisonText="vs last year"
@@ -311,7 +352,12 @@ export default function DashboardHome() {
           <DemographyCard
             title="LGAs"
             value={formatNumber(stateData?.no_of_lgas || "N/A")}
-            icon={<FaMapMarked size={24} color="#16a34a" />}
+            icon={<Image
+              src={lga}
+              alt="LGA"
+              width={24}
+              height={24}
+            />}
             percentage="100%"
             trend="up"
             comparisonText="vs last year"
@@ -319,7 +365,12 @@ export default function DashboardHome() {
           <DemographyCard
             title="Health Allocation"
             value={formatNumber(stateData?.partners_mapping || "N/A")}
-            icon={<FaMoneyCheck size={24} color="#16a34a" />}
+            icon={<Image
+              src={healthAllocation}
+              alt="Health Allocation"
+              width={24}
+              height={24}
+            />}
             percentage="100%"
             trend="up"
             comparisonText="vs last year"

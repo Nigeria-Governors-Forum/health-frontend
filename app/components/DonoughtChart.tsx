@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { PieChart, Pie, Cell, Tooltip } from "recharts";
 
 type DonutChartProps = {
@@ -12,12 +13,20 @@ type DonutChartProps = {
 export default function DonutChart({
   title,
   data,
-  innerRadius = 80,
+  innerRadius = 70,
   outerRadius = 100,
 }: DonutChartProps) {
+  const Info = "/svg/info.svg";
   return (
-    <div className="bg-white shadow-md rounded-xl p-6 text-center text-black">
-      <h2 className="text-lg font-semibold text-green-700 mb-4">{title}</h2>
+    <div className="bg-white shadow-md rounded-xl p-6 text-black border-2 border-[#D6D6D6]">
+      <h2 className="text-lg font-semibold text-green-700 mb-4 flex items-center gap-2"> {title}
+        <Image
+          src={Info}
+          alt="Info"
+          width={20}
+          height={20}
+        />
+      </h2>
 
       <PieChart width={250} height={250} >
         <Pie

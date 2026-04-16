@@ -37,6 +37,8 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
+import { Tooltip } from "recharts";
 
 interface DemographyCardProps {
   title: string;
@@ -57,6 +59,9 @@ const DemographyCard: React.FC<DemographyCardProps> = ({
   comparisonText = "vs last month",
   subtitle,
 }) => {
+  const ArrowUp = "/svg/ArrowUp.svg";
+  const ArrowDown = "/svg/ArrowDown.svg";
+  const Info = "/svg/info.svg";
   return (
     <div className="bg-white rounded-xl border border-[#D6D6D6] p-4 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col gap-3">
 
@@ -71,6 +76,12 @@ const DemographyCard: React.FC<DemographyCardProps> = ({
         <h3 className="text-lg font-bold text-[#333333]">
           {title}
         </h3>
+        <Image
+          src={Info}
+          alt="Info"
+          width={20}
+          height={20}
+        />
       </div>
 
       {/* Value */}
@@ -85,7 +96,19 @@ const DemographyCard: React.FC<DemographyCardProps> = ({
               className={`${trend === "up" ? "text-green-600" : "text-red-500"
                 }`}
             >
-              {trend === "up" ? "↗" : "↘"}
+              {trend === "up" ?
+                <Image
+                  src={ArrowUp}
+                  alt="Arrow Up"
+                  width={20}
+                  height={20}
+                /> :
+                <Image
+                  src={ArrowDown}
+                  alt="Arrow Down"
+                  width={20}
+                  height={20}
+                />}
             </span>
 
             {/* Percentage */}

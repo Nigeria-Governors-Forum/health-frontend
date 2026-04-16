@@ -218,7 +218,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
 
             {/* Heading */}
             <h2 className="text-lg md:text-2xl font-bold text-center text-[#333333] mb-1">
-              Hello! Welcome to
+              Welcome to the
             </h2>
 
             <p className="text-center text-white text-sm md:text-lg font-semibold mb-5 bg-[#00652E] rounded-xl py-3 px-2">
@@ -270,11 +270,26 @@ const LandingPage: React.FC<LandingPageProps> = ({
               </div>
             </div>
 
+            <div className="flex items-center gap-2 rounded-xl mb-5">
+              <input
+                type="checkbox"
+                id="keepLoggedIn"
+                className="w-4 h-4 accent-green-600 cursor-pointer"
+              />
+
+              <label
+                htmlFor="keepLoggedIn"
+                className="text-[#858585] text-sm cursor-pointer"
+              >
+                Keep me logged in
+              </label>
+            </div>
+
             {/* Button */}
             <button
               type="submit"
               disabled={loading}
-              className={`w-full py-2 rounded-lg font-semibold transition duration-200 ${loading
+              className={`w-full py-2 rounded-lg text-md font-semibold transition duration-200 ${loading
                 ? "bg-[#00A141] cursor-not-allowed"
                 : "bg-green-600 hover:bg-green-700 text-white"
                 }`}
