@@ -59,8 +59,8 @@ const DemographyCard: React.FC<DemographyCardProps> = ({
   comparisonText = "vs last month",
   subtitle,
 }) => {
-  const ArrowUp = "/svg/ArrowUp.svg";
-  const ArrowDown = "/svg/ArrowDown.svg";
+  const ArrowUp = "/svg/arrowUp.svg";
+  const ArrowDown = "/svg/arrowDown.svg";
   const Info = "/svg/info.svg";
   return (
     <div className="bg-white rounded-xl border border-[#D6D6D6] p-4 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col gap-3">
