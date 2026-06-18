@@ -1,0 +1,115 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "ikeja-ward-a",
+      "properties": {
+        "id": "ikeja-ward-a",
+        "name": "Ikeja Ward A",
+        "parentId": "ikeja",
+        "level": "ward"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [3.30, 6.58],
+            [3.35, 6.58],
+            [3.35, 6.63],
+            [3.30, 6.63],
+            [3.30, 6.58]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ikeja-ward-b",
+      "properties": {
+        "id": "ikeja-ward-b",
+        "name": "Ikeja Ward B",
+        "parentId": "ikeja",
+        "level": "ward"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [3.35, 6.58],
+            [3.40, 6.58],
+            [3.40, 6.63],
+            [3.35, 6.63],
+            [3.35, 6.58]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "eti-osa-ward-a",
+      "properties": {
+        "id": "eti-osa-ward-a",
+        "name": "Eti-Osa Ward A",
+        "parentId": "eti-osa",
+        "level": "ward"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [3.48, 6.47],
+            [3.54, 6.47],
+            [3.54, 6.53],
+            [3.48, 6.53],
+            [3.48, 6.47]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "nassarawa-ward-a",
+      "properties": {
+        "id": "nassarawa-ward-a",
+        "name": "Nassarawa Ward A",
+        "parentId": "nassarawa",
+        "level": "ward"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [8.49, 11.95],
+            [8.54, 11.95],
+            [8.54, 12.00],
+            [8.49, 12.00],
+            [8.49, 11.95]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "abuja-municipal-ward-a",
+      "properties": {
+        "id": "abuja-municipal-ward-a",
+        "name": "Abuja Municipal Ward A",
+        "parentId": "abuja-municipal",
+        "level": "ward"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [7.24, 8.99],
+            [7.31, 8.99],
+            [7.31, 9.05],
+            [7.24, 9.05],
+            [7.24, 8.99]
+          ]
+        ]
+      }
+    }
+  ]
+}

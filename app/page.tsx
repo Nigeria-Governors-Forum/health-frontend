@@ -5,6 +5,7 @@ import toast, { Toaster } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { Endpoints, httpClient } from "./api-client/src";
 import LandingPage from "./pages/LandingPage";
+import MapsDemoPage from "./maps-demo/page";
 
 export interface User {
   id: string;
@@ -76,6 +77,8 @@ export default function Home() {
         submitLabel="SIGN IN"
         copyRight={true}
       />
+
+      {/* <MapsDemoPage /> */}
     </>
   );
 }

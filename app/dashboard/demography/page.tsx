@@ -18,6 +18,11 @@ import LoadingScreen from "@/app/components/LoadingScreen";
 import DemographyCard from "@/app/components/DemographyCard";
 import LgaSummaryTable, { LgaLookup } from "@/app/components/LgaSummaryTable";
 import { useTopbarFilters } from "@/app/context/TopbarFiltersContext";
+import { LGAMap, StateMap } from "@/app/components/maps";
+import Image from "next/image";
+const info = "/svg/info.svg";
+
+import ToggleSwitch from "@/app/components/ToggleSwitch";
 
 const DemographyPage = () => {
   const [loading, setLoading] = useState(false);
@@ -32,7 +37,7 @@ const DemographyPage = () => {
 
     try {
       const stats = await httpClient.get(
-        `${Endpoints.demography.summary}/${selectedState}/${selectedYear}`
+        `${Endpoints.demography.summary}/${selectedState}/${selectedYear}`,
       );
       // @ts-ignore
       setStateData(stats?.data);
@@ -62,7 +67,6 @@ const DemographyPage = () => {
             title="Year Created"
             value={stateData?.year_created || "N/A"}
             icon={<FaRegCalendar size={24} color="#16a34a" />}
-
           />
           <DemographyCard
             title="Land Mass"
@@ -81,16 +85,12 @@ const DemographyPage = () => {
           />
           <DemographyCard
             title="Health Facilities"
-            value={
-              formatNumber(Number(stateData?.health_facilities)) || "N/A"
-            }
+            value={formatNumber(Number(stateData?.health_facilities)) || "N/A"}
             icon={<FaRegHospital size={24} color="#16a34a" />}
           />
           <DemographyCard
             title="Total Population"
-            value={
-              formatNumber(Number(stateData?.total_population)) || "N/A"
-            }
+            value={formatNumber(Number(stateData?.total_population)) || "N/A"}
             icon={<FaUsers size={24} color="#16a34a" />}
           />
           <DemographyCard
@@ -118,14 +118,65 @@ const DemographyPage = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <MapView
+          {/* <MapView
             mapClassName={`h-96 w-full rounded-xl shadow`}
             showCard={true}
             total={stateData?.demography_LGA?.length}
             h2r={stateData?.total_Hard_To_Reach}
-          />
+          /> */}
+          <div className="bg-white rounded-xl shadow-md p-4 w-auto mb-4">
+            <div className="flex justify-between">
+              <h2 className="text-lg font-semibold text-[#07923F] mb-3 text-center flex items-center gap-2">
+                Population By Accessibility
+                <Image
+                  src={info}
+                  alt="Health Facilities"
+                  width={24}
+                  height={24}
+                />
+              </h2>
+              <ToggleSwitch initial={true} onToggle={() => {}} />
+            </div>
+            <div className="flex justify-between text-sm gap-4 text-gray-700">
+              <span className="text-blue-600 font-medium">
+                Total: {stateData?.no_of_lgas || "N/A"}
+              </span>
+              <span className="text-green-600 font-medium">
+                Safe:{" "}
+                {stateData?.no_of_lgas - stateData?.total_Hard_To_Reach ||
+                  "N/A"}
+              </span>
+              <span className="text-red-600 font-medium">
+                Hard to reach: {stateData?.total_Hard_To_Reach || "N/A"}
+              </span>
+            </div>
+            <LGAMap
+              stateId={selectedState?.toLowerCase() || "fct"}
+              choroplethData={{
+                [stateData?.no_of_lgas - stateData?.total_Hard_To_Reach ||
+                "N/A"]: 100,
+                [stateData?.total_Hard_To_Reach || "N/A"]: 0,
+              }}
+              theme={{
+                backgroundColor: "#F8FAFC",
+                defaultFill: "#DCFCE7",
+                strokeColor: "#166534",
+                hoverFill: "#22C55E",
+                selectedFill: "#15803D",
+                labelColor: "#14532D",
+              }}
+            />
+          </div>
           <LgaSummaryTable title="LGA Summary" data={data} />
         </div>
+        {/* <div className="flex justify-center">
+          <button
+            onClick={() => console.log("hello")}
+            className="text-[#00A141] px-8 py-2 border border-[#00A141] text-lg font-semibold rounded-full cursor-pointer"
+          >
+            View Zonal/National Comparison
+          </button>
+        </div> */}
       </div>
     </>
   );
