@@ -10,7 +10,6 @@ import {
   FaUsers,
   FaUsersCog,
 } from "react-icons/fa";
-import MapView from "@/app/components/MapWrapper";
 import { Endpoints, httpClient } from "@/app/api-client/src";
 import toast from "react-hot-toast";
 import { formatNumber } from "../page";
@@ -18,7 +17,7 @@ import LoadingScreen from "@/app/components/LoadingScreen";
 import DemographyCard from "@/app/components/DemographyCard";
 import LgaSummaryTable, { LgaLookup } from "@/app/components/LgaSummaryTable";
 import { useTopbarFilters } from "@/app/context/TopbarFiltersContext";
-import { LGAMap, StateMap } from "@/app/components/maps";
+import { LGAMap } from "@/app/components/maps";
 import Image from "next/image";
 const info = "/svg/info.svg";
 

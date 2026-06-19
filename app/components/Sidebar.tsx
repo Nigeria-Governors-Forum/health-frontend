@@ -11,6 +11,7 @@ import {
   FaSignOutAlt,
   FaTimes,
   FaChevronDown,
+  FaGlobeAfrica,
 } from "react-icons/fa";
 import { usePathname } from "next/navigation";
 import ConfirmPrompt from "./ConfirmPrompt";
@@ -82,6 +83,12 @@ export const navItem: NavItem[] = [
         href: "/dashboard/score-card",
         icon: <FaMoneyCheck />,
         label: "Score Cards",
+        roles: ["user", "h-admin", "s-admin"],
+      },
+      {
+        href: "/dashboard/africa-map",
+        icon: <FaGlobeAfrica />,
+        label: "Africa Map",
         roles: ["user", "h-admin", "s-admin"],
       },
       {

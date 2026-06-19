@@ -2,15 +2,15 @@
 
 import DonutChart from "../components/DonoughtChart";
 import MultiLineChart from "../components/LineChart";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import { Endpoints, httpClient } from "../api-client/src";
 import DemographyCard from "../components/DemographyCard";
 import LoadingScreen from "../components/LoadingScreen";
 import { useTopbarFilters } from "../context/TopbarFiltersContext";
-import { LGAMap, NigeriaMap, StateMap } from "@/app/components/maps";
 import Image from "next/image";
 import ToggleSwitch from "../components/ToggleSwitch";
+import { NigeriaStatesChoropleth, StateLGAChoropleth, normalizeStateName, slugify } from "../components/ng-maps";
 
 export const formatNumber = (num: number): string => {
   return num.toLocaleString("en-US");
@@ -19,9 +19,12 @@ export const formatNumber = (num: number): string => {
 export default function DashboardHome() {
   const [loading, setLoading] = useState(false);
   const { selectedState, selectedYear } = useTopbarFilters();
-  console.log("selected state", selectedState);
+  const [titlecaption, setTitlecaption] = useState("Population by accessibility");
+  const [isPopulationMode, setIsPopulationMode] = useState(true);
+  const [hoveredLGA, setHoveredLGA] = useState<{ name: string; key: string } | null>(null);
 
   const [stateData, setStateData] = useState<any>();
+  const [demographyData, setDemographyData] = useState<any>();
 
   const fetchData = async () => {
     if (!selectedState || !selectedYear) return;
@@ -42,6 +45,12 @@ export default function DashboardHome() {
       // @ts-ignore
       setStateData(stats.data);
 
+      // Fetch demography data to get LGA populations and status mapping
+      const demoStats = await httpClient.get(
+        `${Endpoints.demography.summary}/${stateParam}/${selectedYear}`,
+      );
+      setDemographyData((demoStats as any).data);
+
       toast.success(`Welcome, ${selectedState} - ${selectedYear}!`);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -55,8 +64,43 @@ export default function DashboardHome() {
     fetchData();
   }, [selectedState, selectedYear]);
 
+  const lgaList = useMemo(() => {
+    return Array.isArray(demographyData?.demography_LGA)
+      ? demographyData.demography_LGA
+      : [];
+  }, [demographyData]);
+
+  const lgaColors = useMemo(() => {
+    const colors: Record<string, string> = {};
+    if (lgaList.length === 0) return colors;
+
+    if (isPopulationMode) {
+      const populations = lgaList.map((item: any) => Number(item.lga_population) || 0);
+      const minPop = Math.min(...populations);
+      const maxPop = Math.max(...populations);
+      const popRange = maxPop - minPop || 1;
+
+      lgaList.forEach((item: any) => {
+        const key = slugify(item.lga);
+        const pop = Number(item.lga_population) || 0;
+        const ratio = (pop - minPop) / popRange;
+        // Denser -> darker green (lightness: 25%), less populated -> lighter green (lightness: 92%)
+        const lightness = 92 - ratio * (92 - 25);
+        const saturation = 35 + ratio * (85 - 35);
+        colors[key] = `hsl(140, ${saturation.toFixed(0)}%, ${lightness.toFixed(0)}%)`;
+      });
+    } else {
+      lgaList.forEach((item: any) => {
+        const key = slugify(item.lga);
+        const isHard = (item.hard_to_reach_lgas || "").toString().trim().toLowerCase() === "yes";
+        colors[key] = isHard ? "#EF4444" : "#22C55E";
+      });
+    }
+    return colors;
+  }, [lgaList, isPopulationMode]);
+
   const chartData = [
-    { name: "Covered", value: stateData?.insurance_coverage, color: "#114ACA" },
+    { name: "Covered", value: stateData?.insurance_coverage, color: "#00C951" },
     {
       name: "Uncovered",
       value: 100 - (stateData?.insurance_coverage || 0),
@@ -119,8 +163,9 @@ export default function DashboardHome() {
   const healthAllocation = "/svg/healthAllocation.svg";
   const info = "/svg/info.svg";
 
-  const onToggle = () => {
-    console.log("toggled");
+  const handleToggle = (value: boolean) => {
+    setIsPopulationMode(value);
+    setTitlecaption(value ? "Population by accessibility" : "Hard to reach LGAs");
   };
 
   return (
@@ -222,19 +267,10 @@ export default function DashboardHome() {
           />
 
           <div className="space-y-2">
-            <p className="text-lg font-semibold text-center text-[#07923F] mb-1 flex items-center justify-center gap-2">
-              Population By Accessibility
-              <Image
-                src={info}
-                alt="Health Facilities"
-                width={24}
-                height={24}
-              />
-            </p>
             <div className="bg-white rounded-xl shadow-md p-4 w-auto mb-4">
               <div className="flex justify-between">
                 <h2 className="text-lg font-semibold text-[#07923F] mb-3 text-center flex items-center gap-2">
-                  Population By Accessibility
+                  {titlecaption}
                   <Image
                     src={info}
                     alt="Health Facilities"
@@ -242,7 +278,7 @@ export default function DashboardHome() {
                     height={24}
                   />
                 </h2>
-                <ToggleSwitch initial={true} onToggle={() => onToggle} />
+                <ToggleSwitch initial={true} onToggle={handleToggle} />
               </div>
               <div className="flex justify-between text-sm gap-4 text-gray-700">
                 <span className="text-blue-600 font-medium">
@@ -258,50 +294,41 @@ export default function DashboardHome() {
                 </span>
               </div>
             </div>
-            <LGAMap 
-            stateId={selectedState?.toLowerCase() || "fct"}
-            choroplethData={{
-              [stateData?.no_of_lgas - stateData?.total_Hard_To_Reach || "N/A"]: 100,
-              [stateData?.total_Hard_To_Reach || "N/A"]: 0,
-            }}
-            theme={{
-              backgroundColor: "#F8FAFC",
-              defaultFill: "#DCFCE7",
-              strokeColor: "#166534",
-              hoverFill: "#22C55E",
-              selectedFill: "#15803D",
-              labelColor: "#14532D",
-            }}
-            />
-            {/* <NigeriaMap
-              width={700}
-              height={600}
-              showWorldMap={false}
-              onStateClick={(stateId) => console.log("Clicked:", stateId)}
-              choroplethData={{
-                [selectedState.toLowerCase()]: 100,
-              }}
-              theme={{
-                backgroundColor: "#F8FAFC",
-                defaultFill: "#DCFCE7",
-                strokeColor: "#166534",
-                hoverFill: "#22C55E",
-                selectedFill: "#15803D",
-                labelColor: "#14532D",
-              }}
-            /> */}
+            <div className="relative">
+              <StateLGAChoropleth
+                stateSlug={normalizeStateName(selectedState || "fct")}
+                stateName={selectedState || "Federal Capital Territory"}
+                height={350}
+                lgaColors={lgaColors}
+                onHoverLGA={setHoveredLGA}
+              />
+              {hoveredLGA && (
+                <div className="absolute top-2 left-2 bg-black/85 backdrop-blur-sm text-white px-3 py-2 rounded-xl shadow-lg pointer-events-none z-10 text-xs border border-white/10 min-w-44">
+                  <p className="font-bold text-[#4ade80] text-sm mb-1">{hoveredLGA.name}</p>
+                  {(() => {
+                    const item = lgaList.find((x: any) => slugify(x.lga) === hoveredLGA.key);
+                    if (!item) return <p className="text-gray-300 italic">No data available</p>;
+                    return (
+                      <div className="space-y-1">
+                        <p className="flex justify-between gap-4">
+                          <span className="text-gray-400">Population:</span>
+                          <span className="font-semibold text-white">{formatNumber(item.lga_population)}</span>
+                        </p>
+                        <p className="flex justify-between gap-4">
+                          <span className="text-gray-400">Status:</span>
+                          <span className={`font-semibold ${item.hard_to_reach_lgas === "Yes" ? "text-red-400" : "text-green-400"}`}>
+                            {item.hard_to_reach_lgas === "Yes" ? "Hard to Reach" : "Safe"}
+                          </span>
+                        </p>
+                      </div>
+                    );
+                  })()}
+                </div>
+              )}
+            </div>
           </div>
-
-          {/* <Test /> */}
         </div>
-        {/* <div className="flex justify-center">
-          <button
-            onClick={() => console.log("hello")}
-            className="text-[#00A141] px-8 py-2 border border-[#00A141] text-lg font-semibold rounded-full cursor-pointer"
-          >
-            View Zonal/National Comparison
-          </button>
-        </div> */}
+
       </div>
     </>
   );

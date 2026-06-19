@@ -7,6 +7,7 @@ import {
   NigeriaMap,
   StateMap,
   WardMap,
+  AfricaMap,
   type GetColor,
 } from "@/app/components/maps";
 
@@ -112,6 +113,26 @@ export default function MapsDemoPage() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
+        <div className="rounded-xl border border-slate-200 bg-white p-4">
+          <h2 className="mb-3 text-lg font-medium text-slate-800">AfricaMap</h2>
+          <AfricaMap
+            height={420}
+            getColor={getColor}
+            choroplethData={{
+              nigeria: 85,
+              ghana: 62,
+              egypt: 74,
+              kenya: 49,
+              "south-africa": 91,
+              ethiopia: 35,
+              algeria: 68,
+              "democratic-republic-of-the-congo": 22,
+            }}
+            selectedRegionId={selectedRegionId}
+            onRegionClick={(id) => setSelectedRegionId(id)}
+          />
+        </div>
+
         <div className="rounded-xl border border-slate-200 bg-white p-4">
           <h2 className="mb-3 text-lg font-medium text-slate-800">NigeriaMap</h2>
           <NigeriaMap
