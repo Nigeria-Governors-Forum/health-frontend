@@ -10,7 +10,8 @@ import LoadingScreen from "../components/LoadingScreen";
 import { useTopbarFilters } from "../context/TopbarFiltersContext";
 import Image from "next/image";
 import ToggleSwitch from "../components/ToggleSwitch";
-import { NigeriaStatesChoropleth, StateLGAChoropleth, normalizeStateName, slugify } from "../components/ng-maps";
+import { StateLGAChoropleth, normalizeStateName, slugify } from "../components/ng-maps";
+import { FiInfo } from "react-icons/fi";
 
 export const formatNumber = (num: number): string => {
   return num.toLocaleString("en-US");
@@ -161,7 +162,6 @@ export default function DashboardHome() {
   const healthTraining = "/svg/healthTraining.svg";
   const lga = "/svg/lga.svg";
   const healthAllocation = "/svg/healthAllocation.svg";
-  const info = "/svg/info.svg";
 
   const handleToggle = (value: boolean) => {
     setIsPopulationMode(value);
@@ -271,12 +271,8 @@ export default function DashboardHome() {
               <div className="flex justify-between">
                 <h2 className="text-lg font-semibold text-[#07923F] mb-3 text-center flex items-center gap-2">
                   {titlecaption}
-                  <Image
-                    src={info}
-                    alt="Health Facilities"
-                    width={24}
-                    height={24}
-                  />
+                  <FiInfo className="text-green-900" size={20} />
+
                 </h2>
                 <ToggleSwitch initial={true} onToggle={handleToggle} />
               </div>
@@ -294,7 +290,8 @@ export default function DashboardHome() {
                 </span>
               </div>
             </div>
-            <div className="relative">
+            <div className="relative border border-gray-100 bg-white rounded-3xl p-4 shadow-sm flex items-center justify-center min-h-[380px]">
+
               <StateLGAChoropleth
                 stateSlug={normalizeStateName(selectedState || "fct")}
                 stateName={selectedState || "Federal Capital Territory"}
@@ -328,7 +325,6 @@ export default function DashboardHome() {
             </div>
           </div>
         </div>
-
       </div>
     </>
   );

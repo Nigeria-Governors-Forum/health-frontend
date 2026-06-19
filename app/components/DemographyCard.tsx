@@ -39,6 +39,7 @@
 import React from "react";
 import Image from "next/image";
 import { Tooltip } from "recharts";
+import { FiInfo } from "react-icons/fi";
 
 interface DemographyCardProps {
   title: string;
@@ -61,7 +62,6 @@ const DemographyCard: React.FC<DemographyCardProps> = ({
 }) => {
   const ArrowUp = "/svg/arrowUp.svg";
   const ArrowDown = "/svg/arrowDown.svg";
-  const Info = "/svg/info.svg";
   return (
     <div className="bg-white rounded-xl border border-[#D6D6D6] p-4 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col gap-3">
 
@@ -76,12 +76,7 @@ const DemographyCard: React.FC<DemographyCardProps> = ({
         <h3 className="text-lg font-bold text-[#333333]">
           {title}
         </h3>
-        <Image
-          src={Info}
-          alt="Info"
-          width={20}
-          height={20}
-        />
+        <FiInfo className="text-green-900" size={20} />
       </div>
 
       {/* Value */}

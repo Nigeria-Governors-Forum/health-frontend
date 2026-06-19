@@ -296,11 +296,11 @@ const LgaSummaryTable: React.FC<LgaSummaryTableProps> = ({
   totalCount,
   pageSize = 10,
   searchValue = "",
-  onSearchChange = () => {},
+  onSearchChange = () => { },
   currentPage = 1,
   totalPages = 1,
   totalResults,
-  onPageChange = () => {},
+  onPageChange = () => { },
   statusStyles = {},
 }) => {
   const styles = { ...defaultStatusStyles, ...statusStyles } as Record<
@@ -322,7 +322,7 @@ const LgaSummaryTable: React.FC<LgaSummaryTableProps> = ({
             <span className="inline-flex items-center rounded-full bg-green-50 px-3 py-0.5 text-xs font-semibold text-green-700">
               {total} Total
             </span>
-            <FiInfo className="text-gray-300" size={15} />
+            <FiInfo className="text-green-900" size={15} />
           </div>
           <p className="mt-1 text-sm text-gray-400">{subtitle}</p>
         </div>
@@ -342,71 +342,68 @@ const LgaSummaryTable: React.FC<LgaSummaryTableProps> = ({
         </div>
       </div>
 
-      {/* Column headers */}
-      <div className="hidden gap-x-4 sm:mb-2.5 sm:grid sm:grid-cols-[1.7fr_1fr_1.3fr]">
-        <div className="flex items-center gap-3 rounded-full bg-green-700 px-5 py-3 text-sm font-semibold text-white">
-          <span className="w-8">SN</span>
-          <span>Local Government Area</span>
-        </div>
-        <div className="flex items-center justify-center rounded-full bg-green-700 px-5 py-3 text-sm font-semibold text-white">
-          Population
-        </div>
-        <div className="flex items-center justify-center rounded-full bg-green-700 px-5 py-3 text-sm font-semibold text-white">
-          Political Wards
-        </div>
-      </div>
-
-      {/* Rows */}
-      <div className="flex flex-col gap-2.5">
-        {data.map((row, i) => {
-          const hard = isHardToReach(row.hard_to_reach_lgas);
-          const style = hard ? styles.hard : styles.safe;
-          const sn = (currentPage - 1) * pageSize + i + 1;
-
-          return (
-            <div
-              key={row.id ?? `${row.lga}-${i}`}
-              className="grid grid-cols-1 gap-2.5 sm:grid-cols-[1.7fr_1fr_1.3fr] sm:gap-x-4"
-            >
-              <div
-                className={`flex items-center gap-3 rounded-full px-5 py-3 text-sm ${style.pillBgClass}`}
-              >
-                <span
-                  className={`w-8 font-medium ${
-                    hard ? style.textClass : "text-gray-500"
-                  }`}
-                >
-                  {String(sn).padStart(2, "0")}
-                </span>
-                <span
-                  className={`font-semibold ${
-                    hard ? style.textClass : "text-green-700"
-                  }`}
-                >
-                  {row.lga}
-                </span>
-              </div>
-
-              <div
-                className={`flex items-center justify-center rounded-full px-5 py-3 text-sm font-medium text-gray-700 ${style.pillBgClass}`}
-              >
-                <span className="mr-1 text-xs text-gray-400 sm:hidden">
-                  Population:
-                </span>
-                {formatNumber(row.lga_population)}
-              </div>
-
-              <div
-                className={`flex items-center justify-center rounded-full px-5 py-3 text-sm font-medium text-gray-700 ${style.pillBgClass}`}
-              >
-                <span className="mr-1 text-xs text-gray-400 sm:hidden">
-                  Wards:
-                </span>
-                {row.number_of_wards}
-              </div>
+      {/* Scrollable table container */}
+      <div className="overflow-x-auto w-full">
+        <div className="min-w-[550px]">
+          {/* Column headers */}
+          <div className="grid grid-cols-[1.7fr_1fr_1.3fr] gap-x-4 mb-2.5">
+            <div className="flex items-center gap-3 rounded-full bg-green-700 px-5 py-3 text-sm font-semibold text-white">
+              <span className="w-8">SN</span>
+              <span>Local Government Area</span>
             </div>
-          );
-        })}
+            <div className="flex items-center justify-center rounded-full bg-green-700 px-5 py-3 text-sm font-semibold text-white">
+              Population
+            </div>
+            <div className="flex items-center justify-center rounded-full bg-green-700 px-5 py-3 text-sm font-semibold text-white">
+              Political Wards
+            </div>
+          </div>
+
+          {/* Rows */}
+          <div className="flex flex-col gap-2.5">
+            {data.map((row, i) => {
+              const hard = isHardToReach(row.hard_to_reach_lgas);
+              const style = hard ? styles.hard : styles.safe;
+              const sn = (currentPage - 1) * pageSize + i + 1;
+
+              return (
+                <div
+                  key={row.id ?? `${row.lga}-${i}`}
+                  className="grid grid-cols-[1.7fr_1fr_1.3fr] gap-x-4"
+                >
+                  <div
+                    className={`flex items-center gap-3 rounded-full px-5 py-3 text-sm ${style.pillBgClass}`}
+                  >
+                    <span
+                      className={`w-8 font-medium ${hard ? style.textClass : "text-gray-500"
+                        }`}
+                    >
+                      {String(sn).padStart(2, "0")}
+                    </span>
+                    <span
+                      className={`font-semibold ${hard ? style.textClass : "text-green-700"
+                        }`}
+                    >
+                      {row.lga}
+                    </span>
+                  </div>
+
+                  <div
+                    className={`flex items-center justify-center rounded-full px-5 py-3 text-sm font-medium text-gray-700 ${style.pillBgClass}`}
+                  >
+                    {formatNumber(row.lga_population)}
+                  </div>
+
+                  <div
+                    className={`flex items-center justify-center rounded-full px-5 py-3 text-sm font-medium text-gray-700 ${style.pillBgClass}`}
+                  >
+                    {row.number_of_wards}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
 
       {/* Pagination */}
@@ -433,11 +430,10 @@ const LgaSummaryTable: React.FC<LgaSummaryTableProps> = ({
                   key={p}
                   type="button"
                   onClick={() => onPageChange(p)}
-                  className={`flex h-7 w-7 items-center justify-center rounded-full font-medium ${
-                    p === currentPage
-                      ? "bg-green-100 text-green-700"
-                      : "text-gray-500 hover:bg-gray-50"
-                  }`}
+                  className={`flex h-7 w-7 items-center justify-center rounded-full font-medium ${p === currentPage
+                    ? "bg-green-100 text-green-700"
+                    : "text-gray-500 hover:bg-gray-50"
+                    }`}
                 >
                   {p}
                 </button>

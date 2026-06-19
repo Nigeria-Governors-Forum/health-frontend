@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { FiInfo } from "react-icons/fi";
 import {
   LineChart,
   Line,
@@ -20,16 +20,10 @@ type LineChartProps = {
 };
 
 export default function MultiLineChart({ title, data, lines }: LineChartProps) {
-  const Info = "/svg/info.svg";
   return (
     <div className="bg-white shadow-md rounded-xl p-6 w-full">
       <h2 className="text-lg font-semibold text-[#07923F] mb-4 flex items-center gap-2">{title}
-        <Image
-          src={Info}
-          alt="Info"
-          width={20}
-          height={20}
-        />
+        <FiInfo className="text-green-900" size={20} />
       </h2>
 
       <ResponsiveContainer width="100%" height={300}>

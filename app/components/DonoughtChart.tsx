@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { FiInfo } from "react-icons/fi";
 import { PieChart, Pie, Cell, Tooltip } from "recharts";
 
 type DonutChartProps = {
@@ -16,16 +16,11 @@ export default function DonutChart({
   innerRadius = 70,
   outerRadius = 100,
 }: DonutChartProps) {
-  const Info = "/svg/info.svg";
   return (
     <div className="bg-white shadow-md rounded-xl p-6 text-black border-2 border-[#D6D6D6]">
       <h2 className="text-lg font-semibold text-green-700 mb-4 flex items-center gap-2"> {title}
-        <Image
-          src={Info}
-          alt="Info"
-          width={20}
-          height={20}
-        />
+        <FiInfo className="text-green-900" size={20} />
+
       </h2>
 
       <PieChart width={250} height={250} >
