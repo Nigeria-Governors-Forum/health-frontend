@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import {
   BarChart,
   Bar,
@@ -10,6 +10,7 @@ import {
   ResponsiveContainer,
   LabelList,
   Cell,
+  Legend,
 } from "recharts";
 
 interface StateData {
@@ -21,6 +22,8 @@ interface StateData {
   total?: number;
   population?: number;
   rate_graph?: number;
+  per_capita?: number;
+  per_person?: number;
 }
 
 interface StateBarChartProps {
@@ -33,108 +36,139 @@ interface StateBarChartProps {
   yaxis?: string;
 }
 
-const blueShades = [
-  "#bfdbfe", // blue-200
-  "#93c5fd", // blue-300
-  "#60a5fa", // blue-400
-  "#3b82f6", // blue-500
-  "#2563eb", // blue-600
-  "#1d4ed8", // blue-700
-];
-
-const formatCurrency = (value: number, symbol = "") =>
-  symbol
-    ? symbol + value.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-    : value.toFixed(0) + "%"; // fallback for percentages etc.
-
 const TooltipContent: React.FC<any> = ({
   active,
   payload,
   label,
-  currencySymbol,
 }) => {
   if (!active || !payload || payload.length === 0) return null;
-  const val = payload[0]?.value ?? 0;
 
   return (
-    <div className="bg-blue-600 shadow rounded p-2 text-sm border border-gray-200">
-      <div className="font-semibold mb-1">{label}</div>
-      <div>{formatCurrency(val, currencySymbol)}</div>
+    <div className="bg-slate-900/95 backdrop-blur-md shadow-xl rounded-xl p-3 text-sm text-white border border-slate-700/50">
+      <div className="font-bold text-slate-200 mb-2 border-b border-slate-700/50 pb-1">{label}</div>
+      <div className="space-y-1.5 min-w-[200px]">
+        {payload.map((item: any, idx: number) => {
+          const isTotal = item.dataKey === "totalValue";
+          const formattedVal = isTotal
+            ? Number(item.value).toLocaleString()
+            : Number(item.value).toFixed(2);
+          const unit = isTotal ? " Facilities" : " per 10k Pop";
+
+          return (
+            <div key={idx} className="flex items-center gap-2">
+              <span
+                className="w-2.5 h-2.5 rounded-full shrink-0"
+                style={{ backgroundColor: item.fill || item.color }}
+              />
+              <span className="text-slate-300">{item.name}:</span>
+              <span className="font-semibold text-white ml-auto">
+                {formattedVal}{unit}
+              </span>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 };
 
 const StateBarChart: React.FC<StateBarChartProps> = ({
   data,
-  barColor = "#2563EB",
   title,
-  currencySymbol = "",
   className,
 }) => {
-  const maxVal =
-    Array.isArray(data) && data.length > 0
-      ? Math.max(
-          ...data
-            .map((d) => d.rate_graph ?? 0) // fallback to 0 if undefined
-            .filter((v): v is number => typeof v === "number"),
-          0
-        )
-      : 0;
-
-  const getColorForValue = (value: number) => {
-    if (maxVal === 0) return blueShades[0];
-    const index = Math.floor((value / maxVal) * (blueShades.length - 1));
-    return blueShades[index];
-  };
+  const processedData = useMemo(() => {
+    if (!Array.isArray(data)) return [];
+    return data.map((d) => {
+      const totalValue = Number(d.rate_graph ?? d.total ?? 0);
+      let perCapitaValue = Number(d.per_capita ?? d.per_person ?? 0);
+      if (!d.per_capita && !d.per_person && d.population && totalValue) {
+        // Fallback calculation: per 10,000 population
+        perCapitaValue = (totalValue / d.population) * 10000;
+      }
+      return {
+        ...d,
+        totalValue,
+        perCapitaValue,
+      };
+    });
+  }, [data]);
 
   return (
-    <div className={className}>
+    <div className={`flex flex-col ${className || ""}`}>
       {title && (
-        <div className="mb-2 text-base font-semibold text-green-800 text-center">
+        <div className="mb-2 text-base font-bold text-green-800 text-center">
           {title}
         </div>
       )}
-      <ResponsiveContainer>
-        <BarChart
-          data={data}
-          margin={{ top: 20, right: 20, left: 20, bottom: 40 }}
-        >
-          <XAxis
-            dataKey="state"
-            tick={{ fontSize: 14, fontWeight: 600 }}
-            interval={0}
-          />
-          <YAxis
-            domain={[0, Math.ceil(maxVal * 1)]}
-            tickFormatter={(val) => formatCurrency(val, currencySymbol)}
-            hide
-          />
-          <Tooltip
-            content={(props) => (
-              <TooltipContent {...props} currencySymbol={currencySymbol} />
-            )}
-          />
-          <Bar dataKey="rate_graph" fill={barColor} radius={[4, 4, 0, 0]}>
-            {data?.map((entry, idx) => (
-              <Cell
-                key={`cell-${idx}`}
-                fill={getColorForValue(entry.rate_graph ?? 0)}
-              />
-            ))}
-            <LabelList
-              dataKey="rate_graph"
-              position="top"
-              formatter={(label) => {
-                if (typeof label === "number") {
-                  return formatCurrency(label, currencySymbol);
-                }
-                return label;
-              }}
-              style={{ fill: "#111827", fontWeight: 600, fontSize: 12 }}
+      <div className="flex-1 min-h-0 w-full">
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart
+            data={processedData}
+            margin={{ top: 20, right: 20, left: 20, bottom: 40 }}
+          >
+            <XAxis
+              dataKey="state"
+              tick={{ fontSize: 13, fontWeight: 600 }}
+              interval={0}
             />
-          </Bar>
-        </BarChart>
-      </ResponsiveContainer>
+            <YAxis
+              yAxisId="left"
+              orientation="left"
+              hide
+            />
+            <YAxis
+              yAxisId="right"
+              orientation="right"
+              hide
+            />
+            <Tooltip
+              content={(props) => <TooltipContent {...props} />}
+            />
+            <Legend
+              verticalAlign="bottom"
+              height={36}
+              iconType="circle"
+              iconSize={8}
+              wrapperStyle={{ fontSize: "12px", fontWeight: 600 }}
+            />
+            <Bar
+              yAxisId="left"
+              dataKey="totalValue"
+              name="Total Facilities"
+              fill="#10B981"
+              radius={[4, 4, 0, 0]}
+            >
+              <LabelList
+                dataKey="totalValue"
+                position="top"
+                formatter={(val: any) => {
+                  const num = Number(val);
+                  return isNaN(num) ? String(val || "") : num.toLocaleString();
+                }}
+                style={{ fill: "#374151", fontWeight: 600, fontSize: 11 }}
+              />
+            </Bar>
+            <Bar
+              yAxisId="right"
+              dataKey="perCapitaValue"
+              name="Per Capita (per 10k Pop)"
+              fill="#3B82F6"
+              radius={[4, 4, 0, 0]}
+            >
+              <LabelList
+                dataKey="perCapitaValue"
+                position="top"
+                formatter={(val: any) => {
+                  const num = Number(val);
+                  return isNaN(num) ? String(val || "") : num.toFixed(2);
+                }}
+                style={{ fill: "#374151", fontWeight: 600, fontSize: 11 }}
+              />
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   );
 };

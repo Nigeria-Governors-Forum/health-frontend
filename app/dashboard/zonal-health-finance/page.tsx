@@ -5,7 +5,6 @@ import CustomBarChart from "../../components/CustomBarChart";
 import { getZoneByState } from "nigerian-geopolitical-zones";
 import toast from "react-hot-toast";
 import ZonalPerBarChart from "../../components/ZonalPerCapita";
-import MapView from "@/app/components/MapWrapper";
 import { useTopbarFilters } from "@/app/context/TopbarFiltersContext";
 import LoadingScreen from "@/app/components/LoadingScreen";
 import { Endpoints, httpClient } from "@/app/api-client/src";
@@ -77,11 +76,7 @@ const ZonalHealthFinance = () => {
               className="bg-white rounded-xl shadow"
             />
           </div>
-          <MapView
-            mapClassName="h-96 w-full rounded-xl shadow"
-            showCard={true}
-            title="National Comparison"
-          />
+          
         </div>
       </div>
     </>

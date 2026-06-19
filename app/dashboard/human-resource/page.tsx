@@ -7,11 +7,13 @@ import toast from "react-hot-toast";
 import { formatNumber } from "../page";
 import HealthCard, { SummaryRow } from "../../components/HealthCard";
 import DemographyCard from "@/app/components/DemographyCard";
-import MapView from "@/app/components/MapWrapper";
 import { useTopbarFilters } from "@/app/context/TopbarFiltersContext";
 import LoadingScreen from "@/app/components/LoadingScreen";
 import { Endpoints, httpClient } from "@/app/api-client/src";
-import PopulationSummaryTable, { LgaRow } from "@/app/components/PopulationSummaryTable";
+import PopulationSummaryTable, {
+  LgaRow,
+} from "@/app/components/PopulationSummaryTable";
+import { useRouter } from "next/navigation";
 
 interface HumanResourcePageProps {
   state?: string;
@@ -24,6 +26,7 @@ const HumanResource = () => {
   const [loading, setLoading] = useState(false);
   const { selectedState, selectedYear } = useTopbarFilters();
   const [stateData, setStateData] = useState<any>();
+  const router = useRouter();
 
   const data: SummaryRow[] = stateData?.training_breakdown || [];
   const dataTwo: LgaRow[] = stateData?.profession || [];
@@ -41,12 +44,11 @@ const HumanResource = () => {
 
     try {
       const stats = await httpClient.get(
-        `${Endpoints.humanResource.summary}/${stateParam}/${selectedYear}`
+        `${Endpoints.humanResource.summary}/${stateParam}/${selectedYear}`,
       );
       // console.log(stats);
       // @ts-ignore
       setStateData(stats?.data);
-
     } catch (error) {
       console.error("Error fetching data:", error);
       toast.error("Invalid Credentials");
@@ -67,7 +69,7 @@ const HumanResource = () => {
         {/* Top Section */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <DemographyCard
-            title="Total Health Workforce"
+            title="Health Workers"
             value={formatNumber(Number(stateData?.hRH_Professions)) || "N/A"}
             icon={<FaUsers size={24} color="#16a34a" />}
           />
@@ -76,25 +78,43 @@ const HumanResource = () => {
             value={formatNumber(Number(stateData?.hRH)) || "N/A"}
             icon={<FaHospitalUser size={24} color="#16a34a" />}
           />
-          <HealthCard
-            title="Health Training Institutions Breakdown"
-            data={data}
+          <DemographyCard
+            title="Doctors"
+            value={formatNumber(Number(stateData?.hRH)) || "N/A"}
+            icon={<FaHospitalUser size={24} color="#16a34a" />}
+          />
+          <DemographyCard
+            title="Nurses/Midwives"
+            value={formatNumber(Number(stateData?.hRH)) || "N/A"}
+            icon={<FaHospitalUser size={24} color="#16a34a" />}
+          />
+          <DemographyCard
+            title="Community Health Extension Workers"
+            value={formatNumber(Number(stateData?.hRH)) || "N/A"}
+            icon={<FaHospitalUser size={24} color="#16a34a" />}
+          />
+          <DemographyCard
+            title="Junior Community Health Extension Workers"
+            value={formatNumber(Number(stateData?.hRH)) || "N/A"}
+            icon={<FaHospitalUser size={24} color="#16a34a" />}
           />
         </div>
+        <PopulationSummaryTable
+          title="Health Workforce Breakdown"
+          data={dataTwo}
+        />
+        <HealthCard
+          title="Health Training Institutions Breakdown"
+          data={data}
+        />
 
-        {/* Middle Section */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="md:col-span-2">
-            <PopulationSummaryTable title="Health Workforce Breakdown" data={dataTwo} />
-          </div>
-          {/* Map spans 2 columns */}
-          <div className="md:col-span-1">
-            <MapView
-              mapClassName="h-96 w-full rounded-xl shadow"
-              showCard={true}
-              title="HRH Breakdown by LGA"
-            />
-          </div>
+        <div className="flex justify-center pt-4">
+          <button
+            onClick={() => router.push("/dashboard/zonal-human-resource")}
+            className="text-[#00A141] px-8 py-2 border border-[#00A141] text-lg font-semibold rounded-full cursor-pointer hover:bg-green-50 transition-colors"
+          >
+            View Zonal / National Comparison
+          </button>
         </div>
       </div>
     </>

@@ -9,14 +9,19 @@ import { useTopbarFilters } from "@/app/context/TopbarFiltersContext";
 import LoadingScreen from "@/app/components/LoadingScreen";
 import { Endpoints, httpClient } from "@/app/api-client/src";
 import { useRouter } from "next/navigation";
-import ComparisonFilterPanel from "@/app/components/ComparisonFilter";
+import ComparisonFilterPanel, {
+  type ComparisonMode,
+} from "@/app/components/ComparisonFilter";
 import { NigeriaStatesChoropleth } from "@/app/components/ng-maps";
+import TrendAreaChart from "@/app/components/TrendAreaChart";
 
 const ZonalHealthFacility = () => {
   const [loading, setLoading] = useState(false);
   const [stateData, setStateData] = useState<any>();
   const [selectedZone, setSelectedZone] = useState<any>();
-  const { selectedState, setSelectedState, selectedYear, setSelectedYear } = useTopbarFilters();
+  const [mode, setMode] = useState<ComparisonMode>("zonal");
+  const { selectedState, setSelectedState, selectedYear, setSelectedYear } =
+    useTopbarFilters();
   const router = useRouter();
 
   const fetchData = async () => {
@@ -57,13 +62,13 @@ const ZonalHealthFacility = () => {
 
   const sampleData = stateData?.zoneWithin;
 
-  console.log(sampleData);
-
   return (
     <>
       {loading && <LoadingScreen text="Please wait..." />}
       <div className="min-h-screen space-y-6">
         <ComparisonFilterPanel
+          mode={mode}
+          onModeChange={setMode}
           selectedZone={selectedZone}
           selectedState={selectedState}
           selectedYear={String(selectedYear)}
@@ -87,24 +92,38 @@ const ZonalHealthFacility = () => {
             return { value: String(year), label: String(year) };
           })}
         />
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="flex flex-col gap-6">
-            <StateBarChart
-              title="Zonal Comparison"
-              data={sampleData}
-              className="bg-white rounded-2xl shadow p-4 h-125"
+        {mode === "zonal" && (
+          <div className="grid grid-cols-1">
+            <div className="flex flex-col gap-6">
+              <StateBarChart
+                title="Zonal Comparison"
+                data={sampleData}
+                className="bg-white rounded-2xl shadow p-4 h-125"
+              />
+            </div>
+          </div>
+        )}
+        {mode === "national" && (
+          <div className="bg-white rounded-2xl shadow p-4">
+            <NigeriaStatesChoropleth
+              valueForState={(slug: string) => {
+                const value = stateData?.[slug];
+                return typeof value === "number" ? value : 50;
+              }}
+              valueLabel="Score"
             />
           </div>
-
-          {/* Right side: map */}
+        )}
+        {mode === "trend" && (
           <div className="bg-white rounded-2xl shadow p-4">
-            {/* <NigeriaStatesChoropleth
-              valueForState={(state: any) => {
-                const key = slugify(state?.name);
-              }}
-            /> */}
+            <TrendAreaChart
+              data={stateData?.trend?.map((point: any) => ({
+                label: point.year,
+                value: point.value,
+              }))}
+            />
           </div>
-        </div>
+        )}
         <div className="flex justify-center pt-4">
           <button
             onClick={() => router.push("/dashboard/health-facilities")}

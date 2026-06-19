@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import MapView from "../../components/MapWrapper";
 import DataCard from "../../components/PieChartUi";
 import toast from "react-hot-toast";
 import { formatNumber } from "../page";
