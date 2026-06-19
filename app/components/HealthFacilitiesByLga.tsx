@@ -10,25 +10,14 @@ import {
 
 export type LgaStatus = "safe" | "hard";
 
-export interface LgaRow {
+export interface LgaHealthRow {
+  id?: number;
   lga: string;
-  population?: string; // you can also use number and format outside
-  healthFacilities?: number | string;
-  politicalWards?: number | string;
-  status?: LgaStatus;
-}
-
-export interface LgaLookup {
-  hard_to_reach_lgas: string;
   health_facilities: number;
-  id: number;
-  lga: string;
   lga_population: number;
-  number_of_wards: number;
-  page: string;
-  state: string;
-  year: number;
-  zone: string;
+  hard_to_reach_lgas: string; // "Yes" | "No"
+  /** Facilities per `densityPer` population. Auto-computed if omitted. */
+  density?: number;
 }
 
 export interface StatusStyle {
@@ -38,11 +27,6 @@ export interface StatusStyle {
   textClass: string;
 }
 
-/**
- * Default mapping:
- * - safe: light green pill, green text/name
- * - hard: light red pill, red text/name
- */
 const defaultStatusStyles: Record<LgaStatus, StatusStyle> = {
   safe: {
     label: "Safe",
@@ -58,19 +42,18 @@ const defaultStatusStyles: Record<LgaStatus, StatusStyle> = {
   },
 };
 
-export interface LgaSummaryTableProps {
+export interface HealthFacilitiesByLgaTableProps {
   title?: string;
   subtitle?: string;
-  data: LgaLookup[];
-  /** Shown in the "X Total" badge. Defaults to data.length */
+  data: LgaHealthRow[];
   totalCount?: number;
-  /** Used only to calculate the SN column across pages */
   pageSize?: number;
+  /** Used to compute density when a row doesn't supply one. Default 10,000. */
+  densityPer?: number;
   searchValue?: string;
   onSearchChange?: (value: string) => void;
   currentPage?: number;
   totalPages?: number;
-  /** Total rows across all pages, for the "Showing X of Y results" line */
   totalResults?: number;
   onPageChange?: (page: number) => void;
   statusStyles?: Partial<Record<LgaStatus, StatusStyle>>;
@@ -86,7 +69,6 @@ function formatNumber(value: number | string) {
   return num.toLocaleString("en-US");
 }
 
-/** Produces e.g. [1,2,3,4,5,'...',99] the way the target design shows it. */
 function getPageNumbers(current: number, total: number): (number | "...")[] {
   if (total <= 1) return [1];
   if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
@@ -104,12 +86,13 @@ function getPageNumbers(current: number, total: number): (number | "...")[] {
   return result;
 }
 
-const LgaSummaryTable: React.FC<LgaSummaryTableProps> = ({
-  title = "LGA Summary",
-  subtitle = "List of LGA Summary",
+const HealthFacilitiesByLgaTable: React.FC<HealthFacilitiesByLgaTableProps> = ({
+  title = "Health Facilities by LGA",
+  subtitle = "List of LGA Facilities",
   data,
   totalCount,
   pageSize = 10,
+  densityPer = 10000,
   searchValue = "",
   onSearchChange = () => { },
   currentPage = 1,
@@ -137,7 +120,7 @@ const LgaSummaryTable: React.FC<LgaSummaryTableProps> = ({
             <span className="inline-flex items-center rounded-full bg-green-50 px-3 py-0.5 text-xs font-semibold text-green-700">
               {total} Total
             </span>
-            <FiInfo className="text-green-900" size={15} />
+            <FiInfo className="text-gray-300" size={15} />
           </div>
           <p className="mt-1 text-sm text-gray-400">{subtitle}</p>
         </div>
@@ -157,68 +140,83 @@ const LgaSummaryTable: React.FC<LgaSummaryTableProps> = ({
         </div>
       </div>
 
-      {/* Scrollable table container */}
-      <div className="overflow-x-auto w-full">
-        <div className="min-w-[550px]">
-          {/* Column headers */}
-          <div className="grid grid-cols-[1.7fr_1fr_1.3fr] gap-x-4 mb-2.5">
-            <div className="flex items-center gap-3 rounded-lg bg-green-700 px-5 py-3 text-sm font-semibold text-white">
-              <span className="w-8">SN</span>
-              <span>Local Government Area</span>
-            </div>
-            <div className="flex items-center justify-center rounded-lg bg-green-700 px-5 py-3 text-sm font-semibold text-white">
-              Population
-            </div>
-            <div className="flex items-center justify-center rounded-lg bg-green-700 px-5 py-3 text-sm font-semibold text-white">
-              Political Wards
-            </div>
-          </div>
-
-          {/* Rows */}
-          <div className="flex flex-col gap-2.5">
-            {data.map((row, i) => {
-              const hard = isHardToReach(row.hard_to_reach_lgas);
-              const style = hard ? styles.hard : styles.safe;
-              const sn = (currentPage - 1) * pageSize + i + 1;
-
-              return (
-                <div
-                  key={row.id ?? `${row.lga}-${i}`}
-                  className="grid grid-cols-[1.7fr_1fr_1.3fr] gap-x-4"
-                >
-                  <div
-                    className={`flex items-center gap-3 rounded-lg px-5 py-3 text-sm ${style.pillBgClass}`}
-                  >
-                    <span
-                      className={`w-8 font-medium ${hard ? style.textClass : "text-gray-500"
-                        }`}
-                    >
-                      {String(sn).padStart(2, "0")}
-                    </span>
-                    <span
-                      className={`font-semibold ${hard ? style.textClass : "text-green-700"
-                        }`}
-                    >
-                      {row.lga}
-                    </span>
-                  </div>
-
-                  <div
-                    className={`flex items-center justify-center rounded-lg px-5 py-3 text-sm font-medium text-gray-700 ${style.pillBgClass}`}
-                  >
-                    {formatNumber(row.lga_population)}
-                  </div>
-
-                  <div
-                    className={`flex items-center justify-center rounded-lg px-5 py-3 text-sm font-medium text-gray-700 ${style.pillBgClass}`}
-                  >
-                    {row.number_of_wards}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+      {/* Column headers */}
+      <div className="hidden gap-2.5 sm:mb-2.5 sm:grid sm:grid-cols-[1.5fr_1.1fr_1.1fr_1.1fr]">
+        <div className="flex items-center gap-3 rounded-lg bg-green-700 px-5 py-3 text-sm font-semibold text-white">
+          <span className="w-8">SN</span>
+          <span>LGA</span>
         </div>
+        <div className="flex items-center justify-center rounded-lg bg-green-700 px-5 py-3 text-sm font-semibold text-white">
+          Health Facilities
+        </div>
+        <div className="flex items-center justify-center rounded-lg bg-green-700 px-5 py-3 text-sm font-semibold text-white">
+          Population
+        </div>
+        <div className="flex flex-col items-center justify-center rounded-lg bg-green-700 px-5 py-2.5 text-center text-white">
+          <span className="text-sm font-semibold leading-tight">Density</span>
+          <span className="text-[11px] italic leading-tight text-green-100">
+            per {formatNumber(densityPer)} Population
+          </span>
+        </div>
+      </div>
+
+      {/* Rows */}
+      <div className="flex flex-col gap-2.5">
+        {data.map((row, i) => {
+          const hard = isHardToReach(row.hard_to_reach_lgas);
+          const style = hard ? styles.hard : styles.safe;
+          const sn = (currentPage - 1) * pageSize + i + 1;
+          const density =
+            row.density ??
+            Math.round((row.health_facilities / row.lga_population) * densityPer);
+
+          return (
+            <div
+              key={row.id ?? `${row.lga}-${i}`}
+              className="grid grid-cols-1 gap-2.5 sm:grid-cols-[1.5fr_1.1fr_1.1fr_1.1fr]"
+            >
+              {/* LGA cell — only this one carries the status color */}
+              <div
+                className={`flex items-center gap-3 rounded-lg px-5 py-3 text-sm ${style.pillBgClass}`}
+              >
+                <span
+                  className={`w-8 font-medium ${hard ? style.textClass : "text-gray-500"
+                    }`}
+                >
+                  {String(sn).padStart(2, "0")}
+                </span>
+                <span
+                  className={`font-semibold ${hard ? style.textClass : "text-green-700"
+                    }`}
+                >
+                  {row.lga}
+                </span>
+              </div>
+
+              {/* Neutral data cells */}
+              <div className="flex items-center justify-center rounded-lg bg-green-50 px-5 py-3 text-sm font-medium text-gray-700">
+                <span className="mr-1 text-xs text-gray-400 sm:hidden">
+                  Health Facilities:
+                </span>
+                {formatNumber(row.health_facilities)}
+              </div>
+
+              <div className="flex items-center justify-center rounded-lg bg-green-50 px-5 py-3 text-sm font-medium text-gray-700">
+                <span className="mr-1 text-xs text-gray-400 sm:hidden">
+                  Population:
+                </span>
+                {formatNumber(row.lga_population)}
+              </div>
+
+              <div className="flex items-center justify-center rounded-lg bg-green-50 px-5 py-3 text-sm font-medium text-gray-700">
+                <span className="mr-1 text-xs text-gray-400 sm:hidden">
+                  Density:
+                </span>
+                {density}
+              </div>
+            </div>
+          );
+        })}
       </div>
 
       {/* Pagination */}
@@ -246,8 +244,8 @@ const LgaSummaryTable: React.FC<LgaSummaryTableProps> = ({
                   type="button"
                   onClick={() => onPageChange(p)}
                   className={`flex h-7 w-7 items-center justify-center rounded-full font-medium ${p === currentPage
-                    ? "bg-green-100 text-green-700"
-                    : "text-gray-500 hover:bg-gray-50"
+                      ? "bg-green-100 text-green-700"
+                      : "text-gray-500 hover:bg-gray-50"
                     }`}
                 >
                   {p}
@@ -279,7 +277,7 @@ const LgaSummaryTable: React.FC<LgaSummaryTableProps> = ({
         {(Object.keys(styles) as LgaStatus[]).map((key) => (
           <div key={key} className="flex items-center gap-2">
             <span
-              className={`h-2.5 w-2.5 rounded-lg ${styles[key].dotClass}`}
+              className={`h-2.5 w-2.5 rounded-full ${styles[key].dotClass}`}
             />
             <span>{styles[key].label}</span>
           </div>
@@ -289,4 +287,4 @@ const LgaSummaryTable: React.FC<LgaSummaryTableProps> = ({
   );
 };
 
-export default LgaSummaryTable;
+export default HealthFacilitiesByLgaTable;

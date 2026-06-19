@@ -1,145 +1,108 @@
 "use client";
 
 import React from "react";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  Cell,
-  LabelList,
-} from "recharts";
+import { FiInfo } from "react-icons/fi";
 
 export interface StateValue {
-  color?: string; // optional override
+  color?: string; // optional per-row bar color override (hex)
   budget?: number;
   id?: number;
   number?: string;
   page?: string;
-  percentage?: number;
-  service_provision?: number;
+  percentage?: number; // 0-100
+  service_provision?: string;
   state?: string;
   year?: number;
   zone?: string;
+  /** Highlights this row with a soft green background, like "Brotha Platforms" in the design */
+  highlight?: boolean;
 }
 
 export interface HorizontalStateBarChartProps {
-  data: StateValue[]; // sorted descending if desired
+  data: StateValue[];
   title?: string;
-  currencySymbol?: string;
   className?: string;
-  barColor?: string; // default if individual color not provided
-  max?: number; // optional max to unify scale (if omitted uses max from data)
-  showValueSuffix?: string; // e.g. "T" or ""
+  barColor?: string; // default bar color if a row doesn't override it
+  max?: number; // scale to use as 100% bar width; defaults to 100
+  showValueSuffix?: string; // defaults to "%"
+  serviceLabel?: string; // left column header
+  coverageLabel?: string; // right column header
+  /** Highlights the last row automatically, matching the screenshot, without needing per-row flags */
+  highlightLast?: boolean;
 }
-
-// const defaultColors = ["#2563EB", "#10B981", "#6366F1", "#F59E0B", "#EF4444"];
-const defaultColors = ["#2563EB"];
-
-const formatCurrency = (val: number, symbol = "₦") =>
-  symbol + val.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-
-const TooltipContent: React.FC<any> = ({
-  active,
-  payload,
-  currencySymbol,
-  suffix,
-}) => {
-  if (!active || !payload || !payload.length) return null;
-  const entry = payload[0].payload as StateValue;
-  return (
-    <div className="ui:bg-black ui:shadow ui:rounded ui:p-2 ui:text-sm ui:border ui:border-gray-200">
-      <div className="ui:font-semibold ui:mb-1">{entry.service_provision}</div>
-      <div>
-        {formatCurrency(Number(entry.percentage) * 100, currencySymbol)}
-        {suffix}
-      </div>
-    </div>
-  );
-};
 
 const HorizontalServiceProvisionBarChart: React.FC<
   HorizontalStateBarChartProps
 > = ({
   data,
   title,
-  currencySymbol = "₦",
   className = "",
   barColor = "#2563EB",
-  max,
-  showValueSuffix = "",
+  max = 100,
+  showValueSuffix = "%",
+  serviceLabel = "Service",
+  coverageLabel = "Coverage",
+  highlightLast = false,
 }) => {
-  const effectiveMax =
-    max && max > 0 ? max : Math.max(...data.map((d) => Number(d.percentage)));
+    return (
+      <div
+        className={`w-full rounded-2xl border border-gray-100 bg-white p-6 shadow-sm ${className}`}
+      >
+        {title && (
+          <div className="mb-4 flex items-center gap-1.5 text-lg font-bold text-green-700">
+            {title}
+            <FiInfo className="text-green-700" size={15} />
+          </div>
+        )}
 
-  return (
-    <div className={className}>
-      {title && (
-        <div className="ui:text-lg ui:font-semibold ui:mb-2 ui:text-green-700">
-          {title}
+        {/* Column headers */}
+        <div className="grid grid-cols-[140px_1fr] gap-4 border-b border-gray-200 pb-2.5 sm:grid-cols-[160px_1fr] bg-[#F8FAFC] rounded-t-2xl py-1">
+          <span className="text-sm font-semibold text-gray-800">
+            {serviceLabel}
+          </span>
+          <span className="text-sm font-semibold text-gray-800">
+            {coverageLabel}
+          </span>
         </div>
-      )}
-      <div className="ui:w-full ui:h-[500px]">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart
-            data={data}
-            layout="vertical"
-            margin={{ top: 8, right: 16, left: 0, bottom: 8 }}
-            barCategoryGap="20%"
-          >
-            <XAxis
-              type="number"
-              domain={[0, Math.ceil(effectiveMax * 1.1)]}
-              hide
-            />
-            <YAxis
-              dataKey="service_provision"
-              type="category"
-              width={120}
-              tick={{ fontSize: 14, fontWeight: 600 }}
-              axisLine={false}
-              tickLine={false}
-              interval={0}
-            />
-            <Tooltip
-              content={(props) => (
-                <TooltipContent
-                  {...props}
-                  currencySymbol={currencySymbol}
-                  suffix={showValueSuffix}
-                />
-              )}
-              wrapperStyle={{ outline: "none" }}
-            />
-            <Bar
-              dataKey="percentage"
-              isAnimationActive={false}
-              maxBarSize={24}
-              background={{ fill: "#f3f4f6" }}
-            >
-              {data.map((entry, idx) => {
-                const color =
-                  entry.color ||
-                  defaultColors[idx % defaultColors.length] ||
-                  barColor;
-                return <Cell key={entry.service_provision} fill={color} />;
-              })}
-              <LabelList
-                dataKey="percentage"
-                position="right"
-                formatter={(v: any) =>
-                  `${formatCurrency(v * 100, currencySymbol)}${showValueSuffix}`
-                }
-                style={{ fill: "#1f2d3a", fontWeight: 600, fontSize: 12 }}
-              />
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
+
+        {/* Rows */}
+        <div>
+          {data.map((row, i) => {
+            const value = Number(row.percentage) || 0;
+            const widthPct = Math.min(100, Math.max(0, (value / max) * 100));
+            const color = row.color || barColor;
+            const isHighlighted =
+              row.highlight || (highlightLast && i === data.length - 1);
+            const isLastRow = i === data.length - 1;
+
+            return (
+              <div
+                key={row.id ?? row.service_provision ?? i}
+                className={`grid grid-cols-[140px_1fr] items-center gap-4 px-2 py-3 sm:grid-cols-[160px_1fr] transition-all duration-200 rounded-lg cursor-pointer ${isHighlighted ? "bg-green-50 hover:bg-green-100" : "hover:bg-gray-50"
+                  } ${!isLastRow && !isHighlighted ? "border-b border-gray-100" : ""} hover:shadow-md hover:bg-green-100`}
+              >
+                <span className="text-sm font-medium text-gray-700">
+                  {row.service_provision}
+                </span>
+
+                <div className="flex items-center gap-3">
+                  <div className="h-2 flex-1 overflow-hidden rounded-full bg-gray-100">
+                    <div
+                      className="h-full rounded-full"
+                      style={{ width: `${widthPct}%`, backgroundColor: color }}
+                    />
+                  </div>
+                  <span className="w-10 shrink-0 text-right text-xs font-medium text-gray-500">
+                    {Math.round(value)}
+                    {showValueSuffix}
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
-    </div>
-  );
-};
+    );
+  };
 
 export default HorizontalServiceProvisionBarChart;
