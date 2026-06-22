@@ -63,7 +63,7 @@ const HealthFinance = () => {
       {loading && <LoadingScreen text="Please wait..." />}
       <div className="space-y-8 min-h-screen">
         {/* Row 1: 3 metric cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 py-2 px-4">
           <RechartMetricCard
             variant="budget"
             title="Total State Budget"
@@ -103,24 +103,25 @@ const HealthFinance = () => {
         </div>
 
         {/* Row 3: Charts */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 p-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 py-2 px-4">
           <ComparisonBarChart
             title="Health Expenditure Trend"
             data={sample}
             currencySymbol="₦"
-            actualColor="#2563EB"
-            budgetColor="#10B981"
+            actualColor="#9011CA"
+            budgetColor="#3B82F6"
             className="bg-white rounded-2xl shadow p-4"
           />
 
           <div className="p-4 bg-white rounded-2xl shadow">
             <LgaPerCapitaBarChart
-              title="Per Capita by LGA"
+              title="Health Expenditure Per Capita Breakdown"
               data={data}
               currencySymbol="₦"
               showValueSuffix=""
               className="w-full"
               autoScale={true}
+              totalCount={data?.length}
             />
           </div>
         </div>
