@@ -65,18 +65,18 @@ const BudgetVariant: React.FC<{
   ];
 
   return (
-    <div className="ui:max-w-sm ui:bg-white ui:rounded-2xl ui:shadow ui:p-6 ui:flex ui:flex-col ui:gap-4 ui:border ui:border-green-400">
-      <div className="ui:text-center">
-        <div className="ui:text-lg ui:font-semibold ui:text-green-800">
+    <div className="max-w-sm bg-white rounded-2xl shadow p-6 flex flex-col gap-4 border border-green-400">
+      <div className="text-center">
+        <div className="text-lg font-semibold text-green-800">
           {title}
         </div>
       </div>
 
-      <div className="ui:flex ui:justify-center ui:items-baseline ui:gap-1">
-        <span className="ui:text-2xl ui:font-bold ui:text-gray-900">
+      <div className="flex justify-center items-baseline gap-1">
+        <span className="text-2xl font-bold text-gray-900">
           {currencySymbol}
         </span>
-        <span className="ui:text-4xl ui:font-extrabold ui:text-black">
+        <span className="text-4xl font-extrabold text-black">
           {amount}
         </span>
       </div>
@@ -99,10 +99,10 @@ const BudgetVariant: React.FC<{
         </ResponsiveContainer>
       </div> */}
 
-      <div className="ui:w-full ui:flex ui:flex-col ui:gap-2">
+      <div className="w-full flex flex-col gap-2">
         {/* Box */}
         <div
-          className="ui:flex ui:w-full ui:rounded-xl ui:overflow-hidden ui:shadow-sm ui:border ui:border-gray-200"
+          className="flex w-full rounded-xl overflow-hidden shadow-sm border border-gray-200"
           style={{ height }}
         >
           {breakdown.map((item, idx) => (
@@ -112,18 +112,18 @@ const BudgetVariant: React.FC<{
                 width: `${item.percentage}%`,
                 backgroundColor: item.color,
               }}
-              className="ui:flex ui:items-center ui:justify-center ui:text-xs ui:font-semibold ui:text-white"
+              className="flex items-center justify-center text-xs font-semibold text-white"
             >
               {showLabels && item.percentage > 10 && `${item.percentage}%`}
             </div>
           ))}
         </div>
 
-        <div className="ui:grid ui:grid-cols-2 ui:sm:grid-cols-4 ui:gap-2 ui:text-xs ui:text-black">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs text-black">
           {breakdown.map((item, idx) => (
-            <div key={idx} className="ui:flex ui:items-center ui:gap-2">
+            <div key={idx} className="flex items-center gap-2">
               <span
-                className="ui:inline-block ui:w-3 h-3 ui:rounded"
+                className="inline-block w-3 h-3 rounded"
                 style={{ backgroundColor: item.color }}
               />
               {item.label} ({item.percentage}%)
@@ -132,14 +132,14 @@ const BudgetVariant: React.FC<{
         </div>
       </div>
 
-      <div className="ui:flex ui:gap-4 ui:mt-2 ui:justify-center ui:flex-wrap">
+      <div className="flex gap-4 mt-2 justify-center flex-wrap">
         {breakdown.map((b, i) => (
-          <div key={i} className="ui:flex ui:items-center ui:gap-2 ui:text-sm">
+          <div key={i} className="flex items-center gap-2 text-sm">
             <span
-              className="ui:inline-block ui:w-3 ui:h-3 ui:rounded-full ui:flex-shrink-0"
+              className="inline-block w-3 h-3 rounded-full flex-shrink-0"
               style={{ backgroundColor: b.color }}
             />
-            <span className="ui:text-gray-700">{b.label}</span>
+            <span className="text-gray-700">{b.label}</span>
           </div>
         ))}
       </div>
@@ -163,14 +163,14 @@ const BudgetVariant: React.FC<{
 //   ];
 
 //   return (
-//     <div className="ui:max-w-sm ui:bg-white ui:rounded-2xl ui:shadow ui:p-6 ui:flex ui:flex-col ui:items-center ui:gap-4 ui:border ui:border-green-400">
-//       <div className="ui:text-center">
-//         <div className="ui:text-lg ui:font-semibold ui:text-gray-900">
+//     <div className="max-w-sm bg-white rounded-2xl shadow p-6 flex flex-col items-center gap-4 border border-green-400">
+//       <div className="text-center">
+//         <div className="text-lg font-semibold text-gray-900">
 //           {title}
 //         </div>
 //       </div>
 
-//       <div className="ui:relative ui:flex ui:items-center ui:justify-center ">
+//       <div className="relative flex items-center justify-center ">
 //         <div style={{ width: 160, height: 150, position: "relative" }}>
 //           <ResponsiveContainer width="100%" height="100%">
 //             <RadialBarChart
@@ -206,15 +206,15 @@ const BudgetVariant: React.FC<{
 //               </RadialBar>
 //             </RadialBarChart>
 //           </ResponsiveContainer>
-//           <div className="ui:absolute ui:inset-0 ui:flex ui:flex-col ui:items-center ui:justify-center ui:pointer-events-none">
-//             <div className="ui:text-3xl ui:font-bold ui:text-black ui:mb-10">
+//           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+//             <div className="text-3xl font-bold text-black mb-10">
 //               {safePct.toFixed(1)}%
 //             </div>
 //           </div>
-//           <div className="ui:absolute ui:left-0 ui:bottom-0 ui:text-xs ui:font-medium ui:text-gray-700">
+//           <div className="absolute left-0 bottom-0 text-xs font-medium text-gray-700">
 //             0%
 //           </div>
-//           <div className="ui:absolute ui:right-0 ui:bottom-0 ui:text-xs ui:font-medium ui:text-gray-700">
+//           <div className="absolute right-0 bottom-0 text-xs font-medium text-gray-700">
 //             {maxPct}%
 //           </div>
 //         </div>
@@ -237,14 +237,14 @@ const GaugeVariant: React.FC<{
   const data = [{ name: "filled", value: percentOfMax }];
 
   return (
-    <div className="ui:max-w-sm ui:bg-white ui:rounded-2xl ui:shadow ui:p-6 ui:flex ui:flex-col ui:items-center ui:gap-4 ui:border ui:border-green-400">
-      <div className="ui:text-center">
-        <div className="ui:text-lg ui:font-semibold ui:text-green-800">
+    <div className="max-w-sm bg-white rounded-2xl shadow p-6 flex flex-col items-center gap-4 border border-green-400">
+      <div className="text-center">
+        <div className="text-lg font-semibold text-green-800">
           {title}
         </div>
       </div>
 
-      <div className="ui:relative ui:flex ui:items-center ui:justify-center ">
+      <div className="relative flex items-center justify-center ">
         <div style={{ width: 160, height: 150, position: "relative" }}>
           <ResponsiveContainer width="100%" height="100%">
             <RadialBarChart
@@ -277,15 +277,15 @@ const GaugeVariant: React.FC<{
               </RadialBar>
             </RadialBarChart>
           </ResponsiveContainer>
-          <div className="ui:absolute ui:inset-0 ui:flex ui:flex-col ui:items-center ui:justify-center ui:pointer-events-none">
-            <div className="ui:text-3xl ui:font-bold ui:text-black ui:mb-10">
+          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+            <div className="text-3xl font-bold text-black mb-10">
               {safePct.toFixed(1)}%
             </div>
           </div>
-          <div className="ui:absolute ui:left-0 ui:bottom-0 ui:text-xs ui:font-medium ui:text-gray-700">
+          <div className="absolute left-0 bottom-0 text-xs font-medium text-gray-700">
             0%
           </div>
-          <div className="ui:absolute ui:right-0 ui:bottom-0 ui:text-xs ui:font-medium ui:text-gray-700">
+          <div className="absolute right-0 bottom-0 text-xs font-medium text-gray-700">
             {maxPct}%
           </div>
         </div>
@@ -301,17 +301,17 @@ const SimpleVariant: React.FC<{
   currencyDenotation?: string;
 }> = ({ title, amount, currencySymbol, currencyDenotation }) => {
   return (
-    <div className="ui:max-w-sm ui:bg-white ui:rounded-2xl ui:shadow ui:p-6 ui:flex ui:flex-col ui:gap-4 ui:border ui:border-green-400">
-      <div className="ui:text-center">
-        <div className="ui:text-lg ui:font-semibold ui:text-green-900">
+    <div className="max-w-sm bg-white rounded-2xl shadow p-6 flex flex-col gap-4 border border-green-400">
+      <div className="text-center">
+        <div className="text-lg font-semibold text-green-900">
           {title}
         </div>
       </div>
-      <div className="ui:flex ui:justify-center ui:items-baseline ui:gap-1 ui:h-[120px]">
-        <span className="ui:text-2xl ui:font-bold ui:text-gray-900 ui:mt-10">
+      <div className="flex justify-center items-baseline gap-1 h-[120px]">
+        <span className="text-2xl font-bold text-gray-900 mt-10">
           {currencySymbol}
         </span>
-        <span className="ui:text-4xl ui:font-extrabold ui:text-black">
+        <span className="text-4xl font-extrabold text-black">
           {amount}
         </span>
       </div>

@@ -45,35 +45,35 @@ const LandingPage: React.FC<LandingPageProps> = ({
 
   return (
     <>
-      <div className="ui:min-h-screen ui:flex ui:bg-[#DCF5DA] ui:items-center ui:justify-center ui:px-4 ui:py-8">
-        <div className="ui:w-full ui:bg-white ui:rounded-2xl ui:overflow-hidden ui:shadow-xl ui:grid ui:grid-cols-1 ui:md:grid-cols-2">
+      <div className="min-h-screen flex bg-[#DCF5DA] items-center justify-center px-4 py-8">
+        <div className="w-full bg-white rounded-2xl overflow-hidden shadow-xl grid grid-cols-1 md:grid-cols-2">
           {/* Left: Logo */}
-          <div className="ui:flex ui:items-center ui:justify-center ui:p-6 ui:md:p-10 ui:bg-white">
+          <div className="flex items-center justify-center p-6 md:p-10 bg-white">
             <Image
               src={logoSrc}
               alt="NGF Logo"
               width={400}
               height={200}
-              className="ui:w-48 ui:md:w-80 ui:object-contain"
+              className="w-48 md:w-80 object-contain"
               priority
             />
           </div>
 
           {/* Right: Form */}
-          <div className="fui:lex ui:items-center ui:justify-center ui:bg-green-50 ui:p-6 ui:md:p-10">
+          <div className="flex items-center justify-center bg-green-50 p-6 md:p-10">
             <form
               onSubmit={onSubmit}
-              className="ui:w-full ui:max-w-sm ui:bg-white ui:p-6 ui:md:p-8 ui:rounded-xl ui:shadow-md"
+              className="w-full max-w-sm bg-white p-6 md:p-8 rounded-xl shadow-md"
             >
-              <h2 className="ui:text-xl ui:font-bold ui:text-center ui:text-green-800 ui:mb-1">
+              <h2 className="text-xl font-bold text-center text-green-800 mb-1">
                 Hello! Welcome to
               </h2>
-              <p className="ui:text-center ui:text-green-600 ui:font-semibold ui:mb-6">
+              <p className="text-center text-green-600 font-semibold mb-6">
                 {text}
               </p>
 
-              <div className="ui:mb-4">
-                <label htmlFor="username" className="ui:block ui:text-sm ui:font-medium ui:text-gray-700 ui:mb-1">
+              <div className="mb-4">
+                <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
                   {usernameLabel}
                 </label>
                 <input
@@ -83,12 +83,12 @@ const LandingPage: React.FC<LandingPageProps> = ({
                   value={username}
                   onChange={onUsernameChange}
                   placeholder="Enter your username"
-                  className="ui:w-full ui:p-3 ui:rounded-md ui:bg-green-50 ui:border ui:border-green-200 ui:text-black ui:placeholder-green-700 ui:focus:outline-none ui:focus:ring-2 ui:focus:ring-green-400"
+                  className="w-full p-3 rounded-md bg-green-50 border border-green-200 text-black placeholder-green-700 focus:outline-none focus:ring-2 focus:ring-green-400"
                 />
               </div>
 
-              <div className="ui:mb-6 ui:relative">
-                <label htmlFor="password" className="ui:block ui:text-sm ui:font-medium ui:text-gray-700 ui:mb-1">
+              <div className="mb-6 relative">
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
                   {passwordLabel}
                 </label>
                 <input
@@ -98,11 +98,11 @@ const LandingPage: React.FC<LandingPageProps> = ({
                   value={password}
                   onChange={onPasswordChange}
                   placeholder="Enter your password"
-                  className="ui:w-full ui:p-3 ui:rounded-md ui:bg-green-50 ui:border ui:border-green-200 ui:text-black ui:placeholder-green-700 ui:focus:outline-none ui:focus:ring-2 ui:focus:ring-green-400"
+                  className="w-full p-3 rounded-md bg-green-50 border border-green-200 text-black placeholder-green-700 focus:outline-none focus:ring-2 focus:ring-green-400"
                 />
                 <div
                   onClick={() => setShowPassword((prev) => !prev)}
-                  className="ui:absolute ui:top-9 ui:right-3 ui:cursor-pointer ui:text-green-700"
+                  className="absolute top-9 right-3 cursor-pointer text-green-700"
                 >
                   {showPassword ? <FaEyeSlash /> : <FaEye />}
                 </div>
@@ -111,16 +111,16 @@ const LandingPage: React.FC<LandingPageProps> = ({
               <button
                 type="submit"
                 disabled={loading}
-                className={`ui:w-full ui:py-2 ui:rounded ui:font-semibold ui:transition ui:duration-200 ui:cursor-pointer ${loading
-                    ? "ui:bg-green-300 ui:cursor-not-allowed"
-                    : "ui:bg-green-600 ui:hover:bg-green-700 ui:text-white"
+                className={`w-full py-2 rounded font-semibold transition duration-200 cursor-pointer ${loading
+                    ? "bg-green-300 cursor-not-allowed"
+                    : "bg-green-600 hover:bg-green-700 text-white"
                   }`}
               >
                 {loading ? "Processing..." : submitLabel}
               </button>
 
               {copyRight && (
-                <p className="ui:text-xs ui:text-center ui:text-gray-400 ui:mt-6">
+                <p className="text-xs text-center text-gray-400 mt-6">
                   &copy; {dateTime.getFullYear()} NGF
                 </p>
               )}

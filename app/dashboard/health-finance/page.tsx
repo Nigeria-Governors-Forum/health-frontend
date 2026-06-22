@@ -31,7 +31,7 @@ const HealthFinance = () => {
 
     try {
       const stats = await httpClient.get(
-        `${Endpoints.healthFinance.summary}/${stateParam}/${selectedYear}`
+        `${Endpoints.healthFinance.summary}/${stateParam}/${selectedYear}`,
       );
       // console.log(stats);
       // @ts-ignore
@@ -105,7 +105,7 @@ const HealthFinance = () => {
             currencySymbol="₦"
             actualColor="#2563EB"
             budgetColor="#10B981"
-            className="ui:bg-white ui:rounded-2xl ui:shadow ui:p-4"
+            className="bg-white rounded-2xl shadow p-4"
           />
           
 
@@ -115,7 +115,7 @@ const HealthFinance = () => {
               data={data}
               currencySymbol="₦"
               showValueSuffix=""
-              className="ui-w-full"
+              className="w-full"
               autoScale={true}
             />
           </div>
@@ -123,76 +123,83 @@ const HealthFinance = () => {
       </div> */}
 
       <div className="space-y-8 min-h-screen">
-  {/* Row 1: 3 metric cards */}
-  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
-    <RechartMetricCard
-      variant="budget"
-      title="Total State Budget"
-      amount={stateData?.state_budget?.formattedTotal || 0}
-      breakdown={stateData?.state_budget?.breakdown || []}
-      currencySymbol="₦"
-    />
+        {/* Row 1: 3 metric cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+          <RechartMetricCard
+            variant="budget"
+            title="Total State Budget"
+            amount={stateData?.state_budget?.formattedTotal || 0}
+            breakdown={stateData?.state_budget?.breakdown || []}
+            currencySymbol="₦"
+          />
 
-    <RechartMetricCard
-      variant="budget"
-      title="Total Health Budget"
-      amount={stateData?.health_budget?.formattedTotal || 0}
-      breakdown={stateData?.health_budget?.breakdown || []}
-      currencySymbol="₦"
-    />
+          <RechartMetricCard
+            variant="budget"
+            title="Total Health Budget"
+            amount={stateData?.health_budget?.formattedTotal || 0}
+            breakdown={stateData?.health_budget?.breakdown || []}
+            currencySymbol="₦"
+          />
 
-    <RechartMetricCard
-      variant="gauge"
-      title="Health Allocation"
-      valuePct={Number(percentage)}
-      maxPct={15}
-    />
-  </div>
+          <RechartMetricCard
+            variant="gauge"
+            title="Health Allocation"
+            valuePct={Number(percentage)}
+            maxPct={15}
+          />
+        </div>
 
-  {/* Row 2: 1 wide card (Per Capita) */}
-  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 p-4">
-    <RechartMetricCard
-      variant="simple"
-      title="Health Expenditure per Capita"
-      amount={
-        formatNumber(
-          parseFloat(
-            Number(stateData?.expenditure?.[0]?.per_capita).toFixed(2)
-          )
-        ) as string
-      }
-      currencySymbol="₦"
-      currencyDenotation="T"
-    />
+        {/* Row 2: 1 wide card (Per Capita) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 p-4">
+          <RechartMetricCard
+            variant="simple"
+            title="Health Expenditure per Capita"
+            amount={
+              formatNumber(
+                parseFloat(
+                  Number(stateData?.expenditure?.[0]?.per_capita).toFixed(2),
+                ),
+              ) as string
+            }
+            currencySymbol="₦"
+            currencyDenotation="T"
+          />
 
-    {/* Placeholder for future card OR leave blank */}
-    <div className="hidden lg:block"></div>
-  </div>
+          {/* Placeholder for future card OR leave blank */}
+          <div className="hidden lg:block"></div>
+        </div>
 
-  {/* Row 3: Charts */}
-  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 p-4">
-    <ComparisonBarChart
-      title="Health Expenditure Trend"
-      data={sample}
-      currencySymbol="₦"
-      actualColor="#2563EB"
-      budgetColor="#10B981"
-      className="ui:bg-white ui:rounded-2xl ui:shadow ui:p-4"
-    />
+        {/* Row 3: Charts */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 p-4">
+          <ComparisonBarChart
+            title="Health Expenditure Trend"
+            data={sample}
+            currencySymbol="₦"
+            actualColor="#2563EB"
+            budgetColor="#10B981"
+            className="bg-white rounded-2xl shadow p-4"
+          />
 
-    <div className="p-4 bg-white rounded-2xl shadow">
-      <LgaPerCapitaBarChart
-        title="Per Capita by LGA"
-        data={data}
-        currencySymbol="₦"
-        showValueSuffix=""
-        className="ui-w-full"
-        autoScale={true}
-      />
-    </div>
-  </div>
-</div>
-
+          <div className="p-4 bg-white rounded-2xl shadow">
+            <LgaPerCapitaBarChart
+              title="Per Capita by LGA"
+              data={data}
+              currencySymbol="₦"
+              showValueSuffix=""
+              className="w-full"
+              autoScale={true}
+            />
+          </div>
+        </div>
+        {/* <div className="flex justify-center pt-4">
+          <button
+            onClick={() => router.push("/dashboard/zonal-health-finance")}
+            className="text-[#00A141] px-8 py-2 border border-[#00A141] text-lg font-semibold rounded-full cursor-pointer hover:bg-green-50 transition-colors"
+          >
+            View Zonal / National Comparison
+          </button>
+        </div> */}
+      </div>
     </>
   );
 };

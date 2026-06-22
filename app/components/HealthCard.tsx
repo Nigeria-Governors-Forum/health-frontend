@@ -97,7 +97,7 @@
 //                     status === "hard"
 //                       ? "bg-red-400" // you can also emphasize full row
 //                       : ""
-//                   } ${isLast? "ui:text-xl" : ""}`}
+//                   } ${isLast? "text-xl" : ""}`}
 //                 >
 //                   <td
 //                     className={`px-4 py-3 font-medium whitespace-nowrap ${style.textClass}`}

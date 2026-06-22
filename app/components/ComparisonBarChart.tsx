@@ -62,19 +62,19 @@ const TooltipContent: React.FC<any> = ({
   );
 
   return (
-    <div className="ui:bg-black ui:shadow ui:rounded ui:p-3 ui:text-sm ui:border ui:border-gray-200">
-      <div className="ui:font-semibold ui:mb-1">{label}</div>
-      <div className="ui:flex ui:flex-col ui:gap-1">
-        <div className="ui:flex ui:items-center">
+    <div className="bg-black shadow rounded p-3 text-sm border border-gray-200">
+      <div className="font-semibold mb-1">{label}</div>
+      <div className="flex flex-col gap-1">
+        <div className="flex items-center">
           <div
-            className="ui:w-2 ui:h-2 ui:rounded-full ui:mr-2"
+            className="w-2 h-2 rounded-full mr-2"
             style={{ backgroundColor: "#10B981" }}
           />
           <span>Budgeted: {formatCurrency(budgeted, currencySymbol)}</span>
         </div>
-        <div className="ui:flex ui:items-center">
+        <div className="flex items-center">
           <div
-            className="ui:w-2 ui:h-2 ui:rounded-full ui:mr-2"
+            className="w-2 h-2 rounded-full mr-2"
             style={{ backgroundColor: "#2563EB" }}
           />
           <span>Actual: {formatCurrency(actual, currencySymbol)}</span>
@@ -103,11 +103,11 @@ const ComparisonBarChart: React.FC<ComparisonBarChartProps> = ({
   return (
     <div className={className}>
       {title && (
-        <div className="ui:mb-2 ui:text-base ui:font-semibold ui:text-gray-800">
+        <div className="mb-2 text-base font-semibold text-gray-800">
           {title}
         </div>
       )}
-      <div className="ui:w-full ui:h-64">
+      <div className="w-full h-64">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             data={data}
@@ -144,7 +144,7 @@ const ComparisonBarChart: React.FC<ComparisonBarChartProps> = ({
               height={36}
               wrapperStyle={{ fontSize: 12 }}
               formatter={(value) => (
-                <span className="ui:font-medium">{value}</span>
+                <span className="font-medium">{value}</span>
               )}
             />
             {/* ✅ Budgeted bar */}

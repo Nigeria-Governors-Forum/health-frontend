@@ -55,10 +55,16 @@ export const navItem: NavItem[] = [
         label: "Health Facilities",
         roles: ["user", "h-admin", "s-admin"],
       },
+      // {
+      //   href: "/dashboard/zonal-health-facilities",
+      //   icon: <FaMoneyCheck />,
+      //   label: "Zonal Health Facilities",
+      //   roles: ["user", "h-admin", "s-admin"],
+      // },
       {
-        href: "/dashboard/zonal-health-facilities",
+        href: "/dashboard/health-insurance",
         icon: <FaMoneyCheck />,
-        label: "Zonal Health Facilities",
+        label: "Health Insurance",
         roles: ["user", "h-admin", "s-admin"],
       },
       {
