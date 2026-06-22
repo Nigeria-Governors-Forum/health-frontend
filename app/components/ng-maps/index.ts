@@ -1,5 +1,6 @@
 export { NigeriaStatesChoropleth, type NigeriaStatesChoroplethProps } from "./NigeriaStatesChoropleth";
 export { StateLGAChoropleth, type StateLGAChoroplethProps } from "./StateLGAChoropleth";
+export { AfricaMap, type AfricaMapProps } from "./AfricaMap";
 export { lgaKeyFromName, stateSlugFromLGAProps } from "./lga-geo";
 export type {
   NigeriaLGAFeature,
@@ -13,3 +14,4 @@ export type {
   NigeriaStateFeatureProperties,
 } from "./states-geo";
 export { normalizeStateName, slugify } from "./slugs";
+

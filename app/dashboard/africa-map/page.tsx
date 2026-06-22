@@ -11,7 +11,7 @@ import {
   FaUsers,
   FaMedkit,
 } from "react-icons/fa";
-import AfricaMap from "@/app/components/maps/AfricaMap";
+import { AfricaMap } from "@/app/components/ng-maps";
 import { type RegionProperties } from "@/app/components/maps/types";
 
 interface CountryStats {
@@ -179,11 +179,10 @@ export default function AfricaHealthObservatory() {
               <button
                 key={key}
                 onClick={() => setSelectedMetric(key)}
-                className={`px-4 py-2 text-xs font-semibold rounded-full transition-all cursor-pointer ${
-                  isActive
+                className={`px-4 py-2 text-xs font-semibold rounded-full transition-all cursor-pointer ${isActive
                     ? "bg-[#06923E] text-white shadow-md"
                     : "bg-[#ecf1ec] text-[#06923E] hover:bg-[#d8ebd8]"
-                }`}
+                  }`}
               >
                 {config.label}
               </button>
@@ -380,11 +379,10 @@ export default function AfricaHealthObservatory() {
                   </div>
                   <div className="space-y-0.5">
                     <span className="text-[10px] text-gray-500 block">ABUJA DECLARATION STATUS</span>
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full inline-block ${
-                      selectedCountry.budgetAlloc >= 15
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full inline-block ${selectedCountry.budgetAlloc >= 15
                         ? "bg-green-100 text-green-800"
                         : "bg-amber-100 text-amber-800"
-                    }`}>
+                      }`}>
                       {selectedCountry.budgetAlloc >= 15 ? "Achieved (15%)" : "Under Target"}
                     </span>
                   </div>
@@ -478,6 +476,8 @@ export default function AfricaHealthObservatory() {
           </AnimatePresence>
         </div>
       </div>
+
+      <AfricaMap />
     </div>
   );
 }

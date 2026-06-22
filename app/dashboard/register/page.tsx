@@ -20,6 +20,8 @@ const RegisterPage = () => {
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const [registeredUser, setRegisteredUser] = useState<any>(null);
 
   const roles = [
     { value: "user", label: "User" },
