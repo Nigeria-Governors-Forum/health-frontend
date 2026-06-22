@@ -1,24 +1,15 @@
+
 "use client";
 
 import React from "react";
-import {
-  BarChart,
-  Bar,
-  Cell,
-  ResponsiveContainer,
-  RadialBarChart,
-  RadialBar,
-  PolarAngleAxis,
-  XAxis,
-  YAxis,
-} from "recharts";
+import { FiInfo } from "react-icons/fi";
 
 export type Variant = "budget" | "gauge" | "simple";
 
 export interface BreakdownItem {
   label: string;
   percentage: number;
-  color: string; // hex or CSS color
+  color: string;
 }
 
 export interface MetricCardProps {
@@ -29,16 +20,19 @@ export interface MetricCardProps {
   breakdown?: BreakdownItem[];
   valuePct?: number;
   maxPct?: number;
+  /** Target marker shown as a green tick on the gauge arc */
+  targetPct?: number;
+  /** e.g. "Updated Nov 24, 2026" — shown at the bottom center of gauge */
+  updatedAt?: string;
+  /** Color of the filled arc. Defaults to #C0392B (red-orange) */
+  arcColor?: string;
   className?: string;
   currencyDenotation?: string;
 }
 
-// simple classnames merger
 const cn = (...args: (string | undefined)[]) => args.filter(Boolean).join(" ");
 
-const formatCurrency = (val: number, symbol = "₦") => {
-  return symbol + val.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-};
+// ─── Budget ────────────────────────────────────────────────────────────────────
 
 const BudgetVariant: React.FC<{
   title: string;
@@ -46,100 +40,42 @@ const BudgetVariant: React.FC<{
   currencySymbol: string;
   breakdown: BreakdownItem[];
   currencyDenotation?: string;
-  height?: number;
-  showLabels?: boolean;
-}> = ({
-  title,
-  amount,
-  currencySymbol,
-  breakdown,
-  currencyDenotation,
-  height = 28,
-  showLabels = true,
-}) => {
-  const data = [
-    breakdown.reduce<Record<string, number>>((acc, b) => {
-      acc[b.label] = b.percentage;
-      return acc;
-    }, {}),
-  ];
-
+}> = ({ title, amount, currencySymbol, breakdown, currencyDenotation }) => {
   return (
-    <div className="max-w-sm bg-white rounded-2xl shadow p-6 flex flex-col gap-4 border border-green-400">
-      <div className="text-center">
-        <div className="text-lg font-semibold text-green-800">
-          {title}
-        </div>
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 flex flex-col gap-4 h-full justify-between">
+      {/* Title */}
+      <div className="flex items-center gap-1.5 pb-3 border-b-2 border-gray-200">
+        <span className="text-base font-bold text-gray-800">{title}</span>
+        <FiInfo className="text-green-900" size={20} />
       </div>
 
-      <div className="flex justify-center items-baseline gap-1">
-        <span className="text-2xl font-bold text-gray-900">
-          {currencySymbol}
-        </span>
-        <span className="text-4xl font-extrabold text-black">
-          {amount}
+      {/* Amount */}
+      <div className="text-center py-2">
+        <span className="text-3xl font-extrabold text-gray-900 tracking-tight">
+          {currencySymbol}{amount}{currencyDenotation}
         </span>
       </div>
 
-      {/* <div style={{ width: "100%", height: 16 }}>
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data} layout="horizontal" stackOffset="expand">
-            {breakdown.map((b) => (
-              <Bar
-                key={b.label}
-                dataKey={b.label}
-                stackId="a"
-                isAnimationActive={false}
-                background={false}
-              >
-                <Cell fill={b.color} />
-              </Bar>
-            ))}
-          </BarChart>
-        </ResponsiveContainer>
-      </div> */}
-
-      <div className="w-full flex flex-col gap-2">
-        {/* Box */}
-        <div
-          className="flex w-full rounded-xl overflow-hidden shadow-sm border border-gray-200"
-          style={{ height }}
-        >
-          {breakdown.map((item, idx) => (
-            <div
-              key={idx}
-              style={{
-                width: `${item.percentage}%`,
-                backgroundColor: item.color,
-              }}
-              className="flex items-center justify-center text-xs font-semibold text-white"
-            >
-              {showLabels && item.percentage > 10 && `${item.percentage}%`}
-            </div>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs text-black">
-          {breakdown.map((item, idx) => (
-            <div key={idx} className="flex items-center gap-2">
-              <span
-                className="inline-block w-3 h-3 rounded"
-                style={{ backgroundColor: item.color }}
-              />
-              {item.label} ({item.percentage}%)
-            </div>
-          ))}
-        </div>
+      {/* Segmented bar */}
+      <div className="flex w-full overflow-hidden rounded-lg" style={{ height: 28 }}>
+        {breakdown.map((item, idx) => (
+          <div
+            key={idx}
+            style={{ width: `${item.percentage}%`, backgroundColor: item.color }}
+          />
+        ))}
       </div>
 
-      <div className="flex gap-4 mt-2 justify-center flex-wrap">
-        {breakdown.map((b, i) => (
-          <div key={i} className="flex items-center gap-2 text-sm">
-            <span
-              className="inline-block w-3 h-3 rounded-full flex-shrink-0"
-              style={{ backgroundColor: b.color }}
-            />
-            <span className="text-gray-700">{b.label}</span>
+      {/* Labels — each centered under its own segment */}
+      <div className="flex w-full">
+        {breakdown.map((item, idx) => (
+          <div
+            key={idx}
+            style={{ width: `${item.percentage}%` }}
+            className="flex flex-col items-center"
+          >
+            <span className="text-xs text-gray-500 truncate w-full text-center">{item.label}</span>
+            <span className="text-xs font-bold text-gray-800">{item.percentage}%</span>
           </div>
         ))}
       </div>
@@ -147,152 +83,188 @@ const BudgetVariant: React.FC<{
   );
 };
 
-// const GaugeVariant: React.FC<{
-//   title: string;
-//   valuePct: number;
-//   maxPct: number;
-// }> = ({ title, valuePct = 0, maxPct = 100 }) => {
-//   const safePct = Math.min(Math.max(valuePct, 0), maxPct);
-//   const percentOfMax = (safePct / maxPct) * 100;
-//   const data = [
-//     { name: "filled", value: percentOfMax },
-//     // { name: "empty", value: 100 - percentOfMax },
-//     // { name: "empty", value: 100 - percentOfMax },
-//     // { name: "empty", value: 100 - percentOfMax },
-//     // { name: "empty", value: 100 - percentOfMax },
-//   ];
+// ─── Gauge ─────────────────────────────────────────────────────────────────────
 
-//   return (
-//     <div className="max-w-sm bg-white rounded-2xl shadow p-6 flex flex-col items-center gap-4 border border-green-400">
-//       <div className="text-center">
-//         <div className="text-lg font-semibold text-gray-900">
-//           {title}
-//         </div>
-//       </div>
+/**
+ * Convert polar angle (standard math: 0°=right, 90°=up, 180°=left)
+ * into SVG x/y coordinates.
+ * SVG has y-axis pointing DOWN, so we negate the sin term.
+ */
+function pt(cx: number, cy: number, r: number, angleDeg: number) {
+  const rad = (angleDeg * Math.PI) / 180;
+  return { x: cx + r * Math.cos(rad), y: cy - r * Math.sin(rad) };
+}
 
-//       <div className="relative flex items-center justify-center ">
-//         <div style={{ width: 160, height: 150, position: "relative" }}>
-//           <ResponsiveContainer width="100%" height="100%">
-//             <RadialBarChart
-//               cx="50%"
-//               cy="100%"
-//               innerRadius="70%"
-//               outerRadius="100%"
-//               startAngle={180}
-//               endAngle={0}
-//               data={data}
-//               barSize={20}
-//             >
-//               <PolarAngleAxis
-//                 type="number"
-//                 domain={[0, 100]}
-//                 angleAxisId={0}
-//                 tick={false}
-//               />
-//               <RadialBar
-//                 cornerRadius={10}
-//                 background={{ fill: "#f0f0f0" }}
-//                 dataKey="value"
-//                 animationDuration={600}
-//                 isAnimationActive={false}
-//                 fill="#dc2626"
-//               >
-//                 {data.map((entry, idx) => {
-//                   if (entry.name === "filled") {
-//                     return <Cell key={idx} fill="#dc2626" />;
-//                   }
-//                   return <Cell key={idx} fill="#f0f0f0" />;
-//                 })}
-//               </RadialBar>
-//             </RadialBarChart>
-//           </ResponsiveContainer>
-//           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-//             <div className="text-3xl font-bold text-black mb-10">
-//               {safePct.toFixed(1)}%
-//             </div>
-//           </div>
-//           <div className="absolute left-0 bottom-0 text-xs font-medium text-gray-700">
-//             0%
-//           </div>
-//           <div className="absolute right-0 bottom-0 text-xs font-medium text-gray-700">
-//             {maxPct}%
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
+/**
+ * SVG arc path from startDeg → endDeg going OVER THE TOP (clockwise in SVG).
+ * sweep-flag=1 means clockwise in screen coordinates (y-axis down),
+ * which visually goes left → top → right — exactly the semicircle we want.
+ */
+function arc(cx: number, cy: number, r: number, startDeg: number, endDeg: number) {
+  const s = pt(cx, cy, r, startDeg);
+  const e = pt(cx, cy, r, endDeg);
+  // largeArc=1 when the span is > 180° (only needed for the full background arc)
+  const large = startDeg - endDeg >= 180 ? 1 : 0;
+  return `M ${s.x} ${s.y} A ${r} ${r} 0 ${large} 1 ${e.x} ${e.y}`;
+}
 
 const GaugeVariant: React.FC<{
   title: string;
   valuePct: number;
   maxPct: number;
-}> = ({ title, valuePct = 0, maxPct = 100 }) => {
-  const safePct = Math.min(Math.max(valuePct, 0), maxPct);
-  const percentOfMax = (safePct / maxPct) * 100;
+  targetPct?: number;
+  updatedAt?: string;
+  arcColor?: string;
+}> = ({
+  title,
+  valuePct = 0,
+  maxPct = 100,
+  targetPct,
+  updatedAt,
+  arcColor = "#C0392B",
+}) => {
+    // ── dimensions ──────────────────────────────────────────────────────────────
+    const W = 260;
+    const H = 170;
+    const cx = W / 2;
+    const cy = H - 24;        // baseline sits near the bottom of the SVG
+    const R = 104;            // mid-radius of the arc stroke
+    const SW = 26;            // stroke width (arc thickness)
 
-  // Pick color based on comparison
-  const gaugeColor = safePct < maxPct ? "#dc2626" : "#16a34a"; // red if less, green if equal/max
+    // ── angles ──────────────────────────────────────────────────────────────────
+    // 180° = leftmost (0 on scale), 0° = rightmost (maxPct on scale)
+    const safe = Math.min(Math.max(valuePct, 0), maxPct);
+    const valAngle = 180 - (safe / maxPct) * 180;
+    const targAngle = targetPct != null
+      ? 180 - (Math.min(targetPct, maxPct) / maxPct) * 180
+      : null;
 
-  const data = [{ name: "filled", value: percentOfMax }];
+    // ── derived points ──────────────────────────────────────────────────────────
+    const tip = pt(cx, cy, R, valAngle);   // center of the dot at arc tip
 
-  return (
-    <div className="max-w-sm bg-white rounded-2xl shadow p-6 flex flex-col items-center gap-4 border border-green-400">
-      <div className="text-center">
-        <div className="text-lg font-semibold text-green-800">
-          {title}
+    // tick: slightly outside the outer edge of the arc
+    const tickOut = targAngle != null ? pt(cx, cy, R + SW / 2 + 10, targAngle) : null;
+    const tickIn = targAngle != null ? pt(cx, cy, R - SW / 2 - 2, targAngle) : null;
+    const lblPt = targAngle != null ? pt(cx, cy, R + SW / 2 + 22, targAngle) : null;
+
+    return (
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 flex flex-col h-full justify-between gap-4">
+        {/* Title */}
+        <div className="flex items-center gap-1.5 mb-1 pb-3 border-b-2 border-gray-200">
+          <span className="text-base font-bold text-gray-800">{title}</span>
+          <FiInfo className="text-green-900" size={20} />
+
         </div>
-      </div>
 
-      <div className="relative flex items-center justify-center ">
-        <div style={{ width: 160, height: 150, position: "relative" }}>
-          <ResponsiveContainer width="100%" height="100%">
-            <RadialBarChart
-              cx="50%"
-              cy="100%"
-              innerRadius="70%"
-              outerRadius="100%"
-              startAngle={180}
-              endAngle={0}
-              data={data}
-              barSize={20}
-            >
-              <PolarAngleAxis
-                type="number"
-                domain={[0, 100]}
-                angleAxisId={0}
-                tick={false}
+        {/* SVG Container */}
+        <div className="flex-1 flex items-center justify-center min-h-0 w-full">
+          <svg viewBox={`0 0 ${W} ${H}`} width="100%" className="max-w-[240px]" style={{ overflow: "visible" }}>
+
+            {/* ── gray background full arc ── */}
+            <path
+              d={arc(cx, cy, R, 180, 0)}
+              fill="none"
+              stroke="#E5E7EB"
+              strokeWidth={SW}
+              strokeLinecap="round"
+            />
+
+            {/* ── colored filled arc ── */}
+            {safe > 0 && (
+              <path
+                d={arc(cx, cy, R, 180, valAngle)}
+                fill="none"
+                stroke={arcColor}
+                strokeWidth={SW}
+                strokeLinecap="round"
               />
-              <RadialBar
-                cornerRadius={10}
-                background={{ fill: "#f0f0f0" }}
-                dataKey="value"
-                animationDuration={600}
-                isAnimationActive={false}
-                fill={gaugeColor} // ✅ use dynamic color
+            )}
+
+            {/* ── white dot with colored border at arc tip ── */}
+            <circle cx={tip.x} cy={tip.y} r={10} fill="white" stroke={arcColor} strokeWidth={3} />
+
+            {/* ── target tick ── */}
+            {tickIn && tickOut && (
+              <line
+                x1={tickIn.x} y1={tickIn.y}
+                x2={tickOut.x} y2={tickOut.y}
+                stroke="#16a34a"
+                strokeWidth={2.5}
+                strokeLinecap="round"
+              />
+            )}
+
+            {/* ── target label ── */}
+            {lblPt && targetPct != null && (
+              <text
+                x={lblPt.x} y={lblPt.y}
+                textAnchor="middle"
+                dominantBaseline="middle"
+                fontSize={11}
+                fontWeight={700}
+                fill="#16a34a"
               >
-                {data.map((entry, idx) => (
-                  <Cell key={idx} fill={gaugeColor} />
-                ))}
-              </RadialBar>
-            </RadialBarChart>
-          </ResponsiveContainer>
-          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-            <div className="text-3xl font-bold text-black mb-10">
-              {safePct.toFixed(1)}%
-            </div>
-          </div>
-          <div className="absolute left-0 bottom-0 text-xs font-medium text-gray-700">
-            0%
-          </div>
-          <div className="absolute right-0 bottom-0 text-xs font-medium text-gray-700">
-            {maxPct}%
-          </div>
+                {targetPct}%
+              </text>
+            )}
+
+            {/* ── large center value ── */}
+            <text
+              x={cx} y={cy - 20}
+              textAnchor="middle"
+              dominantBaseline="auto"
+              fontSize={40}
+              fontWeight={800}
+              fill="#111827"
+              fontFamily="inherit"
+            >
+              {safe}%
+            </text>
+
+            {/* ── updated label ── */}
+            {updatedAt && (
+              <text
+                x={cx} y={cy + 4}
+                textAnchor="middle"
+                dominantBaseline="hanging"
+                fontSize={10}
+                fill="#9CA3AF"
+                fontFamily="inherit"
+              >
+                {updatedAt}
+              </text>
+            )}
+
+            {/* ── 0% (left) ── */}
+            <text
+              x={cx - R - SW / 2 - 4} y={cy + 4}
+              textAnchor="end"
+              dominantBaseline="hanging"
+              fontSize={12}
+              fontWeight={600}
+              fill="#6B7280"
+            >
+              0%
+            </text>
+
+            {/* ── maxPct% (right) ── */}
+            <text
+              x={cx + R + SW / 2 + 4} y={cy + 4}
+              textAnchor="start"
+              dominantBaseline="hanging"
+              fontSize={12}
+              fontWeight={600}
+              fill="#6B7280"
+            >
+              {maxPct}%
+            </text>
+          </svg>
         </div>
       </div>
-    </div>
-  );
-};
+    );
+  };
+
+// ─── Simple ────────────────────────────────────────────────────────────────────
 
 const SimpleVariant: React.FC<{
   title: string;
@@ -301,40 +273,61 @@ const SimpleVariant: React.FC<{
   currencyDenotation?: string;
 }> = ({ title, amount, currencySymbol, currencyDenotation }) => {
   return (
-    <div className="max-w-sm bg-white rounded-2xl shadow p-6 flex flex-col gap-4 border border-green-400">
-      <div className="text-center">
-        <div className="text-lg font-semibold text-green-900">
-          {title}
-        </div>
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 flex flex-col gap-4 h-full">
+      {/* Outer title */}
+      <div className="flex items-center gap-1.5 pb-3 border-b-2 border-gray-200">
+        <span className="text-base font-bold text-gray-800">{title}</span>
+        <FiInfo className="text-green-900" size={20} />
       </div>
-      <div className="flex justify-center items-baseline gap-1 h-[120px]">
-        <span className="text-2xl font-bold text-gray-900 mt-10">
-          {currencySymbol}
-        </span>
-        <span className="text-4xl font-extrabold text-black">
-          {amount}
+
+      {/* Inner card */}
+      <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm flex flex-col gap-3 flex-1 justify-center">
+        {/* Green icon circle */}
+        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-600">
+          <svg viewBox="0 0 24 24" fill="none" width={20} height={20}>
+            <text
+              x="12" y="17"
+              textAnchor="middle"
+              fontSize="14"
+              fontWeight="bold"
+              fill="white"
+            >
+              ₦
+            </text>
+          </svg>
+        </div>
+
+        {/* Inner label */}
+        <span className="text-sm font-semibold text-gray-700">{title}</span>
+
+        {/* Amount */}
+        <span className="text-2xl font-extrabold text-green-600 tracking-tight">
+          {currencySymbol}{amount}{currencyDenotation}
         </span>
       </div>
     </div>
   );
 };
 
+// ─── Wrapper ───────────────────────────────────────────────────────────────────
+
 const RechartMetricCard: React.FC<MetricCardProps> = ({
   variant,
   title,
-  amount="",
+  amount = "",
   currencySymbol = "₦",
   breakdown = [],
   valuePct = 0,
   maxPct = 100,
+  targetPct,
+  updatedAt,
+  arcColor,
   className = "",
-  currencyDenotation = "M",
+  currencyDenotation = "",
 }) => {
-  const baseClass = cn(); // placeholder if you want to extend
-
   if (variant === "budget") {
     return (
-      <div className={cn(baseClass, className)}>
+      <div className={cn("h-full", className)}>
         <BudgetVariant
           title={title}
           amount={amount}
@@ -348,15 +341,22 @@ const RechartMetricCard: React.FC<MetricCardProps> = ({
 
   if (variant === "gauge") {
     return (
-      <div className={cn(baseClass, className)}>
-        <GaugeVariant title={title} valuePct={valuePct} maxPct={maxPct} />
+      <div className={cn("h-full", className)}>
+        <GaugeVariant
+          title={title}
+          valuePct={valuePct}
+          maxPct={maxPct}
+          targetPct={targetPct}
+          updatedAt={updatedAt}
+          arcColor={arcColor}
+        />
       </div>
     );
   }
 
   if (variant === "simple") {
     return (
-      <div className={cn(baseClass, className)}>
+      <div className={cn("h-full", className)}>
         <SimpleVariant
           title={title}
           amount={amount}
