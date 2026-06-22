@@ -14,6 +14,7 @@ import PopulationSummaryTable, {
   LgaRow,
 } from "@/app/components/PopulationSummaryTable";
 import { useRouter } from "next/navigation";
+import HealthTrainingTable from "@/app/components/Healthtrainingtable";
 
 interface HumanResourcePageProps {
   state?: string;
@@ -24,12 +25,27 @@ interface HumanResourcePageProps {
 
 const HumanResource = () => {
   const [loading, setLoading] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
+  const [searchValueTraining, setSearchValueTraining] = useState("");
   const { selectedState, selectedYear } = useTopbarFilters();
   const [stateData, setStateData] = useState<any>();
   const router = useRouter();
 
   const data: SummaryRow[] = stateData?.training_breakdown || [];
   const dataTwo: LgaRow[] = stateData?.profession || [];
+
+  const filteredData = dataTwo.filter((row) => {
+    const searchTerm = searchValue.toLowerCase();
+    const occupation = (row.occupation || "").toLowerCase();
+    const institution = (row.institution || "").toLowerCase();
+    return occupation.includes(searchTerm) || institution.includes(searchTerm);
+  });
+
+  const filteredTrainingData = data.filter((row) => {
+    const searchTerm = searchValueTraining.toLowerCase();
+    const institution = (row.institution || "").toLowerCase();
+    return institution.includes(searchTerm);
+  });
 
   const fetchData = async () => {
     if (!selectedState || !selectedYear) return;
@@ -101,11 +117,48 @@ const HumanResource = () => {
         </div>
         <PopulationSummaryTable
           title="Health Workforce Breakdown"
-          data={dataTwo}
+          data={filteredData}
+          searchValue={searchValue}
+          onSearchChange={setSearchValue}
+          totalCount={filteredData.length}
         />
         <HealthCard
           title="Health Training Institutions Breakdown"
-          data={data}
+          data={filteredTrainingData}
+          searchValue={searchValueTraining}
+          onSearchChange={setSearchValueTraining}
+          totalCount={filteredTrainingData.length}
+        />
+        <HealthTrainingTable
+          data={[
+            {
+              institution: "College(s) of Medicine",
+              programs: [
+                { program: "Medicine", quota: 45 },
+                { program: "Dentistry", quota: 34 },
+              ],
+            },
+            {
+              institution: "School(s) of Nursing & Midwifery",
+              programs: [
+                { program: "Nursing", quota: 56 },
+                { program: "Midwifery", quota: 28 },
+                { program: "Nursing University Graduates", quota: 98 },
+              ],
+            },
+            {
+              institution: "School(s) of Health Technology",
+              programs: [
+                { program: "Community Health Extention Workers", quota: 57 },
+                { program: "Junior Community Health Extention Workers", quota: 86 },
+                { program: "Pharm Tech", quota: 34 },
+                { program: "Dental Technician", quota: 50 },
+                { program: "Lab Tech", quota: 62 },
+                { program: "Medical Record Officers", quota: 18 },
+                { program: "Public Health", quota: 43 },
+              ],
+            },
+          ]}
         />
 
         <div className="flex justify-center pt-4">
