@@ -92,6 +92,30 @@ export const navItem: NavItem[] = [
         roles: ["user", "h-admin", "s-admin"],
       },
       {
+        href: "/dashboard/service-coverage",
+        icon: <FaMoneyCheck />,
+        label: "Service Coverage",
+        roles: ["user", "h-admin", "s-admin"],
+      },
+      {
+        href: "/dashboard/health-outcomes",
+        icon: <FaMoneyCheck />,
+        label: "Health Outcomes",
+        roles: ["user", "h-admin", "s-admin"],
+      },
+      {
+        href: "/dashboard/flagship-projects",
+        icon: <FaMoneyCheck />,
+        label: "Flagship Projects",
+        roles: ["user", "h-admin", "s-admin"],
+      },
+      {
+        href: "/dashboard/partners-mapping",
+        icon: <FaMoneyCheck />,
+        label: "Partners Mapping",
+        roles: ["user", "h-admin", "s-admin"],
+      },
+      {
         href: "/dashboard/africa-map",
         icon: <FaGlobeAfrica />,
         label: "Africa Map",

@@ -267,7 +267,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { FiChevronDown, FiMapPin, FiCalendar, FiHome } from "react-icons/fi";
+import { FiChevronDown, FiMapPin, FiCalendar, FiHome, FiGrid } from "react-icons/fi";
 
 export type ComparisonMode = "zonal" | "national" | "trend";
 
@@ -285,26 +285,35 @@ export interface ComparisonFilterPanelProps {
   states: SelectOption[];
   years: SelectOption[];
   indicators?: SelectOption[];
+  groups?: SelectOption[];
 
   selectedZone?: string;
   selectedState?: string;
   selectedYear?: string;
   selectedIndicator?: string;
+  selectedGroup?: string;
 
   onZoneChange?: (value: string) => void;
   onStateChange?: (value: string) => void;
   onYearChange?: (value: string) => void;
   onIndicatorChange?: (value: string) => void;
+  onGroupChange?: (value: string) => void;
 
   zonesLoading?: boolean;
   statesLoading?: boolean;
   yearsLoading?: boolean;
   indicatorsLoading?: boolean;
+  groupsLoading?: boolean;
 
   className?: string;
   indicatorTitle?: string;
   indicatorText?: string;
   indicatorIcon?: React.ReactNode;
+
+  groupTitle?: string;
+  groupText?: string;
+  groupIcon?: React.ReactNode;
+  grid2x2?: boolean;
 }
 
 const MODES: { key: ComparisonMode; label: string }[] = [
@@ -427,22 +436,30 @@ export default function ComparisonFilterPanel({
   states,
   years,
   indicators,
+  groups,
   selectedZone,
   selectedState,
   selectedYear,
   selectedIndicator,
+  selectedGroup,
   onZoneChange,
   onStateChange,
   onYearChange,
   onIndicatorChange,
+  onGroupChange,
   zonesLoading,
   statesLoading,
   yearsLoading,
   indicatorsLoading,
+  groupsLoading,
   className = "",
   indicatorTitle = "Indicator Filter",
   indicatorText = "Select Indicator",
   indicatorIcon = <FiHome size={15} />,
+  groupTitle = "Group Filter",
+  groupText = "Select Group",
+  groupIcon = <FiGrid size={15} />,
+  grid2x2 = false,
 }: ComparisonFilterPanelProps) {
   const [internalMode, setInternalMode] = useState<ComparisonMode>(defaultMode);
   const activeMode = mode ?? internalMode;
@@ -451,6 +468,19 @@ export default function ComparisonFilterPanel({
     setInternalMode(m);
     onModeChange?.(m);
   };
+
+  const groupField =
+    groups && groups.length > 0 ? (
+      <SelectField
+        icon={groupIcon}
+        label={groupTitle}
+        helperText={groupText}
+        value={selectedGroup}
+        options={groups}
+        loading={groupsLoading}
+        onChange={onGroupChange}
+      />
+    ) : null;
 
   const indicatorField =
     indicators && indicators.length > 0 ? (
@@ -493,34 +523,33 @@ export default function ComparisonFilterPanel({
 
       {/* Fields card */}
       <div className="rounded-xl border border-gray-200 bg-white p-4">
-        <div className="flex flex-col gap-5 sm:flex-row sm:gap-8">
-          {activeMode === "zonal" && (
+        <div className={grid2x2 ? "grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-x-8 md:gap-y-4" : "flex flex-col gap-5 sm:flex-row sm:gap-8"}>
+          {grid2x2 ? (
             <>
-              <SelectField
-                icon={<FiMapPin size={15} />}
-                label="Geopolitical Zone"
-                helperText="Select a Geopolitical Zone"
-                value={selectedZone}
-                options={zones}
-                loading={zonesLoading}
-                onChange={onZoneChange}
-              />
-              {indicatorField}
-              <SelectField
-                icon={<FiCalendar size={15} />}
-                label="Year"
-                helperText="Select a Year"
-                value={selectedYear}
-                options={years}
-                loading={yearsLoading}
-                onChange={onYearChange}
-              />
-            </>
-          )}
+              {/* Grid 2x2 Layout: Column 1 Row 1, Column 2 Row 1, Column 1 Row 2, Column 2 Row 2 */}
+              {activeMode === "zonal" && (
+                <SelectField
+                  icon={<FiMapPin size={15} />}
+                  label="Geopolitical Zone"
+                  helperText="Select a Geopolitical Zone"
+                  value={selectedZone}
+                  options={zones}
+                  loading={zonesLoading}
+                  onChange={onZoneChange}
+                />
+              )}
+              {activeMode === "trend" && (
+                <SelectField
+                  icon={<FiMapPin size={15} />}
+                  label="State"
+                  helperText="Select a State"
+                  value={selectedState}
+                  options={states}
+                  loading={statesLoading}
+                  onChange={onStateChange}
+                />
+              )}
 
-          {activeMode === "national" && (
-            <>
-              {indicatorField}
               <SelectField
                 icon={<FiCalendar size={15} />}
                 label="Year"
@@ -530,30 +559,74 @@ export default function ComparisonFilterPanel({
                 loading={yearsLoading}
                 onChange={onYearChange}
               />
-            </>
-          )}
 
-          {activeMode === "trend" && (
-            <>
-              <SelectField
-                icon={<FiMapPin size={15} />}
-                label="State"
-                helperText="Select a State"
-                value={selectedState}
-                options={states}
-                loading={statesLoading}
-                onChange={onStateChange}
-              />
+              {groupField}
               {indicatorField}
-              <SelectField
-                icon={<FiCalendar size={15} />}
-                label="Year"
-                helperText="Select a Year"
-                value={selectedYear}
-                options={years}
-                loading={yearsLoading}
-                onChange={onYearChange}
-              />
+            </>
+          ) : (
+            <>
+              {activeMode === "zonal" && (
+                <>
+                  <SelectField
+                    icon={<FiMapPin size={15} />}
+                    label="Geopolitical Zone"
+                    helperText="Select a Geopolitical Zone"
+                    value={selectedZone}
+                    options={zones}
+                    loading={zonesLoading}
+                    onChange={onZoneChange}
+                  />
+                  {indicatorField}
+                  <SelectField
+                    icon={<FiCalendar size={15} />}
+                    label="Year"
+                    helperText="Select a Year"
+                    value={selectedYear}
+                    options={years}
+                    loading={yearsLoading}
+                    onChange={onYearChange}
+                  />
+                </>
+              )}
+
+              {activeMode === "national" && (
+                <>
+                  {indicatorField}
+                  <SelectField
+                    icon={<FiCalendar size={15} />}
+                    label="Year"
+                    helperText="Select a Year"
+                    value={selectedYear}
+                    options={years}
+                    loading={yearsLoading}
+                    onChange={onYearChange}
+                  />
+                </>
+              )}
+
+              {activeMode === "trend" && (
+                <>
+                  <SelectField
+                    icon={<FiMapPin size={15} />}
+                    label="State"
+                    helperText="Select a State"
+                    value={selectedState}
+                    options={states}
+                    loading={statesLoading}
+                    onChange={onStateChange}
+                  />
+                  {indicatorField}
+                  <SelectField
+                    icon={<FiCalendar size={15} />}
+                    label="Year"
+                    helperText="Select a Year"
+                    value={selectedYear}
+                    options={years}
+                    loading={yearsLoading}
+                    onChange={onYearChange}
+                  />
+                </>
+              )}
             </>
           )}
         </div>

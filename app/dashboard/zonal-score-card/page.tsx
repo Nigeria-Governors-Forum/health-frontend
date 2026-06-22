@@ -8,12 +8,14 @@ import ZonalPerBarChart from "../../components/ZonalPerCapita";
 import { useTopbarFilters } from "@/app/context/TopbarFiltersContext";
 import LoadingScreen from "@/app/components/LoadingScreen";
 import { Endpoints, httpClient } from "@/app/api-client/src";
+import { useRouter } from "next/navigation";
 
-const ZonalHealthFinance = () => {
+const ZonalScoreCard = () => {
   const [loading, setLoading] = useState(false);
   const [stateData, setStateData] = useState<any>();
   const { selectedState, selectedYear, setSelectedZone, selectedZone } =
     useTopbarFilters();
+  const router = useRouter();
 
   const fetchData = async () => {
     if (!selectedState || !selectedYear) return;
@@ -70,10 +72,17 @@ const ZonalHealthFinance = () => {
               benchmark={15} // ✅ Add a benchmark line (e.g., ₦2000)
             /> */}
 
-            
       </div>
+        <div className="flex justify-center pt-4">
+          <button
+            onClick={() => router.push("/dashboard/zonal-human-resource")}
+            className="text-[#00A141] px-8 py-2 border border-[#00A141] text-lg font-semibold rounded-full cursor-pointer hover:bg-green-50 transition-colors"
+          >
+            Go back to Dashboard
+          </button>
+        </div>
     </>
   );
 };
 
-export default ZonalHealthFinance;
+export default ZonalScoreCard;

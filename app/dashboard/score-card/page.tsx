@@ -6,6 +6,8 @@ import NationalScorecardTable from "@/app/components/NationalScoreCard";
 import { useTopbarFilters } from "@/app/context/TopbarFiltersContext";
 import LoadingScreen from "@/app/components/LoadingScreen";
 import { Endpoints, httpClient } from "@/app/api-client/src";
+import CategorySelect from "@/app/components/CategoryOption";
+import { useRouter } from "next/navigation";
 
 interface ScoreCardProps {
   state: string;
@@ -15,6 +17,7 @@ const ScoreCard = () => {
   const { selectedState, selectedYear } = useTopbarFilters();
   const [stateData, setStateData] = useState<any>("DMA");
   const [selectedRound, setSelectedRound] = useState("");
+  const router = useRouter();
 
   const categories = [
     { value: "DMA", label: "DMA Scorecard" },
@@ -34,7 +37,7 @@ const ScoreCard = () => {
   ];
 
   const [selectedCategory, setSelectedCategory] = useState(
-    categories[0]?.value
+    categories[0]?.value,
   );
   const columnTwo: ScorecardRow[] = stateData?.selected_state || [];
   const prevValues = useRef({
@@ -81,46 +84,20 @@ const ScoreCard = () => {
   return (
     <>
       {loading && <LoadingScreen text="Please wait..." />}
-      <div className="flex justify-around text-black">
-        <div>
-          <h1 className="text-2xl font-bold mb-6">Scorecard Dashboard</h1>
-        </div>
-
-        <div className="mb-6 text-black">
-          <label htmlFor="category" className="mr-2 font-medium">
-            Select Category:
-          </label>
-          <select
-            id="category"
-            className="border rounded px-3 py-2"
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-          >
-            {categories.map((cat) => (
-              <option key={cat.value} value={cat.value}>
-                {cat.label}
-              </option>
-            ))}
-          </select>
-        </div>
+      <div className="flex justify-between text-black">
+        <CategorySelect
+          label="Select Category:"
+          options={categories}
+          value={selectedCategory}
+          onChange={setSelectedCategory}
+        />
         {selectedCategory === "Nutrition" && (
-          <div className="mb-6 text-black">
-            <label htmlFor="category" className="mr-2 font-medium">
-              Select Round:
-            </label>
-            <select
-              id="round"
-              className="border rounded px-3 py-2"
-              value={selectedRound}
-              onChange={(e) => setSelectedRound(e.target.value)}
-            >
-              {round.map((cat) => (
-                <option key={cat.value} value={cat.value}>
-                  {cat.label}
-                </option>
-              ))}
-            </select>
-          </div>
+          <CategorySelect
+            label="Select Round:"
+            options={round}
+            value={selectedRound}
+            onChange={setSelectedRound}
+          />
         )}
       </div>
 
@@ -135,6 +112,14 @@ const ScoreCard = () => {
         <div className="overflow-hidden rounded-xl shadow">
           <NationalScorecardTable title="National View" data={sampleData} />
         </div>
+      </div>
+      <div className="flex justify-center pt-4">
+        <button
+          onClick={() => router.push("/dashboard/zonal-score-card")}
+          className="text-[#00A141] px-8 py-2 border border-[#00A141] text-lg font-semibold rounded-full cursor-pointer hover:bg-green-50 transition-colors"
+        >
+          View Zonal / National Comparison
+        </button>
       </div>
     </>
   );
