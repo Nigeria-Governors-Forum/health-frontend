@@ -85,22 +85,12 @@ const HumanResource = () => {
         {/* Top Section */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <DemographyCard
-            title="Health Workers"
+            title="Total Health Workers"
             value={formatNumber(Number(stateData?.hRH_Professions)) || "N/A"}
             icon={<FaUsers size={24} color="#16a34a" />}
           />
           <DemographyCard
-            title="Total Health Training Institutions"
-            value={formatNumber(Number(stateData?.hRH)) || "N/A"}
-            icon={<FaHospitalUser size={24} color="#16a34a" />}
-          />
-          <DemographyCard
             title="Doctors"
-            value={formatNumber(Number(stateData?.hRH)) || "N/A"}
-            icon={<FaHospitalUser size={24} color="#16a34a" />}
-          />
-          <DemographyCard
-            title="Nurses/Midwives"
             value={formatNumber(Number(stateData?.hRH)) || "N/A"}
             icon={<FaHospitalUser size={24} color="#16a34a" />}
           />
@@ -109,6 +99,18 @@ const HumanResource = () => {
             value={formatNumber(Number(stateData?.hRH)) || "N/A"}
             icon={<FaHospitalUser size={24} color="#16a34a" />}
           />
+          <DemographyCard
+            title="Total Health Training Institutions"
+            value={formatNumber(Number(stateData?.hRH)) || "N/A"}
+            icon={<FaHospitalUser size={24} color="#16a34a" />}
+          />
+
+          <DemographyCard
+            title="Nurses/Midwives"
+            value={formatNumber(Number(stateData?.hRH)) || "N/A"}
+            icon={<FaHospitalUser size={24} color="#16a34a" />}
+          />
+
           <DemographyCard
             title="Junior Community Health Extension Workers"
             value={formatNumber(Number(stateData?.hRH)) || "N/A"}

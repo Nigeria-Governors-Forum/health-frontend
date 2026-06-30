@@ -37,10 +37,16 @@ const DemographyCard: React.FC<DemographyCardProps> = ({
           </div>
         )}
 
-        <h3 className="text-lg font-bold text-[#333333]">
+        <h3 className="text-sm font-bold text-[#333333]">
           {title}
         </h3>
-        <FiInfo className="text-green-900" size={20} />
+        <div className="group relative flex items-center">
+          <FiInfo className="cursor-pointer text-green-900" size={20} />
+          <span className="pointer-events-none absolute bottom-full left-1/2 mb-2 w-max max-w-xs -translate-x-1/2 scale-95 rounded-lg bg-gray-900 px-3 py-1.5 text-center text-xs font-medium text-white opacity-0 shadow-lg transition-all duration-200 group-hover:scale-100 group-hover:opacity-100 z-50">
+            {subtitle || `Information about ${title}`}
+            <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900" />
+          </span>
+        </div>
       </div>
 
       {/* Value */}

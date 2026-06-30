@@ -17,13 +17,20 @@ type LineChartProps = {
   title: string;
   data: ({ year: string } & { [key: string]: number | string })[];
   lines: { key: string; name: string; color: string }[];
+  subtitle?: string;
 };
 
-export default function MultiLineChart({ title, data, lines }: LineChartProps) {
+export default function MultiLineChart({ title, data, lines, subtitle }: LineChartProps) {
   return (
     <div className="bg-white shadow-md rounded-xl p-6 w-full">
       <h2 className="text-lg font-semibold text-[#07923F] mb-4 flex items-center gap-2">{title}
-        <FiInfo className="text-green-900" size={20} />
+        <div className="group relative flex items-center">
+          <FiInfo className="cursor-pointer text-green-900" size={20} />
+          <span className="pointer-events-none absolute bottom-full left-1/2 mb-2 w-max max-w-xs -translate-x-1/2 scale-95 rounded-lg bg-gray-900 px-3 py-1.5 text-center text-xs font-medium text-normal text-white opacity-0 shadow-lg transition-all duration-200 group-hover:scale-100 group-hover:opacity-100 z-50 normal-case font-normal">
+            {subtitle || "Historical trends for the selected health metrics over time."}
+            <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900" />
+          </span>
+        </div>
       </h2>
 
       <ResponsiveContainer width="100%" height={300}>

@@ -125,7 +125,7 @@ const HealthFacility: React.FC<HealthFacilityPageProps> = ({
               comparisonText="vs previous year"
             />
             <DemographyCard
-              title="Facilities Per Capital"
+              title="Facilities Per Capita"
               value={`${formatNumber(stateData?.per_person || "N/A")} Per 10,000`}
               icon={<Image src={land} alt="Land" width={24} height={24} />}
               // percentage="100%"
@@ -204,7 +204,7 @@ const HealthFacility: React.FC<HealthFacilityPageProps> = ({
             />
           </div>
         </div>
-        
+
         <div className="flex justify-center pt-4">
           <button
             onClick={() => router.push("/dashboard/zonal-health-facilities")}

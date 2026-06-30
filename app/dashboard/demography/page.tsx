@@ -40,7 +40,7 @@ const DemographyPage = () => {
 
   const [hoveredLGA, setHoveredLGA] = useState<{ name: string; key: string } | null>(null);
   const [isPopulationMode, setIsPopulationMode] = useState(true);
-  const [titlecaption, setTitlecaption] = useState("Population by accessibility");
+  const [titlecaption, setTitlecaption] = useState("Population Spread");
 
   const [searchValue, setSearchValue] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -212,23 +212,25 @@ const DemographyPage = () => {
                 </h2>
                 <ToggleSwitch initial={true} onToggle={(val) => {
                   setIsPopulationMode(val);
-                  setTitlecaption(val ? "Population by accessibility" : "Hard to reach LGAs");
+                  setTitlecaption(val ? "Population Spread" : "Population by Accessibility");
                 }} />
               </div>
-              <div className="flex justify-between text-sm gap-4 text-gray-700">
-                <span className="text-blue-600 font-semibold">
-                  Total: {stateData?.no_of_lgas || "N/A"}
-                </span>
-                <span className="text-green-600 font-semibold">
-                  Safe:{" "}
-                  {stateData?.no_of_lgas && stateData?.total_Hard_To_Reach !== undefined
-                    ? stateData.no_of_lgas - stateData.total_Hard_To_Reach
-                    : "N/A"}
-                </span>
-                <span className="text-red-600 font-semibold">
-                  Hard to reach: {stateData?.total_Hard_To_Reach ?? "N/A"}
-                </span>
-              </div>
+              {!isPopulationMode && (
+                <div className="flex justify-between text-sm gap-4 text-gray-700">
+                  <span className="text-blue-600 font-semibold">
+                    Total: {stateData?.no_of_lgas || "N/A"}
+                  </span>
+                  <span className="text-green-600 font-semibold">
+                    Safe:{" "}
+                    {stateData?.no_of_lgas && stateData?.total_Hard_To_Reach !== undefined
+                      ? stateData.no_of_lgas - stateData.total_Hard_To_Reach
+                      : "N/A"}
+                  </span>
+                  <span className="text-red-600 font-semibold">
+                    Hard to reach: {stateData?.total_Hard_To_Reach ?? "N/A"}
+                  </span>
+                </div>
+              )}
             </div>
 
             <div className="relative border border-gray-100 bg-white rounded-3xl p-4 shadow-sm flex items-center justify-center min-h-[380px]">

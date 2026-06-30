@@ -120,7 +120,13 @@ const ComparisonBarChart: React.FC<ComparisonBarChartProps> = ({
           <div>
             <div className="flex items-center gap-1.5">
               <h2 className="text-base font-bold text-gray-800">{title}</h2>
-              <FiInfo className="text-green-900" size={20} />
+              <div className="group relative flex items-center">
+                <FiInfo className="cursor-pointer text-green-900" size={20} />
+                <span className="pointer-events-none absolute bottom-full left-1/2 mb-2 w-max max-w-xs -translate-x-1/2 scale-95 rounded-lg bg-gray-900 px-3 py-1.5 text-center text-xs font-medium text-white opacity-0 shadow-lg transition-all duration-200 group-hover:scale-100 group-hover:opacity-100 z-50">
+                  {subtitle || "Comparison chart comparing actual vs budgeted amounts."}
+                  <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900" />
+                </span>
+              </div>
             </div>
             {subtitle && <p className="text-xs text-gray-400">{subtitle}</p>}
           </div>

@@ -62,17 +62,18 @@ export const navItem: NavItem[] = [
       //   roles: ["user", "h-admin", "s-admin"],
       // },
       {
-        href: "/dashboard/health-insurance",
-        icon: <FaMoneyCheck />,
-        label: "Health Insurance",
-        roles: ["user", "h-admin", "s-admin"],
-      },
-      {
         href: "/dashboard/human-resource",
         icon: <FaMoneyCheck />,
         label: "Human Resource",
         roles: ["user", "h-admin", "s-admin"],
       },
+      {
+        href: "/dashboard/health-insurance",
+        icon: <FaMoneyCheck />,
+        label: "Health Insurance",
+        roles: ["user", "h-admin", "s-admin"],
+      },
+
       {
         href: "/dashboard/health-finance",
         icon: <FaMoneyCheck />,

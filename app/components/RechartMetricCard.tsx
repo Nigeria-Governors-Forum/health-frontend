@@ -28,6 +28,7 @@ export interface MetricCardProps {
   arcColor?: string;
   className?: string;
   currencyDenotation?: string;
+  subtitle?: string;
 }
 
 const cn = (...args: (string | undefined)[]) => args.filter(Boolean).join(" ");
@@ -40,13 +41,20 @@ const BudgetVariant: React.FC<{
   currencySymbol: string;
   breakdown: BreakdownItem[];
   currencyDenotation?: string;
-}> = ({ title, amount, currencySymbol, breakdown, currencyDenotation }) => {
+  subtitle?: string;
+}> = ({ title, amount, currencySymbol, breakdown, currencyDenotation, subtitle }) => {
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 flex flex-col gap-4 h-full justify-between">
       {/* Title */}
       <div className="flex items-center gap-1.5 pb-3 border-b-2 border-gray-200">
         <span className="text-base font-bold text-gray-800">{title}</span>
-        <FiInfo className="text-green-900" size={20} />
+        <div className="group relative flex items-center">
+          <FiInfo className="cursor-pointer text-green-900" size={20} />
+          <span className="pointer-events-none absolute bottom-full left-1/2 mb-2 w-max max-w-xs -translate-x-1/2 scale-95 rounded-lg bg-gray-900 px-3 py-1.5 text-center text-xs font-medium text-white opacity-0 shadow-lg transition-all duration-200 group-hover:scale-100 group-hover:opacity-100 z-50">
+            {subtitle || "Overview of budget allocation and expenditures."}
+            <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900" />
+          </span>
+        </div>
       </div>
 
       {/* Amount */}
@@ -115,6 +123,7 @@ const GaugeVariant: React.FC<{
   targetPct?: number;
   updatedAt?: string;
   arcColor?: string;
+  subtitle?: string;
 }> = ({
   title,
   valuePct = 0,
@@ -122,6 +131,7 @@ const GaugeVariant: React.FC<{
   targetPct,
   updatedAt,
   arcColor = "#C0392B",
+  subtitle,
 }) => {
     // ── dimensions ──────────────────────────────────────────────────────────────
     const W = 260;
@@ -152,8 +162,13 @@ const GaugeVariant: React.FC<{
         {/* Title */}
         <div className="flex items-center gap-1.5 mb-1 pb-3 border-b-2 border-gray-200">
           <span className="text-base font-bold text-gray-800">{title}</span>
-          <FiInfo className="text-green-900" size={20} />
-
+          <div className="group relative flex items-center">
+            <FiInfo className="cursor-pointer text-green-900" size={20} />
+            <span className="pointer-events-none absolute bottom-full left-1/2 mb-2 w-max max-w-xs -translate-x-1/2 scale-95 rounded-lg bg-gray-900 px-3 py-1.5 text-center text-xs font-medium text-white opacity-0 shadow-lg transition-all duration-200 group-hover:scale-100 group-hover:opacity-100 z-50">
+              {subtitle || "Performance percentage compared against target values."}
+              <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900" />
+            </span>
+          </div>
         </div>
 
         {/* SVG Container */}
@@ -271,13 +286,20 @@ const SimpleVariant: React.FC<{
   amount: string;
   currencySymbol: string;
   currencyDenotation?: string;
-}> = ({ title, amount, currencySymbol, currencyDenotation }) => {
+  subtitle?: string;
+}> = ({ title, amount, currencySymbol, currencyDenotation, subtitle }) => {
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 flex flex-col gap-4 h-full">
       {/* Outer title */}
       <div className="flex items-center gap-1.5 pb-3 border-b-2 border-gray-200">
         <span className="text-base font-bold text-gray-800">{title}</span>
-        <FiInfo className="text-green-900" size={20} />
+        <div className="group relative flex items-center">
+          <FiInfo className="cursor-pointer text-green-900" size={20} />
+          <span className="pointer-events-none absolute bottom-full left-1/2 mb-2 w-max max-w-xs -translate-x-1/2 scale-95 rounded-lg bg-gray-900 px-3 py-1.5 text-center text-xs font-medium text-white opacity-0 shadow-lg transition-all duration-200 group-hover:scale-100 group-hover:opacity-100 z-50">
+            {subtitle || "Overview of metric values and allocations."}
+            <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900" />
+          </span>
+        </div>
       </div>
 
       {/* Inner card */}
@@ -324,6 +346,7 @@ const RechartMetricCard: React.FC<MetricCardProps> = ({
   arcColor,
   className = "",
   currencyDenotation = "",
+  subtitle,
 }) => {
   if (variant === "budget") {
     return (
@@ -334,6 +357,7 @@ const RechartMetricCard: React.FC<MetricCardProps> = ({
           currencySymbol={currencySymbol}
           breakdown={breakdown}
           currencyDenotation={currencyDenotation}
+          subtitle={subtitle}
         />
       </div>
     );
@@ -349,6 +373,7 @@ const RechartMetricCard: React.FC<MetricCardProps> = ({
           targetPct={targetPct}
           updatedAt={updatedAt}
           arcColor={arcColor}
+          subtitle={subtitle}
         />
       </div>
     );
@@ -362,6 +387,7 @@ const RechartMetricCard: React.FC<MetricCardProps> = ({
           amount={amount}
           currencySymbol={currencySymbol}
           currencyDenotation={currencyDenotation}
+          subtitle={subtitle}
         />
       </div>
     );

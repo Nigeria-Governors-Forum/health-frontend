@@ -69,7 +69,7 @@ const HealthInsurance = () => {
       {loading && <LoadingScreen text="Please wait..." />}
 
       <div className="space-y-6 md:space-y-8 min-h-screen px-4 md:px-0">
-        <IndicatorStatusTable
+        {/* <IndicatorStatusTable
           data={[
             {
               indicator: "Existence of a State Social Health Insurance Agency",
@@ -90,7 +90,7 @@ const HealthInsurance = () => {
               status: "met",
             },
           ]}
-        />
+        /> */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 w-full">
           <div className="col-span-1">
             <DonutChart title="Enrollee Breakdown" data={chartData} />

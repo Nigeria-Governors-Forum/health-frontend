@@ -137,9 +137,15 @@ const LgaSummaryTable: React.FC<LgaSummaryTableProps> = ({
             <span className="inline-flex items-center rounded-full bg-green-50 px-3 py-0.5 text-xs font-semibold text-green-700">
               {total} Total
             </span>
-            <FiInfo className="text-green-900" size={15} />
+            <div className="group relative flex items-center">
+              <FiInfo className="cursor-pointer text-green-900" size={15} />
+              <span className="pointer-events-none absolute bottom-full left-1/2 mb-2 w-max max-w-xs -translate-x-1/2 scale-95 rounded-lg bg-gray-900 px-3 py-1.5 text-center text-xs font-medium text-white opacity-0 shadow-lg transition-all duration-200 group-hover:scale-100 group-hover:opacity-100 z-50">
+                {subtitle}
+                <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900" />
+              </span>
+            </div>
           </div>
-          <p className="mt-1 text-sm text-gray-400">{subtitle}</p>
+          {/* <p className="mt-1 text-sm text-gray-400">{subtitle}</p> */}
         </div>
 
         <div className="relative w-full sm:w-64">
@@ -163,7 +169,7 @@ const LgaSummaryTable: React.FC<LgaSummaryTableProps> = ({
           {/* Column headers */}
           <div className="grid grid-cols-[1.7fr_1fr_1.3fr] gap-x-4 mb-2.5">
             <div className="flex items-center gap-3 rounded-lg bg-green-700 px-5 py-3 text-sm font-semibold text-white">
-              <span className="w-8">SN</span>
+              <span className="w-8">S/N</span>
               <span>Local Government Area</span>
             </div>
             <div className="flex items-center justify-center rounded-lg bg-green-700 px-5 py-3 text-sm font-semibold text-white">

@@ -81,7 +81,6 @@ const SummaryTable: React.FC<SummaryTableProps> = ({
         {/* Column headers */}
         <div className="sticky top-0 grid grid-cols-[2fr_0.8fr_0.8fr_0.7fr] sm:grid-cols-[2fr_1fr_1fr_0.9fr] gap-2 sm:gap-2.5 bg-white z-10 px-4 sm:px-6 py-2.5">
           <div className="flex items-center gap-1 sm:gap-3 rounded-lg bg-green-600 px-2 sm:px-5 py-2 sm:py-3 text-xs sm:text-sm font-semibold text-white">
-            <span>SN</span>
             <span className="hidden sm:inline">Level</span>
           </div>
           <div className="flex items-center justify-center rounded-lg bg-green-600 px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-semibold text-white">
@@ -99,53 +98,48 @@ const SummaryTable: React.FC<SummaryTableProps> = ({
 
         {/* Rows */}
         <div className="flex flex-col gap-2 sm:gap-2.5">
-        {data.map((row, i) => {
-          const sn = i + 1;
-          const totalRow = !!row.isTotal;
+          {data.map((row, i) => {
+            const sn = i + 1;
+            const totalRow = !!row.isTotal;
 
-          return (
-            <div
-              key={`${row.name}-${i}`}
-              className="grid grid-cols-[2fr_0.8fr_0.8fr_0.7fr] sm:grid-cols-[2fr_1fr_1fr_0.9fr] gap-2 sm:gap-2.5 px-4 sm:px-6"
-            >
+            return (
               <div
-                className={`flex items-center gap-1 sm:gap-3 rounded-lg bg-green-50 px-2 sm:px-5 py-2 sm:py-3 text-gray-700 min-w-0 ${totalRow
-                  ? "text-sm sm:text-base font-bold text-black"
-                  : "text-xs sm:text-sm font-medium"
-                  }`}
+                key={`${row.name}-${i}`}
+                className="grid grid-cols-[2fr_0.8fr_0.8fr_0.7fr] sm:grid-cols-[2fr_1fr_1fr_0.9fr] gap-2 sm:gap-2.5 px-4 sm:px-6"
               >
-                {!totalRow && (
-                  <span className="text-gray-500 shrink-0">
-                    {String(sn).padStart(2, "0")}
-                  </span>
-                )}
-                <span className="break-words font-bold">{totalRow ? "Total" : row.name}</span>
-              </div>
+                <div
+                  className={`flex items-center gap-1 sm:gap-3 rounded-lg bg-green-50 px-2 sm:px-5 py-2 sm:py-3 text-gray-700 min-w-0 ${totalRow
+                    ? "text-sm sm:text-base font-bold text-black"
+                    : "text-xs sm:text-sm font-medium"
+                    }`}
+                >
+                  <span className="break-words font-bold">{totalRow ? "Total" : row.name}</span>
+                </div>
 
-              <div
-                className={`flex items-center justify-center rounded-lg bg-green-50 px-2 sm:px-4 py-2 sm:py-3 text-gray-700 ${totalRow ? "text-sm sm:text-base font-bold text-black" : "text-xs sm:text-sm font-medium"
-                  }`}
-              >
-                {row.private ?? "N/A"}
-              </div>
+                <div
+                  className={`flex items-center justify-center rounded-lg bg-green-50 px-2 sm:px-4 py-2 sm:py-3 text-gray-700 ${totalRow ? "text-sm sm:text-base font-bold text-black" : "text-xs sm:text-sm font-medium"
+                    }`}
+                >
+                  {row.private ?? "N/A"}
+                </div>
 
-              <div
-                className={`flex items-center justify-center rounded-lg bg-green-50 px-2 sm:px-4 py-2 sm:py-3 text-gray-700 ${totalRow ? "text-sm sm:text-base font-bold text-black" : "text-xs sm:text-sm font-medium"
-                  }`}
-              >
-                {row.public ?? "N/A"}
-              </div>
+                <div
+                  className={`flex items-center justify-center rounded-lg bg-green-50 px-2 sm:px-4 py-2 sm:py-3 text-gray-700 ${totalRow ? "text-sm sm:text-base font-bold text-black" : "text-xs sm:text-sm font-medium"
+                    }`}
+                >
+                  {row.public ?? "N/A"}
+                </div>
 
-              <div
-                className={`flex items-center justify-center rounded-lg font-bold! bg-green-50 px-2 sm:px-4 py-2 sm:py-3 text-gray-700 ${totalRow ? "text-sm sm:text-base font-bold text-black" : "text-xs sm:text-sm font-medium"
-                  }`}
-              >
-                {formatNumber(Number(row.total)) || "N/A"}
+                <div
+                  className={`flex items-center justify-center rounded-lg font-bold! bg-green-50 px-2 sm:px-4 py-2 sm:py-3 text-gray-700 ${totalRow ? "text-sm sm:text-base font-bold text-black" : "text-xs sm:text-sm font-medium"
+                    }`}
+                >
+                  {formatNumber(Number(row.total)) || "N/A"}
+                </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

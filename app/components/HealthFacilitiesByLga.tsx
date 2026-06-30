@@ -120,7 +120,13 @@ const HealthFacilitiesByLgaTable: React.FC<HealthFacilitiesByLgaTableProps> = ({
             <span className="inline-flex items-center rounded-full bg-green-50 px-3 py-0.5 text-xs font-semibold text-green-700">
               {total} Total
             </span>
-            <FiInfo className="text-gray-300" size={15} />
+            <div className="group relative flex items-center">
+              <FiInfo className="cursor-pointer text-gray-300" size={15} />
+              <span className="pointer-events-none absolute bottom-full left-1/2 mb-2 w-max max-w-xs -translate-x-1/2 scale-95 rounded-lg bg-gray-900 px-3 py-1.5 text-center text-xs font-medium text-white opacity-0 shadow-lg transition-all duration-200 group-hover:scale-100 group-hover:opacity-100 z-50">
+                {subtitle || "Health facilities count and density per LGA."}
+                <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900" />
+              </span>
+            </div>
           </div>
           <p className="mt-1 text-sm text-gray-400">{subtitle}</p>
         </div>
@@ -143,7 +149,7 @@ const HealthFacilitiesByLgaTable: React.FC<HealthFacilitiesByLgaTableProps> = ({
       {/* Column headers */}
       <div className="hidden gap-2.5 sm:mb-2.5 sm:grid sm:grid-cols-[1.5fr_1.1fr_1.1fr_1.1fr]">
         <div className="flex items-center gap-3 rounded-lg bg-green-700 px-5 py-3 text-sm font-semibold text-white">
-          <span className="w-8">SN</span>
+          <span className="w-8">S/N</span>
           <span>LGA</span>
         </div>
         <div className="flex items-center justify-center rounded-lg bg-green-700 px-5 py-3 text-sm font-semibold text-white">
@@ -244,8 +250,8 @@ const HealthFacilitiesByLgaTable: React.FC<HealthFacilitiesByLgaTableProps> = ({
                   type="button"
                   onClick={() => onPageChange(p)}
                   className={`flex h-7 w-7 items-center justify-center rounded-full font-medium ${p === currentPage
-                      ? "bg-green-100 text-green-700"
-                      : "text-gray-500 hover:bg-gray-50"
+                    ? "bg-green-100 text-green-700"
+                    : "text-gray-500 hover:bg-gray-50"
                     }`}
                 >
                   {p}

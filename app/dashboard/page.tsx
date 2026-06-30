@@ -20,7 +20,7 @@ export const formatNumber = (num: number): string => {
 export default function DashboardHome() {
   const [loading, setLoading] = useState(false);
   const { selectedState, selectedYear } = useTopbarFilters();
-  const [titlecaption, setTitlecaption] = useState("Population by accessibility");
+  const [titlecaption, setTitlecaption] = useState("Population Spread");
   const [isPopulationMode, setIsPopulationMode] = useState(true);
   const [hoveredLGA, setHoveredLGA] = useState<{ name: string; key: string } | null>(null);
 
@@ -158,14 +158,14 @@ export default function DashboardHome() {
   const land = "/svg/land.svg";
   const politics = "/svg/politics.svg";
   const healthFacilities = "/svg/healthFacilities.svg";
-  const healthWorkers = "/svg/healthWorkers.svg";
+  const healthWorkers = "/svg/healthworkers.svg";
   const healthTraining = "/svg/healthTraining.svg";
   const lga = "/svg/lga.svg";
   const healthAllocation = "/svg/healthAllocation.svg";
 
   const handleToggle = (value: boolean) => {
     setIsPopulationMode(value);
-    setTitlecaption(value ? "Population by accessibility" : "Hard to reach LGAs");
+    setTitlecaption(value ? "Population Spread" : "Population by Accessibility");
   };
 
   return (
@@ -179,12 +179,12 @@ export default function DashboardHome() {
             icon={<Image src={earth} alt="Earth" width={24} height={24} />}
           />
           <DemographyCard
-            title="Land mass"
+            title="Land Mass"
             value={formatNumber(stateData?.land_mass || "N/A") as any}
             icon={<Image src={land} alt="Land" width={24} height={24} />}
           />
           <DemographyCard
-            title="Political wards"
+            title="Political Wards"
             value={formatNumber(stateData?.political_wards || "N/A") as any}
             icon={
               <Image src={politics} alt="Politics" width={24} height={24} />
@@ -196,7 +196,7 @@ export default function DashboardHome() {
             icon={<Image src={lga} alt="LGA" width={24} height={24} />}
           />
           <DemographyCard
-            title="Health Facility"
+            title="Health Facilities"
             value={formatNumber(stateData?.health_facilities || "N/A") as any}
             icon={
               <Image
@@ -211,7 +211,7 @@ export default function DashboardHome() {
             comparisonText="vs last year"
           />
           <DemographyCard
-            title="Health workers"
+            title="Health Workers"
             value={formatNumber(stateData?.hRH_Professions || "N/A")}
             icon={
               <Image
@@ -271,24 +271,33 @@ export default function DashboardHome() {
               <div className="flex justify-between">
                 <h2 className="text-lg font-semibold text-[#07923F] mb-3 text-center flex items-center gap-2">
                   {titlecaption}
-                  <FiInfo className="text-green-900" size={20} />
-
+                  <div className="group relative flex items-center">
+                    <FiInfo className="cursor-pointer text-green-900" size={20} />
+                    <span className="pointer-events-none absolute bottom-full left-1/2 mb-2 w-max max-w-xs -translate-x-1/2 scale-95 rounded-lg bg-gray-900 px-3 py-1.5 text-center text-xs font-medium text-white opacity-0 shadow-lg transition-all duration-200 group-hover:scale-100 group-hover:opacity-100 z-50 normal-case font-normal">
+                      {isPopulationMode
+                        ? "Geographic distribution of population across the state's LGAs."
+                        : "LGA population breakdown by security and accessibility status (Safe vs. Hard to Reach)."}
+                      <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900" />
+                    </span>
+                  </div>
                 </h2>
                 <ToggleSwitch initial={true} onToggle={handleToggle} />
               </div>
-              <div className="flex justify-between text-sm gap-4 text-gray-700">
-                <span className="text-blue-600 font-medium">
-                  Total: {stateData?.no_of_lgas || "N/A"}
-                </span>
-                <span className="text-green-600 font-medium">
-                  Safe:{" "}
-                  {stateData?.no_of_lgas - stateData?.total_Hard_To_Reach ||
-                    "N/A"}
-                </span>
-                <span className="text-red-600 font-medium">
-                  Hard to reach: {stateData?.total_Hard_To_Reach || "N/A"}
-                </span>
-              </div>
+              {!isPopulationMode && (
+                <div className="flex justify-between text-sm gap-4 text-gray-700">
+                  <span className="text-blue-600 font-medium">
+                    Total: {stateData?.no_of_lgas || "N/A"}
+                  </span>
+                  <span className="text-green-600 font-medium">
+                    Safe:{" "}
+                    {stateData?.no_of_lgas - stateData?.total_Hard_To_Reach ||
+                      "N/A"}
+                  </span>
+                  <span className="text-red-600 font-medium">
+                    Hard to reach: {stateData?.total_Hard_To_Reach || "N/A"}
+                  </span>
+                </div>
+              )}
             </div>
             <div className="relative border border-gray-100 bg-white rounded-3xl p-4 shadow-sm flex items-center justify-center min-h-[380px]">
 
