@@ -93,18 +93,6 @@ const Topbar: React.FC<TopbarProps> = ({
 
   const StateLogo = selectedState ? logos[selectedState] : null;
 
-  useEffect(() => {
-    try {
-      const storedUser = sessionStorage.getItem("user");
-      if (storedUser) {
-        const parsed = JSON.parse(storedUser);
-        setSelectedState(parsed?.state || "");
-      }
-    } catch (err) {
-      console.warn("Invalid session user data:", err);
-      setSelectedState("");
-    }
-  }, [setSelectedState]);
 
   return (
     <div className="w-full bg-[#F5F7FA] border-b px-4 py-4">

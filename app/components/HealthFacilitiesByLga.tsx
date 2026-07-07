@@ -149,7 +149,6 @@ const HealthFacilitiesByLgaTable: React.FC<HealthFacilitiesByLgaTableProps> = ({
       {/* Column headers */}
       <div className="hidden gap-2.5 sm:mb-2.5 sm:grid sm:grid-cols-[1.5fr_1.1fr_1.1fr_1.1fr]">
         <div className="flex items-center gap-3 rounded-lg bg-green-700 px-5 py-3 text-sm font-semibold text-white">
-          <span className="w-8">S/N</span>
           <span>LGA</span>
         </div>
         <div className="flex items-center justify-center rounded-lg bg-green-700 px-5 py-3 text-sm font-semibold text-white">
@@ -185,12 +184,7 @@ const HealthFacilitiesByLgaTable: React.FC<HealthFacilitiesByLgaTableProps> = ({
               <div
                 className={`flex items-center gap-3 rounded-lg px-5 py-3 text-sm ${style.pillBgClass}`}
               >
-                <span
-                  className={`w-8 font-medium ${hard ? style.textClass : "text-gray-500"
-                    }`}
-                >
-                  {String(sn).padStart(2, "0")}
-                </span>
+
                 <span
                   className={`font-semibold ${hard ? style.textClass : "text-green-700"
                     }`}

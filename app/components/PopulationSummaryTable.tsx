@@ -146,13 +146,13 @@ const PopulationSummaryTable: React.FC<PopulationSummaryTableProps> = ({
             </span>
             <div className="group relative flex items-center">
               <FiInfo className="cursor-pointer text-gray-300" size={15} />
-              <span className="pointer-events-none absolute bottom-full left-1/2 mb-2 w-max max-w-xs -translate-x-1/2 scale-95 rounded-lg bg-gray-900 px-3 py-1.5 text-center text-xs font-medium text-white opacity-0 shadow-lg transition-all duration-200 group-hover:scale-100 group-hover:opacity-100 z-50">
+              <span className="pointer-events-none absolute bottom-full left-1/2 mb-2 w-max max-w-xs -translate-x-1/2 scale-95 rounded-lg bg-green-500 px-3 py-1.5 text-center text-xs font-medium text-black opacity-0 shadow-lg transition-all duration-200 group-hover:scale-100 group-hover:opacity-100 z-50">
                 {subtitle || "Health workforce breakdown summary."}
                 <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900" />
               </span>
             </div>
           </div>
-          <p className="mt-1 text-sm">{subtitle} </p>
+          <p className="mt-1 text-sm text-black">{subtitle}</p>
         </div>
 
         <div className="relative w-full sm:w-64">
@@ -198,11 +198,11 @@ const PopulationSummaryTable: React.FC<PopulationSummaryTableProps> = ({
               key={row.id ?? `${row.occupation}-${i}`}
               className="grid grid-cols-1 gap-2.5 sm:grid-cols-[1.6fr_1.2fr_1.2fr]"
             >
-              {/* Occupation cell — carries the status color */}
+              {/* Occupation cell — neutral styling */}
               <div
-                className={`flex items-center gap-3 rounded-full px-5 py-3 text-sm ${style.pillBgClass}`}
+                className="flex items-center gap-3 rounded-full bg-green-50 px-5 py-3 text-sm"
               >
-                <span className={`font-semibold ${style.textClass}`}>
+                <span className="font-semibold text-green-700">
                   {row.institution || row.occupation}
                 </span>
               </div>
@@ -215,11 +215,14 @@ const PopulationSummaryTable: React.FC<PopulationSummaryTableProps> = ({
                 {formatNumber(row.number)}
               </div>
 
-              <div className="flex items-center justify-center rounded-full bg-green-50 px-5 py-3 text-sm font-medium text-gray-700">
+              {/* Density cell — carries status styling */}
+              <div className={`flex items-center justify-center rounded-full px-5 py-3 text-sm font-bold ${style.pillBgClass}`}>
                 <span className="mr-1 text-xs text-gray-400 sm:hidden">
                   Density:
                 </span>
-                {formatNumber(row.density)}
+                <span className={style.textClass}>
+                  {formatNumber(row.density)}
+                </span>
               </div>
             </div>
           );

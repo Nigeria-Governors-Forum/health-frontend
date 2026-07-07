@@ -136,8 +136,8 @@ const StateBarChart: React.FC<StateBarChartProps> = ({
               yAxisId="left"
               dataKey="totalValue"
               name="Total Facilities"
-              fill="#10B981"
-              radius={[4, 4, 0, 0]}
+              fill="#155DFC"
+              radius={[30, 30, 30, 30]}
             >
               <LabelList
                 dataKey="totalValue"
@@ -153,8 +153,8 @@ const StateBarChart: React.FC<StateBarChartProps> = ({
               yAxisId="right"
               dataKey="perCapitaValue"
               name="Per Capita (per 10k Pop)"
-              fill="#3B82F6"
-              radius={[4, 4, 0, 0]}
+              fill="#9011CA"
+              radius={[30, 30, 30, 30]}
             >
               <LabelList
                 dataKey="perCapitaValue"

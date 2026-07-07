@@ -1,7 +1,7 @@
 "use client";
 
 import toast from "react-hot-toast";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import LoadingScreen from "@/app/components/LoadingScreen";
 import { useTopbarFilters } from "@/app/context/TopbarFiltersContext";
 import { Endpoints, httpClient } from "@/app/api-client/src";
@@ -19,9 +19,21 @@ const HealthInsurance = () => {
   const sample = stateData?.yearlyTotals;
   const data = stateData?.perCapita || [];
   const router = useRouter();
+  const lastFetched = useRef<{ state: string; year: number } | null>(null);
 
   const fetchData = async () => {
     if (!selectedState || !selectedYear) return;
+
+    // Avoid double API calls
+    if (
+      lastFetched.current &&
+      lastFetched.current.state === selectedState &&
+      lastFetched.current.year === selectedYear
+    ) {
+      return;
+    }
+    lastFetched.current = { state: selectedState, year: selectedYear };
+
     setLoading(true);
 
     const stateParam =

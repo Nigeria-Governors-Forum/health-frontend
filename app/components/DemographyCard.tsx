@@ -13,6 +13,7 @@ interface DemographyCardProps {
   trend?: "up" | "down";
   comparisonText?: string; // e.g. "vs last month"
   subtitle?: string;
+  showPerCapita?: boolean;
 }
 
 const DemographyCard: React.FC<DemographyCardProps> = ({
@@ -23,6 +24,7 @@ const DemographyCard: React.FC<DemographyCardProps> = ({
   trend = "up",
   comparisonText = "vs last month",
   subtitle,
+  showPerCapita = false,
 }) => {
   const ArrowUp = "/svg/arrowUp.svg";
   const ArrowDown = "/svg/arrowDown.svg";
@@ -50,8 +52,15 @@ const DemographyCard: React.FC<DemographyCardProps> = ({
       </div>
 
       {/* Value */}
-      <div className=" flex justify-between pr-4 text-2xl font-bold text-green-600">
-        {value}
+      <div className=" flex justify-between pr-4 text-2xl font-bold text-green-600 items-baseline">
+        <span className="flex items-baseline gap-1.5">
+          {value}
+          {showPerCapita && (
+            <span className="text-sm text-gray-500 italic font-normal">
+              Per 10,000
+            </span>
+          )}
+        </span>
         {/* Trend */}
         {percentage && (
           <div className="flex items-center gap-2 text-sm">

@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useRef } from "react";
+import { FiMaximize2, FiMinimize2 } from "react-icons/fi";
 import {
   FaChild,
   FaLandmark,
@@ -43,11 +44,45 @@ const DemographyPage = () => {
   const [titlecaption, setTitlecaption] = useState("Population Spread");
 
   const [searchValue, setSearchValue] = useState("");
+  const lastFetched = useRef<{ state: string; year: number } | null>(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [mapHeight, setMapHeight] = useState(350);
+
+  useEffect(() => {
+    if (isFullscreen) {
+      setMapHeight(window.innerHeight - 240);
+    } else {
+      setMapHeight(350);
+    }
+  }, [isFullscreen]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isFullscreen) {
+        setIsFullscreen(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isFullscreen]);
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
 
   const fetchData = async () => {
     if (!selectedState || !selectedYear) return;
+    
+    // Avoid double API calls
+    if (
+      lastFetched.current &&
+      lastFetched.current.state === selectedState &&
+      lastFetched.current.year === selectedYear
+    ) {
+      return;
+    }
+    lastFetched.current = { state: selectedState, year: selectedYear };
+
     setLoading(true);
 
     const stateParam =
@@ -124,10 +159,10 @@ const DemographyPage = () => {
         const key = slugify(item.lga);
         const pop = Number(item.lga_population) || 0;
         const ratio = (pop - minPop) / popRange;
-        // Denser -> darker green (lightness: 25%), less populated -> lighter green (lightness: 92%)
+        // Denser -> darker blue (lightness: 25%), less populated -> lighter blue (lightness: 92%)
         const lightness = 92 - ratio * (92 - 25);
         const saturation = 35 + ratio * (85 - 35);
-        colors[key] = `hsl(140, ${saturation.toFixed(0)}%, ${lightness.toFixed(0)}%)`;
+        colors[key] = `hsl(215, ${saturation.toFixed(0)}%, ${lightness.toFixed(0)}%)`;
       });
     } else {
       lgaList.forEach((item: any) => {
@@ -198,7 +233,10 @@ const DemographyPage = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-4">
+          <div className={isFullscreen
+            ? "fixed inset-0 z-50 bg-[#F8FAFC] p-6 flex flex-col space-y-4 overflow-y-auto"
+            : "space-y-4"
+          }>
             <div className="bg-white rounded-3xl border border-gray-100 p-6 shadow-sm">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-lg font-bold text-green-700 flex items-center gap-2">
@@ -210,7 +248,7 @@ const DemographyPage = () => {
                     height={20}
                   />
                 </h2>
-                <ToggleSwitch initial={true} onToggle={(val) => {
+                <ToggleSwitch initial={isPopulationMode} onToggle={(val) => {
                   setIsPopulationMode(val);
                   setTitlecaption(val ? "Population Spread" : "Population by Accessibility");
                 }} />
@@ -233,17 +271,25 @@ const DemographyPage = () => {
               )}
             </div>
 
-            <div className="relative border border-gray-100 bg-white rounded-3xl p-4 shadow-sm flex items-center justify-center min-h-[380px]">
+            <div className="relative border border-gray-100 bg-white rounded-3xl p-4 shadow-sm flex items-center justify-center min-h-[380px] w-full flex-1">
+              <button
+                onClick={() => setIsFullscreen(!isFullscreen)}
+                className="absolute top-4 right-4 z-20 p-2.5 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-black transition-all shadow-sm cursor-pointer"
+                title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
+              >
+                {isFullscreen ? <FiMinimize2 size={20} /> : <FiMaximize2 size={20} />}
+              </button>
+
               <StateLGAChoropleth
                 stateSlug={normalizeStateName(selectedState || "fct")}
                 stateName={selectedState || "Federal Capital Territory"}
-                height={350}
+                height={mapHeight}
                 lgaColors={lgaColors}
                 onHoverLGA={setHoveredLGA}
               />
               {hoveredLGA && (
                 <div className="absolute top-2 left-2 bg-black/85 backdrop-blur-sm text-white px-3 py-2 rounded-xl shadow-lg pointer-events-none z-10 text-xs border border-white/10 min-w-44">
-                  <p className="font-bold text-[#4ade80] text-sm mb-1">{hoveredLGA.name}</p>
+                  <p className="font-bold text-[#38bdf8] text-sm mb-1">{hoveredLGA.name}</p>
                   {(() => {
                     const item = lgaList.find((x: any) => slugify(x.lga) === hoveredLGA.key);
                     if (!item) return <p className="text-gray-300 italic">No data available</p>;

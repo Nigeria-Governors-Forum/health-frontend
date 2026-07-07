@@ -79,16 +79,16 @@ const HealthCard: React.FC<SummaryTableProps> = ({
 
       {/* Column headers */}
       <div className="hidden gap-2.5 sm:mb-2.5 sm:grid sm:grid-cols-[1.6fr_1fr_1fr_1fr]">
-        <div className="flex items-center gap-3 rounded-full bg-green-700 px-5 py-3 text-sm font-semibold text-white">
+        <div className="flex items-center gap-3 rounded-lg bg-green-700 px-5 py-3 text-sm font-semibold text-white">
           <span>Institution</span>
         </div>
-        <div className="flex items-center justify-center rounded-full bg-green-700 px-5 py-3 text-sm font-semibold text-white">
+        <div className="flex items-center justify-center rounded-lg bg-green-700 px-5 py-3 text-sm font-semibold text-white">
           Private
         </div>
-        <div className="flex items-center justify-center rounded-full bg-green-700 px-5 py-3 text-sm font-semibold text-white">
+        <div className="flex items-center justify-center rounded-lg bg-green-700 px-5 py-3 text-sm font-semibold text-white">
           Public
         </div>
-        <div className="flex items-center justify-center rounded-full bg-green-700 px-5 py-3 text-sm font-semibold text-white">
+        <div className="flex items-center justify-center rounded-lg bg-green-700 px-5 py-3 text-sm font-semibold text-white">
           Total
         </div>
       </div>
@@ -104,7 +104,7 @@ const HealthCard: React.FC<SummaryTableProps> = ({
               key={row.id ?? `${row.institution}-${i}`}
               className="grid grid-cols-1 gap-2.5 sm:grid-cols-[1.6fr_1fr_1fr_1fr]"
             >
-              <div className="flex items-center gap-3 rounded-full bg-green-50 px-5 py-3">
+              <div className="flex items-center gap-3 rounded-lg bg-green-50 px-5 py-3">
                 <span
                   className={`font-semibold text-green-700 ${totalRow ? "text-base text-black" : "text-sm"
                     }`}
@@ -114,21 +114,21 @@ const HealthCard: React.FC<SummaryTableProps> = ({
               </div>
 
               <div
-                className={`flex items-center justify-center rounded-full bg-green-50 px-5 py-3 text-gray-700 ${totalRow ? "text-base font-bold text-black" : "text-sm font-medium"
+                className={`flex items-center justify-center rounded-lg bg-green-50 px-5 py-3 text-gray-700 ${totalRow ? "text-base font-bold text-black" : "text-sm font-medium"
                   }`}
               >
                 {formatNumber(row.private)}
               </div>
 
               <div
-                className={`flex items-center justify-center rounded-full bg-green-50 px-5 py-3 text-gray-700 ${totalRow ? "text-base font-bold text-black" : "text-sm font-medium"
+                className={`flex items-center justify-center rounded-lg bg-green-50 px-5 py-3 text-gray-700 ${totalRow ? "text-base font-bold text-black" : "text-sm font-medium"
                   }`}
               >
                 {formatNumber(row.public)}
               </div>
 
               <div
-                className={`flex items-center justify-center rounded-full bg-green-50 px-5 py-3 ${totalRow
+                className={`flex items-center justify-center rounded-lg bg-green-50 px-5 py-3 ${totalRow
                   ? "text-base font-bold text-black"
                   : "text-sm font-bold text-gray-800"
                   }`}

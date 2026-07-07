@@ -109,7 +109,7 @@ const HealthFinance = () => {
             data={sample}
             currencySymbol="₦"
             actualColor="#9011CA"
-            budgetColor="#3B82F6"
+            budgetColor="#155DFC"
             className="bg-white rounded-2xl shadow p-4"
           />
 

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo, useRef } from "react";
 import DataCard from "../../components/PieChartUi";
 import toast from "react-hot-toast";
 import { formatNumber } from "../page";
@@ -28,13 +28,23 @@ const HealthFacility: React.FC<HealthFacilityPageProps> = ({
   const [stateData, setStateData] = useState<any>();
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalResults, setTotalResults] = useState(0);
 
   const router = useRouter();
+  const lastFetched = useRef<{ state: string; year: number } | null>(null);
 
   const fetchData = async () => {
     if (!selectedState || !selectedYear) return;
+
+    // Avoid double API calls
+    if (
+      lastFetched.current &&
+      lastFetched.current.state === selectedState &&
+      lastFetched.current.year === selectedYear
+    ) {
+      return;
+    }
+    lastFetched.current = { state: selectedState, year: selectedYear };
+
     setLoading(true);
 
     const stateParam =
@@ -61,6 +71,35 @@ const HealthFacility: React.FC<HealthFacilityPageProps> = ({
 
   useEffect(() => {
     fetchData();
+  }, [selectedState, selectedYear]);
+
+  const lgaList = useMemo(() => {
+    return Array.isArray(stateData?.health_facilities_by_lga)
+      ? stateData.health_facilities_by_lga
+      : [];
+  }, [stateData]);
+
+  // Filter list based on search value
+  const filteredLgaList = useMemo(() => {
+    if (!search.trim()) return lgaList;
+    const lowerSearch = search.toLowerCase();
+    return lgaList.filter((item: any) =>
+      item.lga?.toLowerCase().includes(lowerSearch)
+    );
+  }, [lgaList, search]);
+
+  // Paginated list for table
+  const paginatedLgaList = useMemo(() => {
+    const startIndex = (currentPage - 1) * 10;
+    return filteredLgaList.slice(startIndex, startIndex + 10);
+  }, [filteredLgaList, currentPage]);
+
+  const totalPages = Math.ceil(filteredLgaList.length / 10) || 1;
+
+  // Whenever selectedState or selectedYear change, reset page & search
+  useEffect(() => {
+    setCurrentPage(1);
+    setSearch("");
   }, [selectedState, selectedYear]);
 
   const data: SummaryRow[] = [
@@ -126,10 +165,9 @@ const HealthFacility: React.FC<HealthFacilityPageProps> = ({
             />
             <DemographyCard
               title="Facilities Per Capita"
-              value={`${formatNumber(stateData?.per_person || "N/A")} Per 10,000`}
+              value={formatNumber(stateData?.per_person || "N/A")}
               icon={<Image src={land} alt="Land" width={24} height={24} />}
-              // percentage="100%"
-              // trend="up"
+              showPerCapita={true}
               comparisonText=""
             />
             <SummaryTable title="Health Facilities Summary" data={data} />
@@ -147,7 +185,7 @@ const HealthFacility: React.FC<HealthFacilityPageProps> = ({
         </div>
 
         {/* Below: 2 cards per row */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 auto-rows-max lg:auto-rows-fr">
+        <div className="grid grid-cols-1 lg:grid-cols-2 auto-rows-max lg:auto-rows-fr gap-4">
           <div className="flex">
             <DataCard
               title="Health Facilities by Ownership"
@@ -193,13 +231,13 @@ const HealthFacility: React.FC<HealthFacilityPageProps> = ({
 
           <div className="flex">
             <HealthFacilitiesByLgaTable
-              data={stateData?.health_facilities_by_lga || []}
+              data={paginatedLgaList}
               densityPer={10000}
               searchValue={search}
               onSearchChange={setSearch}
               currentPage={currentPage}
               totalPages={totalPages}
-              totalResults={totalResults}
+              totalResults={filteredLgaList.length}
               onPageChange={setCurrentPage}
             />
           </div>

@@ -48,6 +48,8 @@ export interface ZonalBarChartProps {
     showLabels?: boolean;
     height?: number;
     className?: string;
+    /** Corner radius of the bars. Number or [topLeft, topRight, bottomLeft, bottomRight]. Default: [6, 6, 0, 0] */
+    radius?: number | [number, number, number, number];
 }
 
 // ─── Custom tooltip ──────────────────────────────────────────────────────────
@@ -128,6 +130,7 @@ export default function ZonalBarChart({
     showLabels,
     height = 320,
     className = "",
+    radius = [6, 6, 0, 0],
 }: ZonalBarChartProps) {
     const [hoveredLabel, setHoveredLabel] = useState<string | null>(null);
 
@@ -143,7 +146,7 @@ export default function ZonalBarChart({
             <ResponsiveContainer width="100%" height={height}>
                 <BarChart
                     data={data}
-                    margin={{ top: 8, right: 8, left: -24, bottom: 0 }}
+                    margin={{ top: 20, right: 8, left: -24, bottom: 0 }}
                     barCategoryGap="30%"
                     onMouseLeave={() => setHoveredLabel(null)}
                 >
@@ -164,7 +167,7 @@ export default function ZonalBarChart({
                     {!isStacked && (
                         <Bar
                             dataKey="value"
-                            radius={[6, 6, 0, 0]}
+                            radius={radius}
                             maxBarSize={48}
                             onMouseEnter={(_: any, __: number, e: any) => {
                                 const label = e?.activePayload?.[0]?.payload?.label;
@@ -183,6 +186,15 @@ export default function ZonalBarChart({
                                     onMouseLeave={() => setHoveredLabel(null)}
                                 />
                             ))}
+                            <LabelList
+                                dataKey="value"
+                                position="top"
+                                formatter={(val: any) => {
+                                    const num = Number(val);
+                                    return isNaN(num) ? String(val || "") : num.toLocaleString();
+                                }}
+                                style={{ fill: "#374151", fontWeight: 600, fontSize: 11 }}
+                            />
                         </Bar>
                     )}
 

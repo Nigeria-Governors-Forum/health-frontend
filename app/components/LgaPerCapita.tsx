@@ -188,7 +188,7 @@ export interface LgaPerCapitaBarChartProps {
 }
 
 const formatCurrency = (val: number, symbol = "₦") =>
-  symbol + val.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  symbol + Math.round(val).toLocaleString("en-US");
 
 const TooltipContent: React.FC<any> = ({
   active,
@@ -276,11 +276,11 @@ const LgaPerCapitaBarChart: React.FC<LgaPerCapitaBarChartProps> = ({
 
       {/* Column headers */}
       <div
-        className="flex items-center bg-[#F8FAFC] border-b border-gray-200 px-4 py-2 text-sm font-semibold text-gray-700"
-        style={{ paddingLeft: 16 }}
+        className="flex items-center justify-between bg-[#F8FAFC] border-b border-gray-200 px-4 py-2 text-sm font-semibold text-gray-700"
+        style={{ paddingLeft: 16, paddingRight: 16 }}
       >
         <div style={{ width: LABEL_WIDTH }}>LGA</div>
-        <div className="flex-1">Amount</div>
+        <div>Amount</div>
       </div>
 
       {/* Rows */}
@@ -328,7 +328,8 @@ const LgaPerCapitaBarChart: React.FC<LgaPerCapitaBarChartProps> = ({
               isAnimationActive={false}
               maxBarSize={BAR_HEIGHT}
               background={{ fill: "#f3f4f6", radius: 4 } as any}
-              radius={4}
+              radius={[20, 20, 20, 20]}
+
             >
               {data.map((entry, idx) => (
                 <Cell
@@ -336,6 +337,7 @@ const LgaPerCapitaBarChart: React.FC<LgaPerCapitaBarChartProps> = ({
                   fill={entry.color || barColor}
                 />
               ))}
+
             </Bar>
           </BarChart>
         </ResponsiveContainer>

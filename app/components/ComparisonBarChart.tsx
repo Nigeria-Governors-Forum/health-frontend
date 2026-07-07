@@ -10,16 +10,29 @@ import {
   ResponsiveContainer,
   CartesianGrid,
   Cell,
+  LabelList,
 } from "recharts";
 import { FiInfo } from "react-icons/fi";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function formatShort(n: number): string {
-  if (n >= 1e12) return (n / 1e12).toFixed(1) + "T";
-  if (n >= 1e9) return (n / 1e9).toFixed(1) + "B";
-  if (n >= 1e6) return (n / 1e6).toFixed(1) + "M";
-  if (n >= 1e3) return (n / 1e3).toFixed(1) + "K";
+  if (n >= 1e12) {
+    const v = n / 1e12;
+    return (v % 1 === 0 ? v.toFixed(0) : v.toFixed(1)) + "T";
+  }
+  if (n >= 1e9) {
+    const v = n / 1e9;
+    return (v % 1 === 0 ? v.toFixed(0) : v.toFixed(1)) + "B";
+  }
+  if (n >= 1e6) {
+    const v = n / 1e6;
+    return (v % 1 === 0 ? v.toFixed(0) : v.toFixed(1)) + "M";
+  }
+  if (n >= 1e3) {
+    const v = n / 1e3;
+    return (v % 1 === 0 ? v.toFixed(0) : v.toFixed(1)) + "K";
+  }
   return n.toString();
 }
 
@@ -93,8 +106,8 @@ const ComparisonBarChart: React.FC<ComparisonBarChartProps> = ({
   title = "Health Expenditure Trend",
   subtitle = "Track expenditure trend",
   className = "",
-  actualColor = "#7C3AED",   // purple — matches screenshot
-  budgetColor = "#3B82F6",   // blue   — matches screenshot
+  actualColor = "#9011CA",   // purple — matches screenshot
+  budgetColor = "#20E62E",   // blue   — matches screenshot
 }) => {
   const safeData = data.map((d) => ({
     ...d,
@@ -106,7 +119,7 @@ const ComparisonBarChart: React.FC<ComparisonBarChartProps> = ({
     <div className={`w-full rounded-2xl border border-gray-100 bg-white p-5 shadow-sm ${className}`}>
 
       {/* ── Header ── */}
-      <div className="mb-4 flex items-start justify-between pb-3 border-b border-gray-300 w-full">
+      <div className="mb-4 flex items-start pb-3 border-b border-gray-300 w-full">
         <div className="flex items-start gap-3">
           {/* green icon */}
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-green-50">
@@ -131,18 +144,6 @@ const ComparisonBarChart: React.FC<ComparisonBarChartProps> = ({
             {subtitle && <p className="text-xs text-gray-400">{subtitle}</p>}
           </div>
         </div>
-
-        {/* top-right legend */}
-        <div className="flex flex-col items-end gap-1 text-xs font-medium text-gray-600">
-          <div className="flex items-center gap-1.5">
-            <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: budgetColor }} />
-            Actual
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: actualColor }} />
-            Budgeted
-          </div>
-        </div>
       </div>
 
       {/* ── Chart ── */}
@@ -150,7 +151,7 @@ const ComparisonBarChart: React.FC<ComparisonBarChartProps> = ({
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             data={safeData}
-            margin={{ top: 8, right: 8, left: 0, bottom: 4 }}
+            margin={{ top: 20, right: 8, left: 0, bottom: 4 }}
             barGap={4}
             barCategoryGap="35%"
           >
@@ -189,17 +190,40 @@ const ComparisonBarChart: React.FC<ComparisonBarChartProps> = ({
             />
 
             {/* Budgeted — blue */}
-            <Bar dataKey="budgeted" name="Budgeted" fill={budgetColor} radius={[6, 6, 0, 0]} maxBarSize={28}>
+            <Bar dataKey="budgeted"
+              name="Budgeted"
+
+              fill={budgetColor} radius={[10, 10, 10, 10]} maxBarSize={28}>
               {safeData.map((_, i) => (
                 <Cell key={i} fill={budgetColor} />
               ))}
+              <LabelList
+                dataKey="budgeted"
+                position="top"
+                formatter={(val: any) => {
+                  const num = Number(val || 0);
+                  if (num === 0) return "";
+                  return `${currencySymbol}${formatShort(num)}`;
+                }}
+                style={{ fill: "#374151", fontWeight: 600, fontSize: 11 }}
+              />
             </Bar>
 
             {/* Actual — purple */}
-            <Bar dataKey="actual" name="Actual" fill={actualColor} radius={[6, 6, 0, 0]} maxBarSize={28}>
+            <Bar dataKey="actual" name="Actual" fill={actualColor} radius={[10, 10, 10, 10]} maxBarSize={28}>
               {safeData.map((_, i) => (
                 <Cell key={i} fill={actualColor} />
               ))}
+              <LabelList
+                dataKey="actual"
+                position="top"
+                formatter={(val: any) => {
+                  const num = Number(val || 0);
+                  if (num === 0) return "";
+                  return `${currencySymbol}${formatShort(num)}`;
+                }}
+                style={{ fill: "#374151", fontWeight: 600, fontSize: 11 }}
+              />
             </Bar>
           </BarChart>
         </ResponsiveContainer>

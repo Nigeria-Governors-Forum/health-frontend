@@ -110,6 +110,8 @@ const ZonalHealthInsurance = () => {
                   { label: "Borno", value: 6 },
                   { label: "Jigawa", value: 16 },
                 ]}
+                radius={[10, 10, 10, 10]} // rounds the top corners by 10px
+
               />
             </div>
           </div>
@@ -137,7 +139,7 @@ const ZonalHealthInsurance = () => {
         )}
         <div className="flex justify-center pt-4">
           <button
-            onClick={() => router.push("/dashboard/human-resource")}
+            onClick={() => router.push("/dashboard/health-insurance")}
             className="text-[#00A141] px-8 py-2 border border-[#00A141] text-lg font-semibold rounded-full cursor-pointer hover:bg-green-50 transition-colors"
           >
             Go back to dashboard
