@@ -132,35 +132,39 @@ const HumanResource = () => {
           totalCount={filteredTrainingData.length}
         />
         <HealthTrainingTable
-          data={[
-            {
-              institution: "College(s) of Medicine",
-              programs: [
-                { program: "Medicine", quota: 45 },
-                { program: "Dentistry", quota: 34 },
-              ],
-            },
-            {
-              institution: "School(s) of Nursing & Midwifery",
-              programs: [
-                { program: "Nursing", quota: 56 },
-                { program: "Midwifery", quota: 28 },
-                { program: "Nursing University Graduates", quota: 98 },
-              ],
-            },
-            {
-              institution: "School(s) of Health Technology",
-              programs: [
-                { program: "Community Health Extention Workers", quota: 57 },
-                { program: "Junior Community Health Extention Workers", quota: 86 },
-                { program: "Pharm Tech", quota: 34 },
-                { program: "Dental Technician", quota: 50 },
-                { program: "Lab Tech", quota: 62 },
-                { program: "Medical Record Officers", quota: 18 },
-                { program: "Public Health", quota: 43 },
-              ],
-            },
-          ]}
+          data={
+            stateData?.admission_quota && stateData.admission_quota.length > 0
+              ? stateData.admission_quota
+              : [
+                  {
+                    institution: "College(s) of Medicine",
+                    programs: [
+                      { program: "Medicine", quota: 45 },
+                      { program: "Dentistry", quota: 34 },
+                    ],
+                  },
+                  {
+                    institution: "School(s) of Nursing & Midwifery",
+                    programs: [
+                      { program: "Nursing", quota: 56 },
+                      { program: "Midwifery", quota: 28 },
+                      { program: "Nursing University Graduates", quota: 98 },
+                    ],
+                  },
+                  {
+                    institution: "School(s) of Health Technology",
+                    programs: [
+                      { program: "Community Health Extention Workers", quota: 57 },
+                      { program: "Junior Community Health Extention Workers", quota: 86 },
+                      { program: "Pharm Tech", quota: 34 },
+                      { program: "Dental Technician", quota: 50 },
+                      { program: "Lab Tech", quota: 62 },
+                      { program: "Medical Record Officers", quota: 18 },
+                      { program: "Public Health", quota: 43 },
+                    ],
+                  },
+                ]
+          }
         />
 
         <div className="flex justify-center pt-4">

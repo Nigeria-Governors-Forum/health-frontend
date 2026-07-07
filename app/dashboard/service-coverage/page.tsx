@@ -68,14 +68,13 @@ const ServiceCoverage = () => {
           : selectedState;
     try {
       const stats = await httpClient.get(
-        `${Endpoints.healthFinance.zone}/${selectedZone}/${stateParam}/${selectedYear}`,
+        `${Endpoints.serviceCoverage.summary}/${stateParam}/${selectedYear}`,
       );
-      // console.log(stats);
       // @ts-ignore
-      setStateData(stats?.data);
+      setStateData(stats?.data?.data);
     } catch (error) {
       console.error("Error fetching data:", error);
-      toast.error("Invalid Credentials");
+      toast.error("Failed to fetch service coverage stats");
     } finally {
       setLoading(false);
     }
@@ -104,15 +103,21 @@ const ServiceCoverage = () => {
 
                 {/* Cards List */}
                 <div className="flex flex-col gap-3">
-                  {category.cards.map((card, cardIdx) => (
-                    <ServiceCoverageCard
-                      key={cardIdx}
-                      title={card.title}
-                      value={card.value}
-                      target={card.target}
-                      color={card.color}
-                    />
-                  ))}
+                  {category.cards.map((card, cardIdx) => {
+                    const dbData = stateData?.[card.title];
+                    const value = dbData !== undefined ? dbData.value : card.value;
+                    const target = dbData !== undefined ? dbData.target : card.target;
+                    const color = value >= target ? ("green" as const) : ("red" as const);
+                    return (
+                      <ServiceCoverageCard
+                        key={cardIdx}
+                        title={card.title}
+                        value={value}
+                        target={target}
+                        color={color}
+                      />
+                    );
+                  })}
                 </div>
               </div>
             ))}

@@ -80,14 +80,13 @@ const ZonalServiceCoverage = () => {
           : selectedState;
     try {
       const stats = await httpClient.get(
-        `${Endpoints.healthFinance.zone}/${selectedZone}/${stateParam}/${selectedYear}`,
+        `${Endpoints.serviceCoverage.zonal}/${selectedZone}/${stateParam}/${selectedYear}?indicator=${encodeURIComponent(selectedIndicator)}`,
       );
-      // console.log(stats);
       // @ts-ignore
-      setStateData(stats?.data);
+      setStateData(stats?.data?.data);
     } catch (error) {
       console.error("Error fetching data:", error);
-      toast.error("Invalid Credentials");
+      toast.error("Failed to fetch zonal coverage data");
     } finally {
       setLoading(false);
     }
@@ -97,10 +96,9 @@ const ZonalServiceCoverage = () => {
     const zoneArea = getZoneByState(selectedState.toLocaleLowerCase());
     setSelectedZone(zoneArea?.zone as string);
     fetchData();
-  }, [selectedZone, selectedState, selectedYear]);
+  }, [selectedZone, selectedState, selectedYear, selectedIndicator]);
 
   const data = stateData?.states || [];
-  const perCapita = stateData?.per_capita || [];
 
   return (
     <>
@@ -154,18 +152,22 @@ const ZonalServiceCoverage = () => {
             <div className="grid grid-cols-1">
               <div className="flex flex-col gap-6">
                 <ZonalBarChart
-                  title="North Central"
+                  title={selectedZone.toUpperCase()}
                   variant="simple"
                   simpleColor="#2563EB"
-                  data={[
-                    { label: "Bauchi", value: 18 },
-                    { label: "Adamawa", value: 20 },
-                    { label: "Taraba", value: 32 },
-                    { label: "Gombe", value: 14 },
-                    { label: "Yobe", value: 22 },
-                    { label: "Borno", value: 6 },
-                    { label: "Jigawa", value: 16 },
-                  ]}
+                  data={
+                    data.length > 0
+                      ? data
+                      : [
+                          { label: "Bauchi", value: 18 },
+                          { label: "Adamawa", value: 20 },
+                          { label: "Taraba", value: 32 },
+                          { label: "Gombe", value: 14 },
+                          { label: "Yobe", value: 22 },
+                          { label: "Borno", value: 6 },
+                          { label: "Jigawa", value: 16 },
+                        ]
+                  }
                 />
               </div>
             </div>
@@ -174,7 +176,7 @@ const ZonalServiceCoverage = () => {
             <div className="bg-white rounded-2xl shadow p-4">
               <NigeriaStatesChoropleth
                 valueForState={(slug: string) => {
-                  const value = stateData?.[slug];
+                  const value = stateData?.national?.[slug];
                   return typeof value === "number" ? value : 50;
                 }}
                 valueLabel="Score"
@@ -184,10 +186,19 @@ const ZonalServiceCoverage = () => {
           {mode === "trend" && (
             <div className="bg-white rounded-2xl shadow p-4">
               <TrendAreaChart
-                data={stateData?.trend?.map((point: any) => ({
-                  label: point.year,
-                  value: point.value,
-                }))}
+                data={
+                  stateData?.trend && stateData.trend.length > 0
+                    ? stateData.trend.map((point: any) => ({
+                        label: String(point.year),
+                        value: point.value,
+                      }))
+                    : [
+                        { label: "2020", value: 45 },
+                        { label: "2021", value: 50 },
+                        { label: "2022", value: 58 },
+                        { label: "2023", value: 62 },
+                      ]
+                }
               />
             </div>
           )}

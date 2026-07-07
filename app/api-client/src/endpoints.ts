@@ -7,6 +7,7 @@ export const Endpoints = {
   },
   dashboard: {
     summary: "/dashboard",
+    flagship: "/dashboard/flagship",
   },
   demography: {
     summary: "/demography",
@@ -24,6 +25,10 @@ export const Endpoints = {
   healthFinance: {
     summary: "/health-finance",
     zone: "/health-finance/zonal",
+  },
+  serviceCoverage: {
+    summary: "/service-coverage",
+    zonal: "/service-coverage/zonal",
   },
   users: {
     list: "/user",
