@@ -206,7 +206,7 @@ export default function DashboardHome() {
     <>
       {loading && <LoadingScreen text="Please wait..." />}
       <div className="space-y-8 min-h-screen">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <DemographyCard
             title="State Population"
             value={formatNumber(stateData?.total_population || "N/A") as any}

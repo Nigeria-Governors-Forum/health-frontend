@@ -95,15 +95,51 @@ const Topbar: React.FC<TopbarProps> = ({
 
 
   return (
-    <div className="w-full bg-[#F5F7FA] border-b px-4 py-4">
+    <div className="w-full bg-[#F5F7FA] border-b px-4 py-3 md:py-4">
+      {/* Mobile Top Header (only on mobile) */}
+      <div className="flex md:hidden items-center justify-between w-full mb-3">
+        <div className="flex items-center gap-2">
+          {onToggleSidebar && (
+            <button
+              onClick={onToggleSidebar}
+              className="text-[#00A141] p-2 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
+              aria-label="Toggle navigation menu"
+            >
+              <FaBars size={20} />
+            </button>
+          )}
+          {StateLogo && (
+            <div className="w-8 h-8 relative bg-gray-200 rounded-lg overflow-hidden shrink-0">
+              <Image
+                src={(StateLogo as any).src ?? StateLogo}
+                alt={selectedState}
+                fill
+                className="object-contain"
+              />
+            </div>
+          )}
+          <span className="font-bold text-sm text-gray-800">
+            {selectedState || "NGF"}
+          </span>
+        </div>
 
-      {/* GRID CONTAINER */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+        <div className="flex items-center gap-2 bg-[#00A141] text-white text-xs px-2.5 py-1 rounded-full font-medium">
+          <Image
+            src={'/svg/globe.svg'}
+            alt={selectedState}
+            width={14}
+            height={14}
+            className="object-contain invert brightness-0"
+          />
+          {selectedState || "Gombe"}
+        </div>
+      </div>
 
-        {/* COLUMN 1 — Title + Date */}
-        <div>
-          <div className="flex gap-2 flex-wrap justify-start">
-
+      {/* Desktop Grid Layout & Mobile Body */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4 items-center">
+        {/* COLUMN 1 — Filters */}
+        <div className="flex justify-center md:justify-start">
+          <div className="flex gap-2 w-full max-w-xs md:max-w-none">
             {/* State */}
             <select
               value={selectedState}
@@ -112,7 +148,7 @@ const Topbar: React.FC<TopbarProps> = ({
                 setSelectedState(value);
                 onStateChange?.(value);
               }}
-              className="bg-[#dadcde] text-black border border-[#dadcde] text-sm px-3 py-2 rounded-full cursor-pointer"
+              className="flex-1 md:flex-initial bg-[#dadcde] text-black border border-[#dadcde] text-sm px-3 py-2 rounded-full cursor-pointer hover:bg-gray-300 transition-colors"
             >
               <option value="">Filter By State</option>
               {state.map((item) => (
@@ -130,7 +166,7 @@ const Topbar: React.FC<TopbarProps> = ({
                 setSelectedYear(value);
                 onYearChange?.(value);
               }}
-              className="bg-[#dadcde] text-black border border-[#dadcde] text-sm px-3 py-2 rounded-full cursor-pointer"
+              className="bg-[#dadcde] text-black border border-[#dadcde] text-sm px-3 py-2 rounded-full cursor-pointer hover:bg-gray-300 transition-colors"
             >
               {years.map((year) => (
                 <option key={year} value={year}>
@@ -142,16 +178,15 @@ const Topbar: React.FC<TopbarProps> = ({
         </div>
 
         {/* COLUMN 2 — CENTER INFO */}
-        <div className="flex flex-col items-center justify-center text-center">
-          <p className="text-black font-bold text-xl">Welcome to  {selectedState} State {topBarTitle}</p>
-          <p className="text-lg text-black">{currentDate}</p>
-
+        <div className="flex flex-col items-center justify-center text-center order-first md:order-none">
+          <h1 className="text-black font-bold text-base md:text-xl leading-snug">
+            Welcome to {selectedState} State {topBarTitle}
+          </h1>
+          <p className="text-xs md:text-lg text-gray-600 mt-0.5">{currentDate}</p>
         </div>
 
-        {/* COLUMN 3 — User + Filters */}
-        <div className="flex flex-col items-end gap-3">
-
-          {/* User */}
+        {/* COLUMN 3 — User + Logo (Desktop only) */}
+        <div className="hidden md:flex flex-col items-end gap-2">
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2 bg-green-600 text-white text-sm px-3 py-1 rounded-full">
               <Image
@@ -165,7 +200,7 @@ const Topbar: React.FC<TopbarProps> = ({
             </div>
 
             {StateLogo && (
-              <div className="w-12 h-12 relative bg-gray-300 rounded-2xl my-4">
+              <div className="w-12 h-12 relative bg-gray-300 rounded-2xl">
                 <Image
                   src={(StateLogo as any).src ?? StateLogo}
                   alt={selectedState}
@@ -175,9 +210,6 @@ const Topbar: React.FC<TopbarProps> = ({
               </div>
             )}
           </div>
-
-          {/* Filters */}
-
         </div>
       </div>
     </div>

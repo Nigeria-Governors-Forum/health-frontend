@@ -52,8 +52,8 @@ const DemographyCard: React.FC<DemographyCardProps> = ({
       </div>
 
       {/* Value */}
-      <div className=" flex justify-between pr-4 text-2xl font-bold text-green-600 items-baseline">
-        <span className="flex items-baseline gap-1.5">
+      <div className="flex flex-col sm:flex-row sm:justify-between pr-4 text-2xl font-bold text-green-600 items-baseline gap-2">
+        <span className="flex items-baseline gap-1.5 shrink-0">
           {value}
           {showPerCapita && (
             <span className="text-sm text-gray-500 italic font-normal">
@@ -63,38 +63,39 @@ const DemographyCard: React.FC<DemographyCardProps> = ({
         </span>
         {/* Trend */}
         {percentage && (
-          <div className="flex items-center gap-2 text-sm">
-
+          <div className="flex items-center gap-1.5 text-xs sm:text-sm font-normal text-gray-500 flex-wrap">
             {/* Arrow */}
             <span
               className={`${trend === "up" ? "text-green-600" : "text-red-500"
-                }`}
+                } shrink-0`}
             >
               {trend === "up" ?
                 <Image
                   src={ArrowUp}
                   alt="Arrow Up"
-                  width={20}
-                  height={20}
+                  width={16}
+                  height={16}
+                  className="inline-block"
                 /> :
                 <Image
                   src={ArrowDown}
                   alt="Arrow Down"
-                  width={20}
-                  height={20}
+                  width={16}
+                  height={16}
+                  className="inline-block"
                 />}
             </span>
 
             {/* Percentage */}
             <span
               className={`font-semibold ${trend === "up" ? "text-green-600" : "text-red-500"
-                }`}
+                } shrink-0`}
             >
               {percentage}
             </span>
 
             {/* Text */}
-            <span className="text-gray-500">
+            <span className="text-gray-500 shrink-0">
               {comparisonText}
             </span>
           </div>

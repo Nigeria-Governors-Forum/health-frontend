@@ -210,8 +210,6 @@ const TooltipContent: React.FC<any> = ({
 };
 
 const ROW_HEIGHT = 48;
-const LABEL_WIDTH = 130;
-const VALUE_WIDTH = 120;
 const BAR_HEIGHT = 16;
 
 const LgaPerCapitaBarChart: React.FC<LgaPerCapitaBarChartProps> = ({
@@ -226,6 +224,20 @@ const LgaPerCapitaBarChart: React.FC<LgaPerCapitaBarChartProps> = ({
   totalCount,
   subtitle,
 }) => {
+  const [isMobile, setIsMobile] = React.useState(false);
+
+  React.useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  const labelWidth = isMobile ? 90 : 130;
+  const valueWidth = isMobile ? 80 : 120;
+
   const effectiveMax = autoScale
     ? Math.max(...data.map((d) => Number(d.per_capita) || 0), 0)
     : max && max > 0
@@ -279,7 +291,7 @@ const LgaPerCapitaBarChart: React.FC<LgaPerCapitaBarChartProps> = ({
         className="flex items-center justify-between bg-[#F8FAFC] border-b border-gray-200 px-4 py-2 text-sm font-semibold text-gray-700"
         style={{ paddingLeft: 16, paddingRight: 16 }}
       >
-        <div style={{ width: LABEL_WIDTH }}>LGA</div>
+        <div style={{ width: labelWidth }}>LGA</div>
         <div>Amount</div>
       </div>
 
@@ -292,8 +304,8 @@ const LgaPerCapitaBarChart: React.FC<LgaPerCapitaBarChartProps> = ({
             layout="vertical"
             margin={{
               top: 0,
-              right: VALUE_WIDTH,
-              left: LABEL_WIDTH,
+              right: valueWidth,
+              left: labelWidth,
               bottom: 0,
             }}
             barCategoryGap="40%"
@@ -359,12 +371,12 @@ const LgaPerCapitaBarChart: React.FC<LgaPerCapitaBarChartProps> = ({
             style={{ height: ROW_HEIGHT, paddingLeft: 16, paddingRight: 16 }}
           >
             <span
-              className="text-sm font-semibold text-gray-700"
-              style={{ width: LABEL_WIDTH }}
+              className="text-xs sm:text-sm font-semibold text-gray-700 truncate"
+              style={{ width: labelWidth }}
             >
               {entry.lga ?? entry.state}
             </span>
-            <span className="text-sm font-semibold text-gray-800">
+            <span className="text-xs sm:text-sm font-semibold text-gray-800 shrink-0">
               {formatCurrency(Number(entry.per_capita ?? 0), currencySymbol)}
               {showValueSuffix}
             </span>

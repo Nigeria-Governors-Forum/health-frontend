@@ -241,15 +241,6 @@ const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <>
-      {/* Mobile Hamburger */}
-      <button
-        aria-label="Toggle sidebar"
-        onClick={toggleMobile}
-        className="md:hidden fixed top-4 right-4 z-50 bg-white text-[#06923E] p-2 rounded"
-      >
-        <FaTimes size={24} />
-      </button>
-
       {/* Sidebar container */}
       <div
         aria-label="Sidebar"
@@ -269,9 +260,9 @@ const Sidebar: React.FC<SidebarProps> = ({
           >
             {collapsed ? <FaChevronRight /> : <FaChevronLeft />}
           </button>
-
-          {/* Logo */}
-          <div className={cn("flex", collapsed ? "py-2" : "py-5")}>
+ 
+          {/* Logo and Mobile Close Toggle */}
+          <div className={cn("flex items-center justify-between", collapsed ? "py-2" : "py-5")}>
             <Image
               src="/logo.png"
               alt="NGF Logo"
@@ -283,6 +274,14 @@ const Sidebar: React.FC<SidebarProps> = ({
                 collapsed ? "w-10" : "w-36",
               )}
             />
+            {/* Close button inside sidebar for mobile */}
+            <button
+              onClick={closeMobile}
+              className="md:hidden p-2 text-gray-500 hover:text-gray-800 focus:outline-none cursor-pointer"
+              aria-label="Close menu"
+            >
+              <FaTimes size={20} />
+            </button>
           </div>
 
           {filteredNav.map((item) => {
