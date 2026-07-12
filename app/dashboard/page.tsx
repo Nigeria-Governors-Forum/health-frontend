@@ -25,7 +25,6 @@ export default function DashboardHome() {
   const [hoveredLGA, setHoveredLGA] = useState<{ name: string; key: string } | null>(null);
 
   const [stateData, setStateData] = useState<any>();
-  const [demographyData, setDemographyData] = useState<any>();
   const lastFetched = useRef<{ state: string; year: number } | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [mapHeight, setMapHeight] = useState(350);
@@ -80,12 +79,6 @@ export default function DashboardHome() {
       // @ts-ignore
       setStateData(stats.data);
 
-      // Fetch demography data to get LGA populations and status mapping
-      const demoStats = await httpClient.get(
-        `${Endpoints.demography.summary}/${stateParam}/${selectedYear}`,
-      );
-      setDemographyData((demoStats as any).data);
-
       toast.success(`Welcome, ${selectedState} - ${selectedYear}!`);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -100,10 +93,10 @@ export default function DashboardHome() {
   }, [selectedState, selectedYear]);
 
   const lgaList = useMemo(() => {
-    return Array.isArray(demographyData?.demography_LGA)
-      ? demographyData.demography_LGA
+    return Array.isArray(stateData?.demography_LGA)
+      ? stateData.demography_LGA
       : [];
-  }, [demographyData]);
+  }, [stateData]);
 
   const lgaColors = useMemo(() => {
     const colors: Record<string, string> = {};

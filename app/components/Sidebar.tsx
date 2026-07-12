@@ -245,45 +245,46 @@ const Sidebar: React.FC<SidebarProps> = ({
       <div
         aria-label="Sidebar"
         className={cn(
-          "fixed top-0 left-0 h-screen bg-white text-black p-4 z-40 flex flex-col justify-between transition-all duration-300",
+          "fixed top-0 left-0 h-screen bg-white text-black p-4 z-40 flex flex-col transition-all duration-300",
           collapsed ? "w-20" : "w-64",
           mobileOpen ? "translate-x-0" : "-translate-x-full",
           "md:translate-x-0",
         )}
       >
-        <div>
-          {/* Collapse toggle (desktop) */}
-          <button
-            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-            onClick={() => setCollapsed(!collapsed)}
-            className="hidden md:flex items-center justify-center absolute top-4 right-[-16px] text-white bg-[#06923E] border border-white rounded-full w-8 h-8 z-50 shadow"
-          >
-            {collapsed ? <FaChevronRight /> : <FaChevronLeft />}
-          </button>
- 
-          {/* Logo and Mobile Close Toggle */}
-          <div className={cn("flex items-center justify-between", collapsed ? "py-2" : "py-5")}>
-            <Image
-              src="/logo.png"
-              alt="NGF Logo"
-              width={collapsed ? 70 : 180}
-              height={collapsed ? 70 : 60}
-              priority
-              className={cn(
-                "object-contain transition-all duration-300 h-auto",
-                collapsed ? "w-10" : "w-36",
-              )}
-            />
-            {/* Close button inside sidebar for mobile */}
-            <button
-              onClick={closeMobile}
-              className="md:hidden p-2 text-gray-500 hover:text-gray-800 focus:outline-none cursor-pointer"
-              aria-label="Close menu"
-            >
-              <FaTimes size={20} />
-            </button>
-          </div>
+        {/* Collapse toggle (desktop) */}
+        <button
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          onClick={() => setCollapsed(!collapsed)}
+          className="hidden md:flex items-center justify-center absolute top-4 right-[-16px] text-white bg-[#06923E] border border-white rounded-full w-8 h-8 z-50 shadow cursor-pointer"
+        >
+          {collapsed ? <FaChevronRight /> : <FaChevronLeft />}
+        </button>
 
+        {/* Logo and Mobile Close Toggle (Fixed at top) */}
+        <div className={cn("flex items-center justify-between shrink-0 mb-4", collapsed ? "py-2" : "py-5")}>
+          <Image
+            src="/logo.png"
+            alt="NGF Logo"
+            width={collapsed ? 70 : 180}
+            height={collapsed ? 70 : 60}
+            priority
+            className={cn(
+              "object-contain transition-all duration-300 h-auto",
+              collapsed ? "w-10" : "w-36",
+            )}
+          />
+          {/* Close button inside sidebar for mobile */}
+          <button
+            onClick={closeMobile}
+            className="md:hidden p-2 text-gray-500 hover:text-gray-800 focus:outline-none cursor-pointer"
+            aria-label="Close menu"
+          >
+            <FaTimes size={20} />
+          </button>
+        </div>
+
+        {/* Scrollable navigation items area */}
+        <div className="flex-1 overflow-y-auto space-y-1 pr-1 scrollbar-thin">
           {filteredNav.map((item) => {
             if (item.children && item.children.length > 0) {
               const isOpen = expanded[item.label];
@@ -389,8 +390,8 @@ const Sidebar: React.FC<SidebarProps> = ({
           })}
         </div>
 
-        {/* Footer with logout */}
-        <div className="mt-4 border-t border-white/30 pt-4">
+        {/* Footer with logout (Fixed at bottom) */}
+        <div className="mt-auto pt-4 border-t border-gray-200 shrink-0">
           <button
             onClick={handleLogout}
             className="w-full flex items-center gap-2 px-2 py-2 rounded transition-colors duration-200 cursor-pointer hover:bg-[#00A141] hover:text-white outline-none"
