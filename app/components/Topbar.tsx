@@ -7,6 +7,7 @@ import Image from "next/image";
 
 import ConfirmPrompt from "./ConfirmPrompt";
 import { useTopbarFilters } from "../context/TopbarFiltersContext";
+import { getZoneByState } from "nigerian-geopolitical-zones";
 
 export interface TopbarProps {
   collapsed?: boolean;
@@ -52,26 +53,36 @@ const Topbar: React.FC<TopbarProps> = ({
 
   useEffect(() => {
     if (!selectedYear) return;
-    setTopBarTitle(
-      pathname === "/dashboard"
-        ? `Dashboard ${onYearChange ? ` - ${selectedYear}` : ""}`
-        : pathname === "/dashboard/demography"
-          ? `Demography ${onYearChange ? ` - ${selectedYear}` : ""}`
-          : pathname === "/dashboard/health-facilities"
-            ? `Health Facilities ${onYearChange ? ` - ${selectedYear}` : ""}`
-            : pathname === "/dashboard/zonal-health-facilities"
-              ? `Zonal and National View of Health Facilities per Capita`
-              : pathname === "/dashboard/human-resource"
-                ? `${selectedState} State Human Resource for Health Overview`
-                : pathname === "/dashboard/score-card"
-                  ? `NFG Scorecard`
-                  : pathname === "/dashboard/health-finance"
-                    ? `${selectedState} state  Health Finance Dashboard ${selectedYear}`
-                    : pathname === "/dashboard/zonal-health-finance"
-                      ? `${selectedZone} Health Finance Dashboard (${selectedYear})`
-                      : title
-    );
-  }, [selectedYear, pathname, title, onYearChange, selectedZone]);
+
+    const zoneArea = selectedState ? getZoneByState(selectedState.toLocaleLowerCase()) : null;
+    const computedZone = zoneArea?.zone || "Zonal";
+
+    const titleMap: Record<string, string> = {
+      "/dashboard": `Dashboard${onYearChange ? ` - ${selectedYear}` : ""}`,
+      "/dashboard/demography": `Demography${onYearChange ? ` - ${selectedYear}` : ""}`,
+      "/dashboard/health-facilities": `Health Facilities${onYearChange ? ` - ${selectedYear}` : ""}`,
+      "/dashboard/zonal-health-facilities": `Zonal and National View of Health Facilities per Capita`,
+      "/dashboard/human-resource": `${selectedState} State Human Resource for Health Overview`,
+      "/dashboard/zonal-human-resource": `${computedZone} Human Resource for Health (Zonal Comparison)`,
+      "/dashboard/score-card": `NGF Scorecard`,
+      "/dashboard/zonal-score-card": `${computedZone} Scorecard (Zonal Comparison)`,
+      "/dashboard/health-finance": `${selectedState} State Health Finance Dashboard ${selectedYear}`,
+      "/dashboard/zonal-health-finance": `${computedZone} Health Finance Dashboard (${selectedYear})`,
+      "/dashboard/health-insurance": `${selectedState} State Health Insurance Coverage`,
+      "/dashboard/zonal-health-insurance": `${computedZone} Health Insurance Coverage (Zonal Comparison)`,
+      "/dashboard/service-coverage": `${selectedState} State Service Coverage Dashboard`,
+      "/dashboard/zonal-service-coverage": `${computedZone} Service Coverage Dashboard (${selectedYear})`,
+      "/dashboard/health-outcomes": `${selectedState} State Health Outcomes Dashboard`,
+      "/dashboard/zonal-health-outcomes": `${computedZone} Health Outcomes Dashboard (${selectedYear})`,
+      "/dashboard/flagship-projects": `${selectedState} State Flagship Projects (${selectedYear})`,
+      "/dashboard/partners-mapping": `${selectedState} State Partners Mapping`,
+      "/dashboard/africa-map": `Africa Map View`,
+      "/dashboard/upload-data": `Data Upload Management`,
+      "/dashboard/register": `Register User Accounts`,
+    };
+
+    setTopBarTitle(titleMap[pathname] || title);
+  }, [selectedYear, pathname, title, onYearChange, selectedState]);
 
   const years = Array.from({ length: 10 }, (_, i) => 2025 - i);
 
@@ -180,7 +191,7 @@ const Topbar: React.FC<TopbarProps> = ({
         {/* COLUMN 2 — CENTER INFO */}
         <div className="flex flex-col items-center justify-center text-center order-first md:order-none">
           <h1 className="text-black font-bold text-base md:text-xl leading-snug">
-            Welcome to {selectedState} State {topBarTitle}
+            {topBarTitle}
           </h1>
           <p className="text-xs md:text-lg text-gray-600 mt-0.5">{currentDate}</p>
         </div>

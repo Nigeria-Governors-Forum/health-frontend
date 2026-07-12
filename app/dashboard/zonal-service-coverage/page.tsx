@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import CustomBarChart from "../../components/CustomBarChart";
 import { getZoneByState } from "nigerian-geopolitical-zones";
 import toast from "react-hot-toast";
@@ -69,8 +69,29 @@ const ZonalServiceCoverage = () => {
     setSelectedIndicator(firstInd);
   };
 
-  const fetchData = async () => {
-    if (!selectedState || !selectedYear) return;
+  const lastFetched = useRef<{ state: string; year: number; zone: string; indicator: string } | null>(null);
+
+  const fetchData = async (zoneParam?: string) => {
+    const activeZone = zoneParam || selectedZone;
+    if (!selectedState || !selectedYear || !activeZone) return;
+
+    // Avoid double API calls
+    if (
+      lastFetched.current &&
+      lastFetched.current.state === selectedState &&
+      lastFetched.current.year === selectedYear &&
+      lastFetched.current.zone === activeZone &&
+      lastFetched.current.indicator === selectedIndicator
+    ) {
+      return;
+    }
+    lastFetched.current = {
+      state: selectedState,
+      year: selectedYear,
+      zone: activeZone,
+      indicator: selectedIndicator
+    };
+
     setLoading(true);
     const stateParam =
       selectedState === "Federal Capital Territory"
@@ -80,7 +101,7 @@ const ZonalServiceCoverage = () => {
           : selectedState;
     try {
       const stats = await httpClient.get(
-        `${Endpoints.serviceCoverage.zonal}/${selectedZone}/${stateParam}/${selectedYear}?indicator=${encodeURIComponent(selectedIndicator)}`,
+        `${Endpoints.serviceCoverage.zonal}/${activeZone}/${stateParam}/${selectedYear}?indicator=${encodeURIComponent(selectedIndicator)}`,
       );
       // @ts-ignore
       setStateData(stats?.data?.data);
@@ -93,10 +114,17 @@ const ZonalServiceCoverage = () => {
   };
 
   useEffect(() => {
+    if (!selectedState || !selectedYear) return;
     const zoneArea = getZoneByState(selectedState.toLocaleLowerCase());
-    setSelectedZone(zoneArea?.zone as string);
-    fetchData();
-  }, [selectedZone, selectedState, selectedYear, selectedIndicator]);
+    const zone = zoneArea?.zone as string;
+    setSelectedZone(zone);
+    fetchData(zone);
+  }, [selectedState, selectedYear, selectedIndicator]);
+
+  useEffect(() => {
+    if (!selectedState || !selectedYear || !selectedZone) return;
+    fetchData(selectedZone);
+  }, [selectedZone]);
 
   const data = stateData?.states || [];
 

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { getZoneByState } from "nigerian-geopolitical-zones";
 import State from "naija-state-local-government";
 import toast from "react-hot-toast";
@@ -24,8 +24,23 @@ const ZonalHealthFacility = () => {
     useTopbarFilters();
   const router = useRouter();
 
-  const fetchData = async () => {
-    if (!selectedState || !selectedYear) return;
+  const lastFetched = useRef<{ state: string; year: number; zone: string } | null>(null);
+
+  const fetchData = async (zoneParam?: string) => {
+    const activeZone = zoneParam || selectedZone;
+    if (!selectedState || !selectedYear || !activeZone) return;
+
+    // Avoid double API calls
+    if (
+      lastFetched.current &&
+      lastFetched.current.state === selectedState &&
+      lastFetched.current.year === selectedYear &&
+      lastFetched.current.zone === activeZone
+    ) {
+      return;
+    }
+    lastFetched.current = { state: selectedState, year: selectedYear, zone: activeZone };
+
     setLoading(true);
     const stateParam =
       selectedState === "Federal Capital Territory"
@@ -35,7 +50,7 @@ const ZonalHealthFacility = () => {
           : selectedState;
     try {
       const stats = await httpClient.get(
-        `${Endpoints.healthFacilities.zone}/${selectedZone}/${stateParam}/${selectedYear}`,
+        `${Endpoints.healthFacilities.zone}/${activeZone}/${stateParam}/${selectedYear}`,
       );
       // console.log(stats);
       // @ts-ignore
@@ -49,16 +64,17 @@ const ZonalHealthFacility = () => {
   };
 
   useEffect(() => {
-    if (!selectedState) return;
-
+    if (!selectedState || !selectedYear) return;
     const zoneArea = getZoneByState(selectedState.toLocaleLowerCase());
-    setSelectedZone(zoneArea?.zone.toLocaleLowerCase());
-  }, [selectedState]);
+    const zone = zoneArea?.zone.toLocaleLowerCase() as string;
+    setSelectedZone(zone);
+    fetchData(zone);
+  }, [selectedState, selectedYear]);
 
   useEffect(() => {
-    if (!selectedZone || !selectedState || !selectedYear) return;
-    fetchData();
-  }, [selectedZone, selectedState, selectedYear]);
+    if (!selectedState || !selectedYear || !selectedZone) return;
+    fetchData(selectedZone);
+  }, [selectedZone]);
 
   const sampleData = stateData?.zoneWithin;
 

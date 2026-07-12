@@ -1,7 +1,7 @@
 "use client";
 
 import toast from "react-hot-toast";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { formatNumber } from "../page";
 import ComparisonBarChart from "@/app/components/ComparisonBarChart";
 import LoadingScreen from "@/app/components/LoadingScreen";
@@ -20,8 +20,21 @@ const HealthFinance = () => {
   const sample = stateData?.yearlyTotals;
   const data = stateData?.perCapita || [];
 
+  const lastFetched = useRef<{ state: string; year: number } | null>(null);
+
   const fetchData = async () => {
     if (!selectedState || !selectedYear) return;
+
+    // Avoid double API calls
+    if (
+      lastFetched.current &&
+      lastFetched.current.state === selectedState &&
+      lastFetched.current.year === selectedYear
+    ) {
+      return;
+    }
+    lastFetched.current = { state: selectedState, year: selectedYear };
+
     setLoading(true);
 
     const stateParam =

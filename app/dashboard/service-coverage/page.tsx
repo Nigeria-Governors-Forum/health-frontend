@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { getZoneByState } from "nigerian-geopolitical-zones";
 import toast from "react-hot-toast";
 import { useTopbarFilters } from "@/app/context/TopbarFiltersContext";
@@ -57,8 +57,21 @@ const ServiceCoverage = () => {
     useTopbarFilters();
   const router = useRouter();
 
+  const lastFetched = useRef<{ state: string; year: number } | null>(null);
+
   const fetchData = async () => {
     if (!selectedState || !selectedYear) return;
+
+    // Avoid double API calls
+    if (
+      lastFetched.current &&
+      lastFetched.current.state === selectedState &&
+      lastFetched.current.year === selectedYear
+    ) {
+      return;
+    }
+    lastFetched.current = { state: selectedState, year: selectedYear };
+
     setLoading(true);
     const stateParam =
       selectedState === "Federal Capital Territory"
@@ -81,10 +94,14 @@ const ServiceCoverage = () => {
   };
 
   useEffect(() => {
+    if (!selectedState) return;
     const zoneArea = getZoneByState(selectedState.toLocaleLowerCase());
     setSelectedZone(zoneArea?.zone as string);
+  }, [selectedState]);
+
+  useEffect(() => {
     fetchData();
-  }, [selectedZone, selectedState, selectedYear]);
+  }, [selectedState, selectedYear]);
 
   return (
     <>

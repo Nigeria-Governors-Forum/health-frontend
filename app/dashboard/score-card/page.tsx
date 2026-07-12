@@ -40,12 +40,12 @@ const ScoreCard = () => {
     categories[0]?.value,
   );
   const columnTwo: ScorecardRow[] = stateData?.selected_state || [];
-  const prevValues = useRef({
-    selectedRound,
-    selectedState,
-    selectedYear,
-    selectedCategory,
-  });
+  const prevValues = useRef<{
+    selectedRound: string;
+    selectedState: string;
+    selectedYear: number;
+    selectedCategory: string;
+  } | null>(null);
 
   const sampleData = stateData?.all_states || [];
 
@@ -57,6 +57,23 @@ const ScoreCard = () => {
 
   const fetchData = async () => {
     if (!selectedState || !selectedYear) return;
+
+    // Avoid double API calls
+    if (
+      prevValues.current &&
+      prevValues.current.selectedState === selectedState &&
+      prevValues.current.selectedYear === selectedYear &&
+      prevValues.current.selectedRound === selectedRound &&
+      prevValues.current.selectedCategory === selectedCategory
+    ) {
+      return;
+    }
+    prevValues.current = {
+      selectedState,
+      selectedYear,
+      selectedRound,
+      selectedCategory,
+    };
 
     setLoading(true);
     const stateParam = getStateParam(selectedState);

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 
 import { FaHospitalUser, FaUsers } from "react-icons/fa";
 import toast from "react-hot-toast";
@@ -47,8 +47,21 @@ const HumanResource = () => {
     return institution.includes(searchTerm);
   });
 
+  const lastFetched = useRef<{ state: string; year: number } | null>(null);
+
   const fetchData = async () => {
     if (!selectedState || !selectedYear) return;
+
+    // Avoid double API calls
+    if (
+      lastFetched.current &&
+      lastFetched.current.state === selectedState &&
+      lastFetched.current.year === selectedYear
+    ) {
+      return;
+    }
+    lastFetched.current = { state: selectedState, year: selectedYear };
+
     setLoading(true);
 
     const stateParam =

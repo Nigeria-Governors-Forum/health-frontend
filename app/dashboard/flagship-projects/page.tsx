@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useTopbarFilters } from "@/app/context/TopbarFiltersContext";
 import { normalizeStateName } from "@/app/components/ng-maps";
 import FlagshipCard from "@/app/components/FlagshipCard";
@@ -25,6 +25,7 @@ const FlagshipProjects = () => {
   const { selectedState, selectedYear } = useTopbarFilters();
   const [projects, setProjects] = useState<any[]>(projectsData);
   const [loading, setLoading] = useState(false);
+  const lastFetched = useRef<{ state: string; year: number } | null>(null);
   
   // Default to "Gombe" state matching the visual mockup example if none is selected
   const stateName = selectedState || "Gombe";
@@ -33,6 +34,17 @@ const FlagshipProjects = () => {
 
   const fetchData = async () => {
     if (!selectedState || !selectedYear) return;
+
+    // Avoid double API calls
+    if (
+      lastFetched.current &&
+      lastFetched.current.state === selectedState &&
+      lastFetched.current.year === selectedYear
+    ) {
+      return;
+    }
+    lastFetched.current = { state: selectedState, year: selectedYear };
+
     setLoading(true);
 
     const stateParam =
