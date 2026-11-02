@@ -20,12 +20,17 @@ const ZonalHealthInsurance = () => {
   const [stateData, setStateData] = useState<any>();
   const [selectedZone, setSelectedZone] = useState<any>();
   const [mode, setMode] = useState<ComparisonMode>("zonal");
-  const [indicator, setIndicator] = useState<string>("total_hrh");
+  const [selectedChart, setSelectedChart] = useState<string>("covered");
   const { selectedState, setSelectedState, selectedYear, setSelectedYear } =
     useTopbarFilters();
   const router = useRouter();
 
-  const lastFetched = useRef<{ state: string; year: number; zone: string; indicator: string } | null>(null);
+  const chartOptions = [
+    { value: "covered", label: "Covered" },
+    { value: "not_covered", label: "Not Covered" },
+  ];
+
+  const lastFetched = useRef<{ state: string; year: number; zone: string } | null>(null);
 
   const fetchData = async (zoneParam?: string) => {
     const activeZone = zoneParam || selectedZone;
@@ -36,8 +41,7 @@ const ZonalHealthInsurance = () => {
       lastFetched.current &&
       lastFetched.current.state === selectedState &&
       lastFetched.current.year === selectedYear &&
-      lastFetched.current.zone === activeZone &&
-      lastFetched.current.indicator === indicator
+      lastFetched.current.zone === activeZone
     ) {
       return;
     }
@@ -45,7 +49,6 @@ const ZonalHealthInsurance = () => {
       state: selectedState,
       year: selectedYear,
       zone: activeZone,
-      indicator
     };
 
     setLoading(true);
@@ -57,7 +60,7 @@ const ZonalHealthInsurance = () => {
           : selectedState;
     try {
       const stats = await httpClient.get(
-        `${Endpoints.healthFacilities.zone}/${activeZone}/${stateParam}/${selectedYear}`,
+        `${Endpoints.healthInsurance.zone}/${activeZone}/${stateParam}/${selectedYear}`,
       );
       // console.log(stats);
       // @ts-ignore
@@ -76,7 +79,7 @@ const ZonalHealthInsurance = () => {
     const zone = zoneArea?.zone.toLocaleLowerCase() as string;
     setSelectedZone(zone);
     fetchData(zone);
-  }, [selectedState, selectedYear, indicator]);
+  }, [selectedState, selectedYear]);
 
   useEffect(() => {
     if (!selectedState || !selectedYear || !selectedZone) return;
@@ -84,6 +87,25 @@ const ZonalHealthInsurance = () => {
   }, [selectedZone]);
 
   const sampleData = stateData?.zoneWithin;
+
+  const nationalValueForState = (slug: string) => {
+    const valueSource =
+      selectedChart === "not_covered"
+        ? stateData?.not_covered
+        : stateData?.covered || stateData?.national;
+
+    if (valueSource && typeof valueSource === "object" && slug in valueSource) {
+      const value = valueSource[slug];
+      return typeof value === "number" ? value : 0;
+    }
+
+    if (stateData && typeof stateData === "object" && slug in stateData) {
+      const value = stateData[slug];
+      return typeof value === "number" ? value : 0;
+    }
+
+    return 0;
+  };
 
   return (
     <>
@@ -97,6 +119,9 @@ const ZonalHealthInsurance = () => {
           selectedYear={String(selectedYear)}
           onZoneChange={setSelectedZone}
           onStateChange={setSelectedState}
+          selectedChart={selectedChart}
+          onSelectedChart={setSelectedChart}
+          chartOptions={chartOptions}
           onYearChange={(year) => setSelectedYear(Number(year))}
           zones={[
             { value: "north west", label: "North West" },
@@ -114,26 +139,51 @@ const ZonalHealthInsurance = () => {
             const year = 2016 + i;
             return { value: String(year), label: String(year) };
           })}
-
         />
         {mode === "zonal" && (
           <div className="grid grid-cols-1">
             <div className="flex flex-col gap-6">
               <ZonalBarChart
-                title="North Central"
+                title={
+                  selectedZone
+                    ? `${selectedZone.toUpperCase()} - ${
+                        selectedChart === "not_covered"
+                          ? "Not Covered (%)"
+                          : "Covered (%)"
+                      }`
+                    : "Zonal Comparison"
+                }
                 variant="simple"
-                simpleColor="#2563EB"
-                data={[
-                  { label: "Bauchi", value: 18 },
-                  { label: "Adamawa", value: 20 },
-                  { label: "Taraba", value: 32 },
-                  { label: "Gombe", value: 14 },
-                  { label: "Yobe", value: 22 },
-                  { label: "Borno", value: 6 },
-                  { label: "Jigawa", value: 16 },
-                ]}
-                radius={[10, 10, 10, 10]} // rounds the top corners by 10px
-
+                simpleColor={
+                  selectedChart === "not_covered" ? "#BE123C" : "#00A141"
+                }
+                data={
+                  Array.isArray(sampleData) && sampleData.length > 0
+                    ? sampleData.map((item: any) => ({
+                        label: item.state || item.label,
+                        value:
+                          selectedChart === "not_covered"
+                            ? Number(
+                                item.not_covered ??
+                                  Math.max(
+                                    0,
+                                    100 -
+                                      (item.covered ??
+                                        item.value ??
+                                        item.rate_graph ??
+                                        0),
+                                  ).toFixed(2),
+                              )
+                            : Number(
+                                item.covered ??
+                                  item.value ??
+                                  item.rate_graph ??
+                                  0,
+                              ),
+                      }))
+                    : []
+                }
+                radius={[10, 10, 10, 10]}
               />
             </div>
           </div>
@@ -141,21 +191,18 @@ const ZonalHealthInsurance = () => {
         {mode === "national" && (
           <div className="bg-white rounded-2xl shadow p-4">
             <NigeriaStatesChoropleth
-              valueForState={(slug: string) => {
-                const value = stateData?.[slug];
-                return typeof value === "number" ? value : 50;
-              }}
-              valueLabel="Score"
+              valueForState={nationalValueForState}
+              valueLabel={selectedChart === "not_covered" ? "Not Covered (%)" : "Covered (%)"}
             />
           </div>
         )}
         {mode === "trend" && (
           <div className="bg-white rounded-2xl shadow p-4">
             <TrendAreaChart
-              data={stateData?.trend?.map((point: any) => ({
-                label: point.year,
-                value: point.value,
-              }))}
+              data={Array.isArray(stateData?.trend) ? stateData.trend.map((point: any) => ({
+                label: String(point.year),
+                value: Number(point.value || 0),
+              })) : []}
             />
           </div>
         )}

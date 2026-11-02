@@ -223,6 +223,14 @@ const Topbar: React.FC<TopbarProps> = ({
           </div>
         </div>
       </div>
+
+      {showConfirm && (
+        <ConfirmPrompt
+          message="Are you sure you want to logout?"
+          onConfirm={confirmLogout}
+          onClose={cancelPrompt}
+        />
+      )}
     </div>
   );
 };

@@ -13,7 +13,7 @@ import {
   Legend,
 } from "recharts";
 
-interface StateData {
+export interface StateData {
   state?: string;
   zone?: string;
   public?: string;

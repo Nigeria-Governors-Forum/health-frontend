@@ -76,6 +76,14 @@ export default function DashboardLayout({
     }
   }, [router]);
 
+  const handleUserLogout = () => {
+    if (typeof window !== "undefined") {
+      sessionStorage.clear();
+      localStorage.clear();
+    }
+    router.replace("/");
+  };
+
   const sidebarWidth = collapsed ? 80 : 256;
 
   return (
@@ -86,33 +94,32 @@ export default function DashboardLayout({
         className="flex min-h-screen bg-ngfGreen transition-all duration-300 ease-in-out"
         style={{ "--sidebar-width": `${sidebarWidth}px` } as any}
       >
-        {/* Sidebar */}
-        <div
-          aria-label="sidebar-wrapper"
-          className={`
-            fixed left-0 top-0 h-full z-10 transition-all duration-300 bg-white shadow
-            ${mobileOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0
-          `}
-          style={{ width: sidebarWidth }}
-        >
-          <Sidebar
-            collapsed={collapsed}
-            setCollapsed={setCollapsed}
-            mobileOpen={mobileOpen}
-            setMobileOpen={setMobileOpen}
-          />
-        </div>
+        <TopbarFiltersProvider>
+          <div
+            aria-label="sidebar-wrapper"
+            className={`
+              fixed left-0 top-0 h-full z-10 transition-all duration-300 bg-white shadow
+              ${mobileOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0
+            `}
+            style={{ width: sidebarWidth }}
+          >
+            <Sidebar
+              collapsed={collapsed}
+              setCollapsed={setCollapsed}
+              mobileOpen={mobileOpen}
+              setMobileOpen={setMobileOpen}
+            />
+          </div>
 
-        {/* Main area */}
-        <div className={`flex bg-[#ecf1ec] flex-col flex-1 transition-all duration-300 ease-in-out ${collapsed ? "md:ml-20" : "md:ml-64"}`}>
-          <TopbarFiltersProvider>
+          <div className={`flex bg-[#ecf1ec] flex-col flex-1 transition-all duration-300 ease-in-out ${collapsed ? "md:ml-20" : "md:ml-64"}`}>
             <TopbarWithFilters
               collapsed={collapsed}
               onToggleSidebar={() => setMobileOpen((o) => !o)}
+              onLogout={handleUserLogout}
             />
             <main className="p-4">{children}</main>
-          </TopbarFiltersProvider>
-        </div>
+          </div>
+        </TopbarFiltersProvider>
       </div>
     </>
   );
@@ -121,9 +128,11 @@ export default function DashboardLayout({
 function TopbarWithFilters({
   collapsed,
   onToggleSidebar,
+  onLogout,
 }: {
   collapsed: boolean;
   onToggleSidebar: () => void;
+  onLogout: () => void;
 }) {
   const { setSelectedState, setSelectedYear } = useTopbarFilters();
 
@@ -134,6 +143,7 @@ function TopbarWithFilters({
       logos={stateLogos}
       state={State.states()}
       onToggleSidebar={onToggleSidebar}
+      onLogout={onLogout}
       onStateChange={setSelectedState}
       onYearChange={setSelectedYear}
       showLogout={false}

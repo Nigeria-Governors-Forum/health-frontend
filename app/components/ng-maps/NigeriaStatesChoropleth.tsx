@@ -3,6 +3,7 @@
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { geoCentroid, geoMercator, geoPath } from "d3-geo";
+import { scaleLinear } from "d3-scale";
 import { scoreColor } from "./score-color";
 import {
   type NigeriaStateFeature,
@@ -12,7 +13,7 @@ import {
 import { cn } from "./cn";
 
 export interface NigeriaStatesChoroplethProps {
-  /** Choropleth value 0–100 per state slug (from GeoJSON `name` → `stateFeatureSlug`). */
+  /** Choropleth value per state slug (from GeoJSON `name` → `stateFeatureSlug`). */
   valueForState: (slug: string) => number;
   /** Tooltip / legend label, e.g. `"Score"`. */
   valueLabel?: string;
@@ -20,6 +21,10 @@ export interface NigeriaStatesChoroplethProps {
   selectedSlug?: string;
   /** When set, only that state is drawn and the map fits its bounds. */
   focusStateSlug?: string;
+  /** Optional custom color mapping function for the values. */
+  colorForValue?: (value: number) => string;
+  /** Optional custom numeric domain [min, max] for choropleth scale. */
+  domain?: [number, number];
   onHover?: (
     slug: string | null,
     info: { slug: string; name: string; value: number } | null,
@@ -37,6 +42,8 @@ export function NigeriaStatesChoropleth({
   geoUrl = "/geo/nigeria-states.geo.json",
   selectedSlug,
   focusStateSlug,
+  colorForValue,
+  domain,
   onHover,
   onSelect,
   className,
@@ -116,10 +123,45 @@ export function NigeriaStatesChoropleth({
     return geoPath(projection);
   }, [projection]);
 
+  const computedColorScale = useMemo(() => {
+    if (colorForValue) return colorForValue;
+
+    if (domain) {
+      const [dMin, dMax] = domain;
+      if (dMin === dMax) return () => "#4ade80";
+      const step = (dMax - dMin) / 5;
+      return scaleLinear<string>()
+        .domain([dMin, dMin + step, dMin + step * 2, dMin + step * 3, dMin + step * 4, dMax])
+        .range(["#fef3c7", "#fde68a", "#86efac", "#4ade80", "#16a34a", "#005031"])
+        .clamp(true);
+    }
+
+    const featureValues = ((geo?.features as NigeriaStateFeature[]) || [])
+      .map((f) => valueForState(stateFeatureSlug(f.properties)))
+      .filter((v) => typeof v === "number" && Number.isFinite(v) && v > 0);
+
+    if (featureValues.length === 0) {
+      return (val: number) => (Number.isFinite(val) ? scoreColor(val) : defaultFill);
+    }
+
+    const min = Math.min(...featureValues);
+    const max = Math.max(...featureValues);
+
+    if (min === max) {
+      return () => "#4ade80";
+    }
+
+    const step = (max - min) / 5;
+    return scaleLinear<string>()
+      .domain([min, min + step, min + step * 2, min + step * 3, min + step * 4, max])
+      .range(["#fef3c7", "#fde68a", "#86efac", "#4ade80", "#16a34a", "#005031"])
+      .clamp(true);
+  }, [geo, valueForState, colorForValue, domain, defaultFill]);
+
   const fillFor = (slug: string) => {
     const v = valueForState(slug);
-    if (!Number.isFinite(v)) return defaultFill;
-    return scoreColor(v);
+    if (v === null || v === undefined || !Number.isFinite(v) || v <= 0) return defaultFill;
+    return computedColorScale(v);
   };
 
   const setTipFromEvent = (e: React.MouseEvent, slug: string, name: string) => {
@@ -228,7 +270,7 @@ export function NigeriaStatesChoropleth({
 
       {tip ? (
         <div
-          className="pointer-events-none absolute z-20 min-w-[200px] -translate-x-1/2 -translate-y-full rounded-xl border border-border/60 bg-popover/95 p-3 shadow-xl backdrop-blur"
+          className="pointer-events-none absolute z-20 min-w-[200px] -translate-x-1/2 -translate-y-full rounded-xl border border-border/60 bg-popover/95 p-3 shadow-xl backdrop-blur text-black"
           style={{ left: tip.x, top: tip.y - 8 }}
         >
           <div className="mb-1 flex items-baseline justify-between gap-2">
@@ -237,7 +279,12 @@ export function NigeriaStatesChoropleth({
           <div className="flex items-end justify-between">
             <div className="text-[11px] uppercase tracking-wider text-muted-foreground">{valueLabel}</div>
             <div className="font-display text-2xl font-semibold leading-none num">
-              {Math.round(tip.value)}
+              {Number.isInteger(tip.value)
+                ? tip.value.toLocaleString()
+                : Number(tip.value).toLocaleString(undefined, {
+                    minimumFractionDigits: 1,
+                    maximumFractionDigits: 2,
+                  })}
             </div>
           </div>
         </div>

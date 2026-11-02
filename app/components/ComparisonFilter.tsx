@@ -1,7 +1,13 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { FiChevronDown, FiMapPin, FiCalendar, FiHome, FiGrid } from "react-icons/fi";
+import {
+  FiChevronDown,
+  FiMapPin,
+  FiCalendar,
+  FiHome,
+  FiGrid,
+} from "react-icons/fi";
 
 export type ComparisonMode = "zonal" | "national" | "trend";
 
@@ -24,14 +30,17 @@ export interface ComparisonFilterPanelProps {
   selectedZone?: string;
   selectedState?: string;
   selectedYear?: string;
+  selectedChart?: string;
   selectedIndicator?: string;
   selectedGroup?: string;
+  chartOptions?: SelectOption[];
 
   onZoneChange?: (value: string) => void;
   onStateChange?: (value: string) => void;
   onYearChange?: (value: string) => void;
   onIndicatorChange?: (value: string) => void;
   onGroupChange?: (value: string) => void;
+  onSelectedChart?: (value: string) => void;
 
   zonesLoading?: boolean;
   statesLoading?: boolean;
@@ -47,6 +56,8 @@ export interface ComparisonFilterPanelProps {
   groupTitle?: string;
   groupText?: string;
   groupIcon?: React.ReactNode;
+  chartTitle?: string;
+  chartText?: string;
   grid2x2?: boolean;
 }
 
@@ -103,8 +114,9 @@ function SelectField({
 
       <div ref={wrapperRef} className="relative">
         <div
-          className={`flex items-stretch overflow-hidden rounded-md border border-gray-200 ${disabled ? "opacity-50" : ""
-            }`}
+          className={`flex items-stretch overflow-hidden rounded-md border border-gray-200 ${
+            disabled ? "opacity-50" : ""
+          }`}
         >
           <button
             type="button"
@@ -144,10 +156,11 @@ function SelectField({
                     onChange?.(opt.value);
                     setOpen(false);
                   }}
-                  className={`block w-full px-3 py-2 text-left text-sm hover:bg-green-50 ${opt.value === value
-                    ? "bg-green-50 font-medium text-green-700"
-                    : "text-gray-700"
-                    }`}
+                  className={`block w-full px-3 py-2 text-left text-sm hover:bg-green-50 ${
+                    opt.value === value
+                      ? "bg-green-50 font-medium text-green-700"
+                      : "text-gray-700"
+                  }`}
                 >
                   {opt.label}
                 </button>
@@ -172,13 +185,16 @@ export default function ComparisonFilterPanel({
   selectedZone,
   selectedState,
   selectedYear,
+  selectedChart,
   selectedIndicator,
   selectedGroup,
+  chartOptions = [],
   onZoneChange,
   onStateChange,
   onYearChange,
   onIndicatorChange,
   onGroupChange,
+  onSelectedChart,
   zonesLoading,
   statesLoading,
   yearsLoading,
@@ -191,6 +207,8 @@ export default function ComparisonFilterPanel({
   groupTitle = "Group Filter",
   groupText = "Select Group",
   groupIcon = <FiGrid size={15} />,
+  chartTitle,
+  chartText,
   grid2x2 = false,
 }: ComparisonFilterPanelProps) {
   const [internalMode, setInternalMode] = useState<ComparisonMode>(defaultMode);
@@ -227,6 +245,44 @@ export default function ComparisonFilterPanel({
       />
     ) : null;
 
+  const chartField =
+    chartOptions && chartOptions.length > 0 ? (
+      <SelectField
+        icon={<FiMapPin size={15} />}
+        label={
+          chartTitle ||
+          (activeMode === "national"
+            ? "Map type"
+            : activeMode === "trend"
+              ? "Chart type"
+              : "Comparison Type")
+        }
+        helperText={
+          chartText ||
+          (activeMode === "national"
+            ? "Select a Map type"
+            : "Select an option")
+        }
+        value={selectedChart}
+        options={chartOptions}
+        loading={zonesLoading}
+        onChange={onSelectedChart}
+      />
+    ) : null;
+
+  const yearField =
+    activeMode !== "trend" ? (
+      <SelectField
+        icon={<FiCalendar size={15} />}
+        label="Year"
+        helperText="Select a Year"
+        value={selectedYear}
+        options={years}
+        loading={yearsLoading}
+        onChange={onYearChange}
+      />
+    ) : null;
+
   return (
     <div className={`w-full ${className}`}>
       {/* Mode radio group */}
@@ -255,20 +311,29 @@ export default function ComparisonFilterPanel({
 
       {/* Fields card */}
       <div className="rounded-xl border border-gray-200 bg-white p-4">
-        <div className={grid2x2 ? "grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-x-8 md:gap-y-4" : "flex flex-col gap-5 sm:flex-row sm:gap-8"}>
+        <div
+          className={
+            grid2x2
+              ? "grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-x-8 md:gap-y-4"
+              : "flex flex-col gap-5 sm:flex-row sm:gap-8"
+          }
+        >
           {grid2x2 ? (
             <>
               {/* Grid 2x2 Layout: Column 1 Row 1, Column 2 Row 1, Column 1 Row 2, Column 2 Row 2 */}
               {activeMode === "zonal" && (
-                <SelectField
-                  icon={<FiMapPin size={15} />}
-                  label="Geopolitical Zone"
-                  helperText="Select a Geopolitical Zone"
-                  value={selectedZone}
-                  options={zones}
-                  loading={zonesLoading}
-                  onChange={onZoneChange}
-                />
+                <>
+                  <SelectField
+                    icon={<FiMapPin size={15} />}
+                    label="Geopolitical Zone"
+                    helperText="Select a Geopolitical Zone"
+                    value={selectedZone}
+                    options={zones}
+                    loading={zonesLoading}
+                    onChange={onZoneChange}
+                  />
+                  {chartField}
+                </>
               )}
               {activeMode === "trend" && (
                 <SelectField
@@ -282,15 +347,7 @@ export default function ComparisonFilterPanel({
                 />
               )}
 
-              <SelectField
-                icon={<FiCalendar size={15} />}
-                label="Year"
-                helperText="Select a Year"
-                value={selectedYear}
-                options={years}
-                loading={yearsLoading}
-                onChange={onYearChange}
-              />
+              {yearField}
 
               {groupField}
               {indicatorField}
@@ -308,55 +365,23 @@ export default function ComparisonFilterPanel({
                     loading={zonesLoading}
                     onChange={onZoneChange}
                   />
+                  {chartField}
                   {indicatorField}
-                  <SelectField
-                    icon={<FiCalendar size={15} />}
-                    label="Year"
-                    helperText="Select a Year"
-                    value={selectedYear}
-                    options={years}
-                    loading={yearsLoading}
-                    onChange={onYearChange}
-                  />
+                  {yearField}
                 </>
               )}
 
               {activeMode === "national" && (
                 <>
                   {indicatorField}
-                  <SelectField
-                    icon={<FiCalendar size={15} />}
-                    label="Year"
-                    helperText="Select a Year"
-                    value={selectedYear}
-                    options={years}
-                    loading={yearsLoading}
-                    onChange={onYearChange}
-                  />
+                  {chartField}
                 </>
               )}
 
               {activeMode === "trend" && (
                 <>
-                  <SelectField
-                    icon={<FiMapPin size={15} />}
-                    label="State"
-                    helperText="Select a State"
-                    value={selectedState}
-                    options={states}
-                    loading={statesLoading}
-                    onChange={onStateChange}
-                  />
+                  {chartField}
                   {indicatorField}
-                  <SelectField
-                    icon={<FiCalendar size={15} />}
-                    label="Year"
-                    helperText="Select a Year"
-                    value={selectedYear}
-                    options={years}
-                    loading={yearsLoading}
-                    onChange={onYearChange}
-                  />
                 </>
               )}
             </>

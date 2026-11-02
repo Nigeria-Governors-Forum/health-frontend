@@ -14,7 +14,7 @@ import {
   FaGlobeAfrica,
 } from "react-icons/fa";
 import { usePathname } from "next/navigation";
-import ConfirmPrompt from "./ConfirmPrompt";
+import { useTopbarFilters } from "../context/TopbarFiltersContext";
 
 const cn = (...classes: (string | undefined | false)[]) =>
   classes.filter(Boolean).join(" ");
@@ -169,10 +169,10 @@ const Sidebar: React.FC<SidebarProps> = ({
   // const { showConfirm, setShowConfirm } = useTopbarFilters();
 
   const [role, setRole] = useState<string | null>(null);
-  const [showConfirm, setShowConfirm] = useState(false);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
   const pathname = usePathname();
+  const { setShowConfirm } = useTopbarFilters();
 
   const normalizePath = (p: string) => {
     if (!p) return "/";
@@ -183,9 +183,11 @@ const Sidebar: React.FC<SidebarProps> = ({
     // Replace with real auth lookup
     const user = sessionStorage.getItem("user");
     const parsedUser = JSON.parse(user ?? "{}");
-    // console.log("role", parsedUser.role);
-
-    setRole(parsedUser.role);
+    let userRole = parsedUser.role;
+    if (userRole && (userRole.toLowerCase() === "admin" || userRole.toLowerCase() === "administrator")) {
+      userRole = "s-admin";
+    }
+    setRole(userRole);
   }, []);
 
   const toggleMobile = useCallback(() => {
@@ -227,13 +229,6 @@ const Sidebar: React.FC<SidebarProps> = ({
   const handleLogout = useCallback(() => {
     setShowConfirm(true);
   }, []);
-
-  const confirmLogout = () => {
-    setShowConfirm(false);
-  };
-  const cancelPrompt = () => {
-    setShowConfirm(false);
-  };
 
   const toggleExpand = (label: string) => {
     setExpanded((prev) => ({ ...prev, [label]: !prev[label] }));
@@ -414,13 +409,6 @@ const Sidebar: React.FC<SidebarProps> = ({
         />
       )}
 
-      {showConfirm && (
-        <ConfirmPrompt
-          message="Are you sure you want to logout?"
-          onConfirm={confirmLogout}
-          onClose={cancelPrompt}
-        />
-      )}
     </>
   );
 };

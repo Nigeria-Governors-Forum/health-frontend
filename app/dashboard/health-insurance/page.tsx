@@ -15,9 +15,6 @@ const HealthInsurance = () => {
   const [loading, setLoading] = useState(false);
   const { selectedState, selectedYear } = useTopbarFilters();
   const [stateData, setStateData] = useState<any>();
-
-  const sample = stateData?.yearlyTotals;
-  const data = stateData?.perCapita || [];
   const router = useRouter();
   const lastFetched = useRef<{ state: string; year: number } | null>(null);
 
@@ -44,11 +41,10 @@ const HealthInsurance = () => {
           : selectedState;
 
     try {
-      const stats = await httpClient.get(
-        `${Endpoints.healthFinance.summary}/${stateParam}/${selectedYear}`,
-      );
+      const stats = (await httpClient.get(
+        `${Endpoints.healthInsurance.summary}/${stateParam}/${selectedYear}`,
+      )) as { data?: any };
       // console.log(stats);
-      // @ts-ignore
       setStateData(stats?.data);
 
       toast.success(`Welcome, ${selectedState} - ${selectedYear}!`);
@@ -64,17 +60,37 @@ const HealthInsurance = () => {
     fetchData();
   }, [selectedState, selectedYear]);
 
-  const stateTotal = Number(stateData?.state_budget?.total) || 0;
-  const healthTotal = Number(stateData?.health_budget?.total) || 0;
+  const coveredValue =
+    typeof stateData?.covered === "number"
+      ? stateData.covered
+      : Number(stateData?.insurance_coverage || 0);
+
+  const notCoveredValue =
+    typeof stateData?.not_covered === "number"
+      ? stateData.not_covered
+      : Number(Math.max(0, 100 - coveredValue).toFixed(2));
 
   const chartData = [
-    { name: "Covered", value: stateData?.insurance_coverage, color: "#00C951" },
+    { name: "Covered", value: coveredValue, color: "#00C951" },
     {
-      name: "Uncovered",
-      value: 100 - (stateData?.insurance_coverage || 0),
+      name: "Not Covered",
+      value: notCoveredValue,
       color: "#BE123C",
     },
   ];
+
+  const breakdownData =
+    Array.isArray(stateData?.breakdown) && stateData.breakdown.length > 0
+      ? stateData.breakdown
+      : [
+          { label: "Formal", value: "N/A" },
+          { label: "Informal", value: "N/A" },
+          { label: "TISHIP", value: "N/A" },
+          { label: "BHCPF", value: "N/A" },
+          { label: "Equity", value: "N/A" },
+          { label: "Others (Specify)", value: "N/A" },
+          { label: "Total", value: "N/A", isTotal: true },
+        ];
 
   return (
     <>
@@ -110,15 +126,7 @@ const HealthInsurance = () => {
           <div className="col-span-1 md:col-span-2">
             <EnrolleeBreakdownTable
               title="Enrollee Breakdown"
-              data={[
-                { label: "Formal", value: 78 },
-                { label: "Informal", value: 78 },
-                { label: "TISHIP", value: 78 },
-                { label: "BHCPF", value: 78 },
-                { label: "Equity", value: 78 },
-                { label: "Others (Specify)", value: 78 },
-                { label: "Total", value: 78, isTotal: true },
-              ]}
+              data={breakdownData}
             />
           </div>
         </div>

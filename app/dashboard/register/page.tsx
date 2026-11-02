@@ -411,7 +411,7 @@ const RegisterPage = () => {
                         <td className="py-4">
                           <span
                             className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-bold border ${
-                              u.role === "s-admin"
+                              u.role === "s-admin" || u.role?.toLowerCase() === "admin"
                                 ? "bg-red-50 text-red-700 border-red-100"
                                 : u.role === "h-admin"
                                 ? "bg-amber-50 text-amber-700 border-amber-100"
@@ -420,7 +420,7 @@ const RegisterPage = () => {
                                 : "bg-gray-50 text-gray-700 border-gray-100"
                             }`}
                           >
-                            {u.role === "s-admin"
+                            {u.role === "s-admin" || u.role?.toLowerCase() === "admin"
                               ? "Super Admin"
                               : u.role === "h-admin"
                               ? "Health Admin"

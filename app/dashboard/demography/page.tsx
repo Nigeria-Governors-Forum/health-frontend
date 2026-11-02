@@ -72,7 +72,7 @@ const DemographyPage = () => {
 
   const fetchData = async () => {
     if (!selectedState || !selectedYear) return;
-    
+
     // Avoid double API calls
     if (
       lastFetched.current &&
@@ -116,6 +116,14 @@ const DemographyPage = () => {
       ? stateData.demography_LGA
       : [];
   }, [stateData]);
+
+  const hasLgaData = useMemo(() => {
+    return lgaList.some(
+      (item: any) =>
+        (item.lga_population !== null && item.lga_population !== undefined && Number(item.lga_population) > 0) ||
+        (item.number_of_wards !== null && item.number_of_wards !== undefined && Number(item.number_of_wards) > 0)
+    );
+  }, [lgaList]);
 
   // Filter list based on search value
   const filteredLgaList = useMemo(() => {
@@ -232,100 +240,102 @@ const DemographyPage = () => {
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className={isFullscreen
-            ? "fixed inset-0 z-50 bg-[#F8FAFC] p-6 flex flex-col space-y-4 overflow-y-auto"
-            : "space-y-4"
-          }>
-            <div className="bg-white rounded-3xl border border-gray-100 p-6 shadow-sm">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-bold text-green-700 flex items-center gap-2">
-                  {titlecaption}
-                  <Image
-                    src={info}
-                    alt="Info"
-                    width={20}
-                    height={20}
-                  />
-                </h2>
-                <ToggleSwitch initial={isPopulationMode} onToggle={(val) => {
-                  setIsPopulationMode(val);
-                  setTitlecaption(val ? "Population Spread" : "Population by Accessibility");
-                }} />
+        {hasLgaData && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className={isFullscreen
+              ? "fixed inset-0 z-50 bg-[#F8FAFC] p-6 flex flex-col space-y-4 overflow-y-auto"
+              : "space-y-4"
+            }>
+              <div className="bg-white rounded-3xl border border-gray-100 p-6 shadow-sm">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-lg font-bold text-green-700 flex items-center gap-2">
+                    {titlecaption}
+                    <Image
+                      src={info}
+                      alt="Info"
+                      width={20}
+                      height={20}
+                    />
+                  </h2>
+                  <ToggleSwitch initial={isPopulationMode} onToggle={(val) => {
+                    setIsPopulationMode(val);
+                    setTitlecaption(val ? "Population Spread" : "Population by Accessibility");
+                  }} />
+                </div>
+                {!isPopulationMode && (
+                  <div className="flex justify-between text-sm gap-4 text-gray-700">
+                    <span className="text-blue-600 font-semibold">
+                      Total: {stateData?.no_of_lgas || "N/A"}
+                    </span>
+                    <span className="text-green-600 font-semibold">
+                      Safe:{" "}
+                      {stateData?.no_of_lgas && stateData?.total_Hard_To_Reach !== undefined
+                        ? stateData.no_of_lgas - stateData.total_Hard_To_Reach
+                        : "N/A"}
+                    </span>
+                    <span className="text-red-600 font-semibold">
+                      Hard to reach: {stateData?.total_Hard_To_Reach ?? "N/A"}
+                    </span>
+                  </div>
+                )}
               </div>
-              {!isPopulationMode && (
-                <div className="flex justify-between text-sm gap-4 text-gray-700">
-                  <span className="text-blue-600 font-semibold">
-                    Total: {stateData?.no_of_lgas || "N/A"}
-                  </span>
-                  <span className="text-green-600 font-semibold">
-                    Safe:{" "}
-                    {stateData?.no_of_lgas && stateData?.total_Hard_To_Reach !== undefined
-                      ? stateData.no_of_lgas - stateData.total_Hard_To_Reach
-                      : "N/A"}
-                  </span>
-                  <span className="text-red-600 font-semibold">
-                    Hard to reach: {stateData?.total_Hard_To_Reach ?? "N/A"}
-                  </span>
-                </div>
-              )}
+
+              <div className="relative border border-gray-100 bg-white rounded-3xl p-4 shadow-sm flex items-center justify-center min-h-[380px] w-full flex-1">
+                <button
+                  onClick={() => setIsFullscreen(!isFullscreen)}
+                  className="absolute top-4 right-4 z-20 p-2.5 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-black transition-all shadow-sm cursor-pointer"
+                  title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
+                >
+                  {isFullscreen ? <FiMinimize2 size={20} /> : <FiMaximize2 size={20} />}
+                </button>
+
+                <StateLGAChoropleth
+                  stateSlug={normalizeStateName(selectedState || "fct")}
+                  stateName={selectedState || "Federal Capital Territory"}
+                  height={mapHeight}
+                  lgaColors={lgaColors}
+                  onHoverLGA={setHoveredLGA}
+                />
+                {hoveredLGA && (
+                  <div className="absolute top-2 left-2 bg-black/85 backdrop-blur-sm text-white px-3 py-2 rounded-xl shadow-lg pointer-events-none z-10 text-xs border border-white/10 min-w-44">
+                    <p className="font-bold text-[#38bdf8] text-sm mb-1">{hoveredLGA.name}</p>
+                    {(() => {
+                      const item = lgaList.find((x: any) => slugify(x.lga) === hoveredLGA.key);
+                      if (!item) return <p className="text-gray-300 italic">No data available</p>;
+                      return (
+                        <div className="space-y-1">
+                          <p className="flex justify-between gap-4">
+                            <span className="text-gray-400">Population:</span>
+                            <span className="font-semibold text-white">{formatNumber(item.lga_population)}</span>
+                          </p>
+                          <p className="flex justify-between gap-4">
+                            <span className="text-gray-400">Status:</span>
+                            <span className={`font-semibold ${item.hard_to_reach_lgas === "Yes" ? "text-red-400" : "text-green-400"}`}>
+                              {item.hard_to_reach_lgas === "Yes" ? "Hard to Reach" : "Safe"}
+                            </span>
+                          </p>
+                        </div>
+                      );
+                    })()}
+                  </div>
+                )}
+              </div>
             </div>
 
-            <div className="relative border border-gray-100 bg-white rounded-3xl p-4 shadow-sm flex items-center justify-center min-h-[380px] w-full flex-1">
-              <button
-                onClick={() => setIsFullscreen(!isFullscreen)}
-                className="absolute top-4 right-4 z-20 p-2.5 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-black transition-all shadow-sm cursor-pointer"
-                title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
-              >
-                {isFullscreen ? <FiMinimize2 size={20} /> : <FiMaximize2 size={20} />}
-              </button>
-
-              <StateLGAChoropleth
-                stateSlug={normalizeStateName(selectedState || "fct")}
-                stateName={selectedState || "Federal Capital Territory"}
-                height={mapHeight}
-                lgaColors={lgaColors}
-                onHoverLGA={setHoveredLGA}
-              />
-              {hoveredLGA && (
-                <div className="absolute top-2 left-2 bg-black/85 backdrop-blur-sm text-white px-3 py-2 rounded-xl shadow-lg pointer-events-none z-10 text-xs border border-white/10 min-w-44">
-                  <p className="font-bold text-[#38bdf8] text-sm mb-1">{hoveredLGA.name}</p>
-                  {(() => {
-                    const item = lgaList.find((x: any) => slugify(x.lga) === hoveredLGA.key);
-                    if (!item) return <p className="text-gray-300 italic">No data available</p>;
-                    return (
-                      <div className="space-y-1">
-                        <p className="flex justify-between gap-4">
-                          <span className="text-gray-400">Population:</span>
-                          <span className="font-semibold text-white">{formatNumber(item.lga_population)}</span>
-                        </p>
-                        <p className="flex justify-between gap-4">
-                          <span className="text-gray-400">Status:</span>
-                          <span className={`font-semibold ${item.hard_to_reach_lgas === "Yes" ? "text-red-400" : "text-green-400"}`}>
-                            {item.hard_to_reach_lgas === "Yes" ? "Hard to Reach" : "Safe"}
-                          </span>
-                        </p>
-                      </div>
-                    );
-                  })()}
-                </div>
-              )}
-            </div>
+            <LgaSummaryTable
+              title="LGA Summary"
+              data={paginatedLgaList}
+              totalCount={lgaList.length}
+              pageSize={pageSize}
+              searchValue={searchValue}
+              onSearchChange={handleSearchChange}
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalResults={filteredLgaList.length}
+              onPageChange={setCurrentPage}
+            />
           </div>
-
-          <LgaSummaryTable
-            title="LGA Summary"
-            data={paginatedLgaList}
-            totalCount={lgaList.length}
-            pageSize={pageSize}
-            searchValue={searchValue}
-            onSearchChange={handleSearchChange}
-            currentPage={currentPage}
-            totalPages={totalPages}
-            totalResults={filteredLgaList.length}
-            onPageChange={setCurrentPage}
-          />
-        </div>
+        )}
       </div>
     </>
   );

@@ -16,6 +16,10 @@ export const Endpoints = {
     summary: "/health-facilities",
     zone: "/health-facilities/zonal",
   },
+  healthInsurance: {
+    summary: "/health-insurance",
+    zone: "/health-insurance/zonal",
+  },
   humanResource: {
     summary: "/human-resource",
   },
