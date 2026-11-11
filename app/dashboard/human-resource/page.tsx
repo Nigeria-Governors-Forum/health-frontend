@@ -4,7 +4,7 @@ import React, { useEffect, useState, useRef } from "react";
 
 import { FaHospitalUser, FaUsers } from "react-icons/fa";
 import toast from "react-hot-toast";
-import { formatNumber } from "../page";
+import { formatNumber } from "@/app/lib/formatNumber";
 import HealthCard, { SummaryRow } from "../../components/HealthCard";
 import DemographyCard from "@/app/components/DemographyCard";
 import { useTopbarFilters } from "@/app/context/TopbarFiltersContext";

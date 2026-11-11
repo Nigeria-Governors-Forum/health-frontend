@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useMemo, useRef } from "react";
 import DataCard from "../../components/PieChartUi";
 import toast from "react-hot-toast";
-import { formatNumber } from "../page";
+import { formatNumber } from "@/app/lib/formatNumber";
 import { Endpoints, httpClient } from "@/app/api-client/src";
 import LoadingScreen from "@/app/components/LoadingScreen";
 import SummaryTable, { SummaryRow } from "@/app/components/SummaryTable";
@@ -16,13 +16,7 @@ import HealthFacilitiesByLgaTable from "@/app/components/HealthFacilitiesByLga";
 import { useRouter } from "next/navigation";
 const land = "/svg/land.svg";
 
-interface HealthFacilityPageProps {
-  title?: string;
-}
-
-const HealthFacility: React.FC<HealthFacilityPageProps> = ({
-  title = "Total Health Facilities",
-}) => {
+const HealthFacility = () => {
   const [loading, setLoading] = useState(false);
   const { selectedState, selectedYear } = useTopbarFilters();
   const [stateData, setStateData] = useState<any>();

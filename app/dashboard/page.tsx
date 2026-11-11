@@ -12,10 +12,7 @@ import Image from "next/image";
 import ToggleSwitch from "../components/ToggleSwitch";
 import { StateLGAChoropleth, normalizeStateName, slugify } from "../components/ng-maps";
 import { FiInfo, FiMaximize2, FiMinimize2 } from "react-icons/fi";
-
-export const formatNumber = (num: number): string => {
-  return num.toLocaleString("en-US");
-};
+import { formatNumber } from "../lib/formatNumber";
 
 export default function DashboardHome() {
   const [loading, setLoading] = useState(false);

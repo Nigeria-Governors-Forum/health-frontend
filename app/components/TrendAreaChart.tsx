@@ -67,7 +67,6 @@ export default function TrendAreaChart({
         <AreaChart
           data={data}
           margin={{ top: 8, right: 18, left: 18, bottom: 8 }}
-          padding={{ left: 18, right: 18 }}
         >
           <defs>
             <linearGradient id="trendFill" x1="0" y1="0" x2="0" y2="1">

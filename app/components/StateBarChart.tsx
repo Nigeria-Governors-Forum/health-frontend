@@ -46,8 +46,8 @@ type TooltipItem = {
 
 const TooltipContent: React.FC<{
   active?: boolean;
-  payload?: TooltipItem[];
-  label?: string;
+  payload?: readonly TooltipItem[];
+  label?: string | number;
 }> = ({ active, payload, label }) => {
   if (!active || !payload || payload.length === 0) return null;
 

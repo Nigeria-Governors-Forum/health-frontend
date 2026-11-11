@@ -13,7 +13,7 @@ import {
 } from "react-icons/fa";
 import { Endpoints, httpClient } from "@/app/api-client/src";
 import toast from "react-hot-toast";
-import { formatNumber } from "../page";
+import { formatNumber } from "@/app/lib/formatNumber";
 import LoadingScreen from "@/app/components/LoadingScreen";
 import DemographyCard from "@/app/components/DemographyCard";
 import LgaSummaryTable, { LgaLookup } from "@/app/components/LgaSummaryTable";

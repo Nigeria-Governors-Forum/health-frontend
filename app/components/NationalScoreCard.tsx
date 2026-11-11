@@ -15,15 +15,16 @@ export interface StatusMapping {
 }
 
 export interface ScorecardItem {
-  id: number;
+  [key: string]: unknown;
+  id?: number | string;
   zone?: string;
   state?: string;
   name?: string;
   round?: string;
-  year?: number;
+  year?: number | string;
   indicator?: string;
   status?: string;
-  value?: number;
+  value?: number | string;
 }
 
 export interface ScorecardTableProps {

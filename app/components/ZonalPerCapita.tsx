@@ -11,7 +11,7 @@ import {
   LabelList,
   Cell,
 } from "recharts";
-import { formatNumber } from "../dashboard/page";
+import { formatNumber } from "../lib/formatNumber";
 
 interface StateData {
   state: string;

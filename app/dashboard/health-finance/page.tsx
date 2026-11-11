@@ -2,7 +2,7 @@
 
 import toast from "react-hot-toast";
 import { useEffect, useState, useRef } from "react";
-import { formatNumber } from "../page";
+import { formatNumber } from "@/app/lib/formatNumber";
 import ComparisonBarChart from "@/app/components/ComparisonBarChart";
 import LoadingScreen from "@/app/components/LoadingScreen";
 import { useTopbarFilters } from "@/app/context/TopbarFiltersContext";
