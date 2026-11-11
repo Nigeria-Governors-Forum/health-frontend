@@ -252,15 +252,15 @@ export default function ComparisonFilterPanel({
         label={
           chartTitle ||
           (activeMode === "national"
-            ? "Map type"
+            ? "Indicator"
             : activeMode === "trend"
-              ? "Chart type"
+              ? "Indicator"
               : "Comparison Type")
         }
         helperText={
           chartText ||
           (activeMode === "national"
-            ? "Select a Map type"
+            ? "Select a Indicator"
             : "Select an option")
         }
         value={selectedChart}

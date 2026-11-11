@@ -33,6 +33,12 @@ function CustomTooltip({ active, payload, label }: any) {
   );
 }
 
+function clampValue(value: number | string | undefined, min = 0, max = 100) {
+  const numericValue = Number(value ?? 0);
+  if (!Number.isFinite(numericValue)) return min;
+  return Math.min(Math.max(numericValue, min), max);
+}
+
 export default function TrendAreaChart({
   data,
   height = 280,
@@ -58,7 +64,11 @@ export default function TrendAreaChart({
   return (
     <div className={`w-full bg-white ${className}`} style={{ height }}>
       <ResponsiveContainer width="100%" height="100%">
-        <AreaChart data={data} margin={{ top: 8, right: 8, left: 8, bottom: 0 }}>
+        <AreaChart
+          data={data}
+          margin={{ top: 8, right: 18, left: 18, bottom: 8 }}
+          padding={{ left: 18, right: 18 }}
+        >
           <defs>
             <linearGradient id="trendFill" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor={fillColor} stopOpacity={1} />
@@ -71,7 +81,10 @@ export default function TrendAreaChart({
             axisLine={{ stroke: "#E5E7EB" }}
             tickLine={false}
             tick={{ fontSize: 12, fontWeight: 600, fill: "#374151" }}
-            dy={8}
+            minTickGap={18}
+            tickMargin={10}
+            interval={0}
+            padding={{ left: 12, right: 12 }}
           />
 
           <Tooltip content={<CustomTooltip />} cursor={false} />

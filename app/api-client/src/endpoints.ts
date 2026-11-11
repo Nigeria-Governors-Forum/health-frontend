@@ -22,6 +22,7 @@ export const Endpoints = {
   },
   humanResource: {
     summary: "/human-resource",
+    zone: "/human-resource/zonal",
   },
   scorecard: {
     summary: "/scorecard",
@@ -29,6 +30,10 @@ export const Endpoints = {
   healthFinance: {
     summary: "/health-finance",
     zone: "/health-finance/zonal",
+  },
+  healthOutcomes: {
+    summary: "/health-outcomes",
+    zone: "/health-outcomes/zonal",
   },
   serviceCoverage: {
     summary: "/service-coverage",

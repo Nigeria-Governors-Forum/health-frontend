@@ -60,15 +60,13 @@ const HealthInsurance = () => {
     fetchData();
   }, [selectedState, selectedYear]);
 
-  const coveredValue =
+  const coveredValue = Math.round(
     typeof stateData?.covered === "number"
       ? stateData.covered
-      : Number(stateData?.insurance_coverage || 0);
+      : Number(stateData?.insurance_coverage || 0),
+  );
 
-  const notCoveredValue =
-    typeof stateData?.not_covered === "number"
-      ? stateData.not_covered
-      : Number(Math.max(0, 100 - coveredValue).toFixed(2));
+  const notCoveredValue = 100 - coveredValue;
 
   const chartData = [
     { name: "Covered", value: coveredValue, color: "#00C951" },
@@ -121,7 +119,7 @@ const HealthInsurance = () => {
         /> */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 w-full">
           <div className="col-span-1">
-            <DonutChart title="Enrollee Breakdown" data={chartData} />
+            <DonutChart title="Insurance Coverage" data={chartData} />
           </div>
           <div className="col-span-1 md:col-span-2">
             <EnrolleeBreakdownTable

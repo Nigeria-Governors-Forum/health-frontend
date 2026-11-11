@@ -88,6 +88,12 @@ const ZonalHealthInsurance = () => {
 
   const sampleData = stateData?.zoneWithin;
 
+  const normalizeInsuranceValue = (value: number | string | undefined, fallback = 0) => {
+    const numericValue = Number(value ?? fallback);
+    if (!Number.isFinite(numericValue)) return 0;
+    return Math.max(0, Math.min(100, numericValue));
+  };
+
   const nationalValueForState = (slug: string) => {
     const valueSource =
       selectedChart === "not_covered"
@@ -163,18 +169,17 @@ const ZonalHealthInsurance = () => {
                         label: item.state || item.label,
                         value:
                           selectedChart === "not_covered"
-                            ? Number(
+                            ? normalizeInsuranceValue(
                                 item.not_covered ??
-                                  Math.max(
-                                    0,
-                                    100 -
-                                      (item.covered ??
+                                  100 -
+                                    normalizeInsuranceValue(
+                                      item.covered ??
                                         item.value ??
                                         item.rate_graph ??
-                                        0),
-                                  ).toFixed(2),
+                                        0,
+                                    ),
                               )
-                            : Number(
+                            : normalizeInsuranceValue(
                                 item.covered ??
                                   item.value ??
                                   item.rate_graph ??
@@ -199,10 +204,12 @@ const ZonalHealthInsurance = () => {
         {mode === "trend" && (
           <div className="bg-white rounded-2xl shadow p-4">
             <TrendAreaChart
-              data={Array.isArray(stateData?.trend) ? stateData.trend.map((point: any) => ({
-                label: String(point.year),
-                value: Number(point.value || 0),
-              })) : []}
+              data={Array.isArray(stateData?.trend)
+                ? stateData.trend.map((point: any) => ({
+                    label: String(point.year),
+                    value: normalizeInsuranceValue(point.value),
+                  }))
+                : []}
             />
           </div>
         )}

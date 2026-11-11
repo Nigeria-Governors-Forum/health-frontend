@@ -2,23 +2,19 @@
 
 import React from "react";
 
-export type StatusKey = "yes" | "no";
+export type StatusKey = 1 | 0;
 
 export interface StatusMappingEntry {
   label: string;
   colorClass: string;
 }
 
-export interface StatusMapping {
-  yes: StatusMappingEntry;
-  no: StatusMappingEntry;
-  // blank: StatusMappingEntry;
-}
+export type StatusMapping = Record<StatusKey, StatusMappingEntry>;
 
 export interface TableColumn {
   key: string; // property name in data
   label: string; // column label
-  type?: "status" | "text";
+  type?: "value" | "text";
 }
 
 export interface ScorecardRow {
@@ -33,12 +29,12 @@ export interface ScorecardTableProps {
 }
 
 const defaultStatusMapping: StatusMapping = {
-  yes: { label: "Target Met", colorClass: "bg-[#10B981]" },
-  no: { label: "Target not Met", colorClass: "bg-[#EF4444]" },
+  1: { label: "Target Met", colorClass: "bg-[#10B981]" },
+  0: { label: "Target not Met", colorClass: "bg-[#EF4444]" },
 };
 
 interface StatusCircleProps {
-  status?: string;
+  status?: number;
   mapping: StatusMapping;
 }
 
@@ -46,7 +42,7 @@ const StatusCircle: React.FC<StatusCircleProps> = ({
   status,
   mapping = defaultStatusMapping,
 }) => {
-  const key: StatusKey = status === "Yes" ? "yes" : "no";
+  const key: StatusKey = status === 1 ? 1 : 0;
   const { label, colorClass } = mapping[key];
 
   return (
@@ -66,14 +62,16 @@ const ScorecardTable: React.FC<ScorecardTableProps> = ({
   // Default columns if not provided
   const defaultSingleCols: TableColumn[] = [
     { key: "indicator", label: "Indicator", type: "text" },
-    { key: "status", label: "Status", type: "status" },
+    { key: "value", label: "Value", type: "text" },
   ];
 
   const finalColumns = columns || defaultSingleCols;
 
   // Extract indicator and status columns
-  const indicatorCol = finalColumns.find((col) => col.type !== "status") || defaultSingleCols[0];
-  const statusCol = finalColumns.find((col) => col.type === "status") || defaultSingleCols[1];
+  const indicatorCol =
+    finalColumns.find((col) => col.type !== "value") || defaultSingleCols[0];
+  const statusCol =
+    finalColumns.find((col) => col.type === "value") || defaultSingleCols[1];
 
   return (
     <div className="w-full bg-white rounded-3xl border border-gray-100 p-6 shadow-sm flex flex-col gap-6 text-black">
@@ -84,8 +82,7 @@ const ScorecardTable: React.FC<ScorecardTableProps> = ({
       )}
 
       {/* Main Table Grid */}
-      <div className="flex flex-col gap-3">
-        {/* Header Row */}
+      {/* <div className="flex flex-col gap-3">
         <div className="grid grid-cols-[4fr_1fr] gap-4 sm:gap-6">
           <div className="bg-[#00A141] text-white text-sm font-semibold rounded-xl px-5 py-3 text-left">
             {indicatorCol.label}
@@ -95,30 +92,25 @@ const ScorecardTable: React.FC<ScorecardTableProps> = ({
           </div>
         </div>
 
-        {/* Data Rows */}
         <div className="flex flex-col gap-2.5">
           {data.map((row, idx) => {
             const indicatorValue = String(row[indicatorCol.key] || "");
-            const statusValue = String(row[statusCol.key] || "");
+            const statusValue = Number(row[statusCol.key] || 0);
+
+            const isMet = statusValue === 1;
             
-            // Check status: Yes vs No
-            const isMet = statusValue === "Yes";
-            
-            // Background/text styling for row cells
             const cellBgClass = isMet ? "bg-[#EEF7F2]" : "bg-[#FDF2F2]";
             const textClass = isMet ? "text-green-700 font-semibold" : "text-red-600 font-semibold";
 
             return (
               <div key={idx} className="grid grid-cols-[4fr_1fr] gap-4 sm:gap-6">
-                {/* Indicator Pill */}
                 <div className={`rounded-xl px-5 py-3.5 text-sm ${cellBgClass} ${textClass} text-left flex items-center`}>
                   {indicatorValue}
                 </div>
                 
-                {/* Status Pill */}
                 <div className={`rounded-xl px-5 py-3.5 ${cellBgClass} flex items-center justify-center`}>
                   <StatusCircle
-                    status={statusValue}
+                    status={Number(statusValue)}
                     mapping={statusMapping}
                   />
                 </div>
@@ -126,6 +118,61 @@ const ScorecardTable: React.FC<ScorecardTableProps> = ({
             );
           })}
         </div>
+      </div> */}
+
+      <div className="flex flex-col gap-2.5">
+        <div className="grid grid-cols-[4fr_1fr] gap-4 sm:gap-6">
+          <div className="bg-[#00A141] text-white text-sm font-semibold rounded-xl px-5 py-3 text-left">
+            {indicatorCol.label}
+          </div>
+          <div className="bg-[#00A141] text-white text-sm font-semibold rounded-xl px-5 py-3 text-center">
+            {statusCol.label}
+          </div>
+        </div>
+        {data && data.length > 0 ? (
+          data.map((row, idx) => {
+            const indicatorValue = String(row[indicatorCol.key] || "");
+            const statusValue = Number(row[statusCol.key] || 0);
+
+            const isMet = statusValue === 1;
+
+            const cellBgClass = isMet ? "bg-[#EEF7F2]" : "bg-[#FDF2F2]";
+            const textClass = isMet
+              ? "text-green-700 font-semibold"
+              : "text-red-600 font-semibold";
+
+            return (
+              <div
+                key={idx}
+                className="grid grid-cols-[4fr_1fr] gap-4 sm:gap-6"
+              >
+                <div
+                  className={`rounded-xl px-5 py-3.5 text-sm ${cellBgClass} ${textClass} text-left flex items-center`}
+                >
+                  {indicatorValue}
+                </div>
+
+                <div
+                  className={`rounded-xl px-5 py-3.5 ${cellBgClass} flex items-center justify-center`}
+                >
+                  <StatusCircle
+                    status={Number(statusValue)}
+                    mapping={statusMapping}
+                  />
+                </div>
+              </div>
+            );
+          })
+        ) : (
+          <div className="flex flex-col items-center justify-center py-10 text-center">
+            <p className="text-sm font-semibold text-gray-500">
+              No data available
+            </p>
+            <p className="text-xs text-gray-400 mt-1">
+              There are currently no records available for this category.
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Legend */}
@@ -133,7 +180,7 @@ const ScorecardTable: React.FC<ScorecardTableProps> = ({
         {Object.entries(statusMapping).map(([key, { label, colorClass }]) => (
           <div key={key} className="flex items-center gap-2">
             <span className={`h-3 w-3 rounded-full ${colorClass}`} />
-            <span className="text-gray-600">{label}</span>
+            <span className="text-gray-600">{label} </span>
           </div>
         ))}
       </div>

@@ -195,6 +195,7 @@ const ZonalHealthFacility = () => {
               <StateBarChart
                 title="Zonal Comparison"
                 data={sampleData}
+                selectedMetric={selectedChartType === "per_capita" ? "per_capita" : "total"}
                 className="bg-white rounded-2xl shadow p-4 h-125"
               />
             </div>

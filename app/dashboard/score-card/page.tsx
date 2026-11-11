@@ -1,32 +1,31 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import ScorecardTable, { ScorecardRow } from "@/app/components/ScoreCard";
-import NationalScorecardTable from "@/app/components/NationalScoreCard";
 import { useTopbarFilters } from "@/app/context/TopbarFiltersContext";
 import LoadingScreen from "@/app/components/LoadingScreen";
 import { Endpoints, httpClient } from "@/app/api-client/src";
 import CategorySelect from "@/app/components/CategoryOption";
 import { useRouter } from "next/navigation";
+import NationalScorecardTable from "@/app/components/NationalScoreCard";
 
-interface ScoreCardProps {
-  state: string;
-}
 const ScoreCard = () => {
   const [loading, setLoading] = useState(false);
   const { selectedState, selectedYear } = useTopbarFilters();
-  const [stateData, setStateData] = useState<any>("DMA");
+  const [stateData, setStateData] = useState<Record<string, unknown> | null>(
+    null,
+  );
   const [selectedRound, setSelectedRound] = useState("");
   const router = useRouter();
 
   const categories = [
-    { value: "DMA", label: "DMA Scorecard" },
+    { value: "SDSS", label: "SDSS Scorecard" },
     { value: "Health Information", label: "Health Information Scorecard" },
     { value: "Health Insurance", label: "Health Insurance Scorecard" },
     { value: "Health Security", label: "Health Security Scorecard" },
     { value: "Immunization", label: "Immunization Scorecard" },
     { value: "Nutrition", label: "Nutrition Scorecard" },
-    { value: "PHCLC", label: "PHCLC Scorecard" },
+    { value: "PHC Systems", label: "PHC Systems Scorecard" },
   ];
 
   const round = [
@@ -39,13 +38,34 @@ const ScoreCard = () => {
   const [selectedCategory, setSelectedCategory] = useState(
     categories[0]?.value,
   );
-  const columnTwo: ScorecardRow[] = stateData?.selected_state || [];
+  const columnTwo: ScorecardRow[] =
+    (stateData?.selected_state as ScorecardRow[]) || [];
   const prevValues = useRef<{
     selectedRound: string;
     selectedState: string;
     selectedYear: number;
     selectedCategory: string;
   } | null>(null);
+
+  const scorecardCategoryMap: Record<string, string> = {
+    SDSS: "sdss",
+    "Health Information": "health-information",
+    "Health Insurance": "health-insurance",
+    "Health Security": "health-security",
+    Immunization: "immunization",
+    Nutrition: "nutrition",
+    "PHC Systems": "phc-systems",
+  };
+
+  const normalizeScorecardCategory = (category: string) =>
+    scorecardCategoryMap[category] ||
+    category.toLowerCase().replace(/\s+/g, "-");
+
+  const normalizeRound = (round: string) =>
+    round
+      .toLowerCase()
+      .replace(/\s+/g, "-")
+      .replace(/[^a-z0-9-]/g, "");
 
   const sampleData = stateData?.all_states || [];
 
@@ -55,7 +75,7 @@ const ScoreCard = () => {
     return state;
   };
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     if (!selectedState || !selectedYear) return;
 
     // Avoid double API calls
@@ -79,24 +99,26 @@ const ScoreCard = () => {
     const stateParam = getStateParam(selectedState);
 
     try {
+      const categorySlug = normalizeScorecardCategory(selectedCategory);
       const url =
         selectedCategory === "Nutrition"
-          ? `${Endpoints.scorecard.summary}/${stateParam}/${selectedYear}/${selectedCategory}/${selectedRound}`
-          : `${Endpoints.scorecard.summary}/${stateParam}/${selectedYear}/${selectedCategory}`;
+          ? `${Endpoints.scorecard.summary}/${stateParam}/${selectedYear}/${categorySlug}/${normalizeRound(selectedRound)}`
+          : `${Endpoints.scorecard.summary}/${stateParam}/${selectedYear}/${categorySlug}`;
 
-      const stats = await httpClient.get(url);
-      // @ts-ignore
-      setStateData(stats?.data);
-    } catch (error) {
+      const response = (await httpClient.get(url)) as {
+        data?: Record<string, unknown>;
+      };
+      setStateData(response?.data ?? null);
+    } catch {
       toast.error("Failed to load scorecard data");
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedCategory, selectedRound, selectedState, selectedYear]);
 
   useEffect(() => {
     fetchData();
-  }, [selectedRound, selectedState, selectedYear, selectedCategory]);
+  }, [fetchData]);
 
   return (
     <>
@@ -126,9 +148,8 @@ const ScoreCard = () => {
           />
         </div>
 
-        <div className="overflow-hidden rounded-xl shadow">
-          <NationalScorecardTable title="National View" data={sampleData} />
-        </div>
+        {/* <NationalScorecardTable title="National View" data={sampleData} /> */}
+        
       </div>
       <div className="flex justify-center pt-4">
         <button

@@ -76,7 +76,7 @@ export default function DashboardLayout({
     }
   }, [router]);
 
-  const handleUserLogout = () => {
+  const npm = () => {
     if (typeof window !== "undefined") {
       sessionStorage.clear();
       localStorage.clear();
@@ -115,7 +115,7 @@ export default function DashboardLayout({
             <TopbarWithFilters
               collapsed={collapsed}
               onToggleSidebar={() => setMobileOpen((o) => !o)}
-              onLogout={handleUserLogout}
+              onLogout={npm}
             />
             <main className="p-4">{children}</main>
           </div>

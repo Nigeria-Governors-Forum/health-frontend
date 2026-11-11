@@ -42,12 +42,12 @@ const HealthCard: React.FC<SummaryTableProps> = ({
   const total = totalCount ?? data.length;
 
   return (
-    <div className="w-full rounded-3xl border border-gray-100 bg-white p-6 shadow-sm md:p-7">
+    <div className="w-full min-w-0 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm sm:rounded-3xl sm:p-6 md:p-7">
       {/* Header */}
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <div className="flex items-center gap-2">
-            <h2 className="text-xl font-bold text-green-700">{title}</h2>
+      <div className="mb-5 flex min-w-0 flex-col gap-4 sm:mb-6 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            <h2 className="min-w-0 text-lg font-bold leading-snug text-green-700 sm:text-xl">{title}</h2>
             <span className="inline-flex items-center rounded-full bg-green-50 px-3 py-0.5 text-xs font-semibold text-green-700">
               {total - 1} Total
             </span>
@@ -62,7 +62,7 @@ const HealthCard: React.FC<SummaryTableProps> = ({
           {subtitle && <p className="mt-1 text-sm text-gray-400">{subtitle}</p>}
         </div>
 
-        <div className="relative w-full sm:w-64">
+        <div className="relative w-full sm:w-64 sm:shrink-0">
           <input
             type="text"
             value={searchValue}
@@ -78,7 +78,7 @@ const HealthCard: React.FC<SummaryTableProps> = ({
       </div>
 
       {/* Column headers */}
-      <div className="hidden gap-2.5 sm:mb-2.5 sm:grid sm:grid-cols-[1.6fr_1fr_1fr_1fr]">
+      <div className="hidden gap-2.5 sm:mb-2.5 sm:grid sm:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)]">
         <div className="flex items-center gap-3 rounded-lg bg-green-700 px-5 py-3 text-sm font-semibold text-white">
           <span>Institution</span>
         </div>
@@ -102,11 +102,14 @@ const HealthCard: React.FC<SummaryTableProps> = ({
           return (
             <div
               key={row.id ?? `${row.institution}-${i}`}
-              className="grid grid-cols-1 gap-2.5 sm:grid-cols-[1.6fr_1fr_1fr_1fr]"
+              className="grid min-w-0 grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)] sm:gap-2.5"
             >
-              <div className="flex items-center gap-3 rounded-lg bg-green-50 px-5 py-3">
+              <div className="flex min-w-0 items-center justify-between gap-3 rounded-lg bg-green-50 px-4 py-3 sm:justify-start sm:px-5">
+                <span className="text-xs font-medium text-gray-500 sm:hidden">
+                  Institution
+                </span>
                 <span
-                  className={`font-semibold text-green-700 ${totalRow ? "text-base text-black" : "text-sm"
+                  className={`min-w-0 break-words text-right font-semibold text-green-700 sm:text-left ${totalRow ? "text-base text-black" : "text-sm"
                     }`}
                 >
                   {totalRow ? "Total" : row.institution}
@@ -114,25 +117,34 @@ const HealthCard: React.FC<SummaryTableProps> = ({
               </div>
 
               <div
-                className={`flex items-center justify-center rounded-lg bg-green-50 px-5 py-3 text-gray-700 ${totalRow ? "text-base font-bold text-black" : "text-sm font-medium"
+                className={`flex min-w-0 items-center justify-between gap-3 rounded-lg bg-green-50 px-4 py-3 text-gray-700 sm:justify-center sm:px-5 ${totalRow ? "text-base font-bold text-black" : "text-sm font-medium"
                   }`}
               >
+                <span className="text-xs font-medium text-gray-500 sm:hidden">
+                  Private
+                </span>
                 {formatNumber(row.private)}
               </div>
 
               <div
-                className={`flex items-center justify-center rounded-lg bg-green-50 px-5 py-3 text-gray-700 ${totalRow ? "text-base font-bold text-black" : "text-sm font-medium"
+                className={`flex min-w-0 items-center justify-between gap-3 rounded-lg bg-green-50 px-4 py-3 text-gray-700 sm:justify-center sm:px-5 ${totalRow ? "text-base font-bold text-black" : "text-sm font-medium"
                   }`}
               >
+                <span className="text-xs font-medium text-gray-500 sm:hidden">
+                  Public
+                </span>
                 {formatNumber(row.public)}
               </div>
 
               <div
-                className={`flex items-center justify-center rounded-lg bg-green-50 px-5 py-3 ${totalRow
+                className={`flex min-w-0 items-center justify-between gap-3 rounded-lg bg-green-50 px-4 py-3 sm:justify-center sm:px-5 ${totalRow
                   ? "text-base font-bold text-black"
                   : "text-sm font-bold text-gray-800"
                   }`}
               >
+                <span className="text-xs font-medium text-gray-500 sm:hidden">
+                  Total
+                </span>
                 {formatNumber(row.total)}
               </div>
             </div>

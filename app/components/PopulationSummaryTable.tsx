@@ -16,8 +16,10 @@ export interface LgaRow {
   density?: number | string;
   target?: number | string;
   institution?: string;
+  indicator?: string;
   page?: string;
   state?: string;
+  values?: string;
   year?: number;
   zone?: string;
 }
@@ -32,6 +34,8 @@ export interface WorkforceRow {
   status?: WorkforceStatus;
   // Kept for backward compatibility with the old interface; not rendered.
   institution?: string;
+  values?: number | string;
+  indicator?: string;
   target?: number | string;
   page?: string;
   state?: string;
@@ -118,11 +122,11 @@ const PopulationSummaryTable: React.FC<PopulationSummaryTableProps> = ({
   pageSize = 10,
   densityPer = 10000,
   searchValue = "",
-  onSearchChange = () => { },
+  onSearchChange = () => {},
   currentPage = 1,
   totalPages = 1,
   totalResults,
-  onPageChange = () => { },
+  onPageChange = () => {},
   statusStyles = {},
 }) => {
   const styles = { ...defaultStatusStyles, ...statusStyles } as Record<
@@ -135,12 +139,12 @@ const PopulationSummaryTable: React.FC<PopulationSummaryTableProps> = ({
   const pages = getPageNumbers(currentPage, totalPages);
 
   return (
-    <div className="w-full rounded-3xl border border-gray-100 bg-white p-6 shadow-sm md:p-7">
+    <div className="w-full min-w-0 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm sm:rounded-3xl sm:p-6 md:p-7">
       {/* Header */}
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <div className="flex items-center gap-2">
-            <h2 className="text-xl font-bold text-green-700">{title}</h2>
+      <div className="mb-5 flex min-w-0 flex-col gap-4 sm:mb-6 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            <h2 className="min-w-0 text-lg font-bold leading-snug text-green-700 sm:text-xl">{title}</h2>
             <span className="inline-flex items-center rounded-full bg-green-50 px-3 py-0.5 text-xs font-semibold text-green-700">
               {total} Total
             </span>
@@ -155,7 +159,7 @@ const PopulationSummaryTable: React.FC<PopulationSummaryTableProps> = ({
           <p className="mt-1 text-sm text-black">{subtitle}</p>
         </div>
 
-        <div className="relative w-full sm:w-64">
+        <div className="relative w-full sm:w-64 sm:shrink-0">
           <input
             type="text"
             value={searchValue}
@@ -173,7 +177,7 @@ const PopulationSummaryTable: React.FC<PopulationSummaryTableProps> = ({
       {/* Column headers */}
       <div className="hidden gap-2.5 sm:mb-2.5 sm:grid sm:grid-cols-[1.6fr_1.2fr_1.2fr]">
         <div className="flex items-center gap-3 rounded-full bg-green-700 px-5 py-3 text-sm font-semibold text-white">
-          <span>Occupation</span>
+          <span>Institution</span>
         </div>
         <div className="flex items-center justify-center rounded-full bg-green-700 px-5 py-3 text-sm font-semibold text-white">
           Number
@@ -194,30 +198,32 @@ const PopulationSummaryTable: React.FC<PopulationSummaryTableProps> = ({
           const sn = (currentPage - 1) * pageSize + i + 1;
 
           return (
-            <div
+              <div
               key={row.id ?? `${row.occupation}-${i}`}
-              className="grid grid-cols-1 gap-2.5 sm:grid-cols-[1.6fr_1.2fr_1.2fr]"
+                className="grid min-w-0 grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1.6fr)_minmax(0,1.2fr)_minmax(0,1.2fr)] sm:gap-2.5"
             >
               {/* Occupation cell — neutral styling */}
-              <div
-                className="flex items-center gap-3 rounded-full bg-green-50 px-5 py-3 text-sm"
-              >
-                <span className="font-semibold text-green-700">
-                  {row.institution || row.occupation}
+              <div className="flex min-w-0 items-center gap-3 rounded-xl bg-green-50 px-4 py-3 text-sm sm:rounded-full sm:px-5">
+                <span className="min-w-0 break-words font-semibold text-green-700">
+                  {row.indicator || row.institution || row.occupation}
                 </span>
               </div>
 
               {/* Neutral data cells */}
-              <div className="flex items-center justify-center rounded-full bg-green-50 px-5 py-3 text-sm font-medium text-gray-700">
-                <span className="mr-1 text-xs text-gray-400 sm:hidden">
+              <div className="flex min-w-0 items-center justify-between gap-2 rounded-xl bg-green-50 px-4 py-3 text-sm font-medium text-gray-700 sm:justify-center sm:rounded-full sm:px-5">
+                <span className="text-xs text-gray-500 sm:hidden">
                   Number:
                 </span>
-                {formatNumber(row.number)}
+                <span className="min-w-0 break-words text-right sm:text-center">
+                  {formatNumber(row.number || row.values)}
+                </span>
               </div>
 
               {/* Density cell — carries status styling */}
-              <div className={`flex items-center justify-center rounded-full px-5 py-3 text-sm font-bold ${style.pillBgClass}`}>
-                <span className="mr-1 text-xs text-gray-400 sm:hidden">
+              <div
+                className={`flex min-w-0 items-center justify-between gap-2 rounded-xl px-4 py-3 text-sm font-bold sm:justify-center sm:rounded-full sm:px-5 ${style.pillBgClass}`}
+              >
+                <span className="text-xs text-gray-500 sm:hidden">
                   Density:
                 </span>
                 <span className={style.textClass}>
@@ -253,14 +259,15 @@ const PopulationSummaryTable: React.FC<PopulationSummaryTableProps> = ({
                   key={p}
                   type="button"
                   onClick={() => onPageChange(p)}
-                  className={`flex h-7 w-7 items-center justify-center rounded-full font-medium ${p === currentPage
-                    ? "bg-green-100 text-green-700"
-                    : "text-gray-500 hover:bg-gray-50"
-                    }`}
+                  className={`flex h-7 w-7 items-center justify-center rounded-full font-medium ${
+                    p === currentPage
+                      ? "bg-green-100 text-green-700"
+                      : "text-gray-500 hover:bg-gray-50"
+                  }`}
                 >
                   {p}
                 </button>
-              )
+              ),
             )}
           </div>
 

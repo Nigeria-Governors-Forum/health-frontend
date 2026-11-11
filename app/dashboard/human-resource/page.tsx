@@ -33,16 +33,16 @@ const HumanResource = () => {
 
   const data: SummaryRow[] = stateData?.training_breakdown || [];
   const dataTwo: LgaRow[] = stateData?.profession || [];
+  const searchTerm = searchValue.trim().toLowerCase();
 
-  const filteredData = dataTwo.filter((row) => {
-    const searchTerm = searchValue.toLowerCase();
-    const occupation = (row.occupation || "").toLowerCase();
-    const institution = (row.institution || "").toLowerCase();
-    return occupation.includes(searchTerm) || institution.includes(searchTerm);
-  });
+  const filteredData = dataTwo.filter((row) =>
+    [row.indicator, row.institution, row.occupation, row.values, row.density].some(
+      (value) => String(value ?? "").toLowerCase().includes(searchTerm),
+    ),
+  );
 
   const filteredTrainingData = data.filter((row) => {
-    const searchTerm = searchValueTraining.toLowerCase();
+    const searchTerm = searchValueTraining.trim().toLowerCase();
     const institution = (row.institution || "").toLowerCase();
     return institution.includes(searchTerm);
   });
@@ -94,22 +94,22 @@ const HumanResource = () => {
     <>
       {loading && <LoadingScreen text="Please wait..." />}
 
-      <div className="flex flex-col gap-6">
+      <div className="flex min-w-0 flex-col gap-4 sm:gap-6">
         {/* Top Section */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-3">
           <DemographyCard
             title="Total Health Workers"
-            value={formatNumber(Number(stateData?.hRH_Professions)) || "N/A"}
+            value={formatNumber(Number(stateData?.HRH)) || "N/A"}
             icon={<FaUsers size={24} color="#16a34a" />}
           />
           <DemographyCard
             title="Doctors"
-            value={formatNumber(Number(stateData?.hRH)) || "N/A"}
+            value={formatNumber(Number(stateData?.profession[0]?.values)) || "N/A"}
             icon={<FaHospitalUser size={24} color="#16a34a" />}
           />
           <DemographyCard
             title="Community Health Extension Workers"
-            value={formatNumber(Number(stateData?.hRH)) || "N/A"}
+            value={formatNumber(Number(stateData?.profession[2]?.values)) || "N/A"}
             icon={<FaHospitalUser size={24} color="#16a34a" />}
           />
           <DemographyCard
@@ -120,13 +120,13 @@ const HumanResource = () => {
 
           <DemographyCard
             title="Nurses/Midwives"
-            value={formatNumber(Number(stateData?.hRH)) || "N/A"}
+            value={formatNumber(Number(stateData?.profession[1]?.values)) || "N/A"}
             icon={<FaHospitalUser size={24} color="#16a34a" />}
           />
 
           <DemographyCard
             title="Junior Community Health Extension Workers"
-            value={formatNumber(Number(stateData?.hRH)) || "N/A"}
+            value={formatNumber(Number(stateData?.profession[3]?.values)) || "N/A"}
             icon={<FaHospitalUser size={24} color="#16a34a" />}
           />
         </div>
@@ -180,10 +180,10 @@ const HumanResource = () => {
           }
         />
 
-        <div className="flex justify-center pt-4">
+        <div className="flex justify-center pt-1 sm:pt-2">
           <button
             onClick={() => router.push("/dashboard/zonal-human-resource")}
-            className="text-[#00A141] px-8 py-2 border border-[#00A141] text-lg font-semibold rounded-full cursor-pointer hover:bg-green-50 transition-colors"
+            className="w-full cursor-pointer rounded-full border border-[#00A141] px-5 py-3 text-center text-sm font-semibold text-[#00A141] transition-colors hover:bg-green-50 sm:w-auto sm:px-8 sm:py-2 sm:text-base"
           >
             View Zonal / National Comparison
           </button>

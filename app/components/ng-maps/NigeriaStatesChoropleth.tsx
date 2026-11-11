@@ -67,14 +67,16 @@ export function NigeriaStatesChoropleth({
 
   useEffect(() => {
     let canceled = false;
-    setLoadError(null);
     fetch(geoUrl)
       .then((r) => {
         if (!r.ok) throw new Error(`Failed to load state boundaries (${r.status})`);
         return r.json();
       })
       .then((data: NigeriaStateFeatureCollection) => {
-        if (!canceled) setGeo(data);
+        if (!canceled) {
+          setGeo(data);
+          setLoadError(null);
+        }
       })
       .catch((e: Error) => {
         if (!canceled) setLoadError(e.message ?? "Could not load map data");
@@ -123,7 +125,7 @@ export function NigeriaStatesChoropleth({
     return geoPath(projection);
   }, [projection]);
 
-  const computedColorScale = useMemo(() => {
+  const computedColorScale = (() => {
     if (colorForValue) return colorForValue;
 
     if (domain) {
@@ -156,11 +158,12 @@ export function NigeriaStatesChoropleth({
       .domain([min, min + step, min + step * 2, min + step * 3, min + step * 4, max])
       .range(["#fef3c7", "#fde68a", "#86efac", "#4ade80", "#16a34a", "#005031"])
       .clamp(true);
-  }, [geo, valueForState, colorForValue, domain, defaultFill]);
+  })();
 
   const fillFor = (slug: string) => {
     const v = valueForState(slug);
-    if (v === null || v === undefined || !Number.isFinite(v) || v <= 0) return defaultFill;
+    if (v === null || v === undefined || !Number.isFinite(v)) return defaultFill;
+    if (colorForValue) return colorForValue(v);
     return computedColorScale(v);
   };
 
@@ -258,7 +261,7 @@ export function NigeriaStatesChoropleth({
                       textAnchor="middle"
                       fontSize={10}
                       fill="#0b3d2c"
-                      style={{ pointerEvents: "none", textShadow: "0 1px 0 rgba(255,255,255,0.7)" }}
+                      style={{ pointerEvents: "none", textShadow: "0 1px 0 rgba(255,255,255,0.5)" }}
                     >
                       {f.properties.name}
                     </text>

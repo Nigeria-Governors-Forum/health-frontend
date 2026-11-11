@@ -9,7 +9,6 @@ import {
   Tooltip,
   ResponsiveContainer,
   LabelList,
-  Cell,
   Legend,
 } from "recharts";
 
@@ -34,24 +33,34 @@ interface StateBarChartProps {
   className?: string;
   xaxis?: string;
   yaxis?: string;
+  selectedMetric?: "total" | "per_capita";
 }
 
-const TooltipContent: React.FC<any> = ({
-  active,
-  payload,
-  label,
-}) => {
+type TooltipItem = {
+  dataKey?: string;
+  value?: number | string;
+  fill?: string;
+  color?: string;
+  name?: string;
+};
+
+const TooltipContent: React.FC<{
+  active?: boolean;
+  payload?: TooltipItem[];
+  label?: string;
+}> = ({ active, payload, label }) => {
   if (!active || !payload || payload.length === 0) return null;
 
   return (
     <div className="bg-slate-900/95 backdrop-blur-md shadow-xl rounded-xl p-3 text-sm text-white border border-slate-700/50">
       <div className="font-bold text-slate-200 mb-2 border-b border-slate-700/50 pb-1">{label}</div>
       <div className="space-y-1.5 min-w-[200px]">
-        {payload.map((item: any, idx: number) => {
+        {payload.map((item, idx) => {
           const isTotal = item.dataKey === "totalValue";
+          const numericValue = Number(item.value ?? 0);
           const formattedVal = isTotal
-            ? Number(item.value).toLocaleString()
-            : Number(item.value).toFixed(2);
+            ? numericValue.toLocaleString()
+            : numericValue.toFixed(2);
           const unit = isTotal ? " Facilities" : " per 10k Pop";
 
           return (
@@ -76,6 +85,7 @@ const StateBarChart: React.FC<StateBarChartProps> = ({
   data,
   title,
   className,
+  selectedMetric = "total",
 }) => {
   const processedData = useMemo(() => {
     if (!Array.isArray(data)) return [];
@@ -132,40 +142,43 @@ const StateBarChart: React.FC<StateBarChartProps> = ({
               iconSize={8}
               wrapperStyle={{ fontSize: "12px", fontWeight: 600 }}
             />
-            <Bar
-              yAxisId="left"
-              dataKey="totalValue"
-              name="Total Facilities"
-              fill="#155DFC"
-              radius={[30, 30, 30, 30]}
-            >
-              <LabelList
+            {selectedMetric === "total" ? (
+              <Bar
+                yAxisId="left"
                 dataKey="totalValue"
-                position="top"
-                formatter={(val: any) => {
-                  const num = Number(val);
-                  return isNaN(num) ? String(val || "") : num.toLocaleString();
-                }}
-                style={{ fill: "#374151", fontWeight: 600, fontSize: 11 }}
-              />
-            </Bar>
-            <Bar
-              yAxisId="right"
-              dataKey="perCapitaValue"
-              name="Per Capita (per 10k Pop)"
-              fill="#9011CA"
-              radius={[30, 30, 30, 30]}
-            >
-              <LabelList
+                name="Total Facilities"
+                fill="#155DFC"
+                radius={[30, 30, 30, 30]}
+              >
+                <LabelList
+                  dataKey="totalValue"
+                  position="top"
+                  formatter={(val: unknown) => {
+                    const num = Number(val ?? 0);
+                    return Number.isNaN(num) ? String(val ?? "") : num.toLocaleString();
+                  }}
+                  style={{ fill: "#374151", fontWeight: 600, fontSize: 11 }}
+                />
+              </Bar>
+            ) : (
+              <Bar
+                yAxisId="right"
                 dataKey="perCapitaValue"
-                position="top"
-                formatter={(val: any) => {
-                  const num = Number(val);
-                  return isNaN(num) ? String(val || "") : num.toFixed(2);
-                }}
-                style={{ fill: "#374151", fontWeight: 600, fontSize: 11 }}
-              />
-            </Bar>
+                name="Per Capita (per 10k Pop)"
+                fill="#9011CA"
+                radius={[30, 30, 30, 30]}
+              >
+                <LabelList
+                  dataKey="perCapitaValue"
+                  position="top"
+                  formatter={(val: unknown) => {
+                    const num = Number(val ?? 0);
+                    return Number.isNaN(num) ? String(val ?? "") : num.toFixed(2);
+                  }}
+                  style={{ fill: "#374151", fontWeight: 600, fontSize: 11 }}
+                />
+              </Bar>
+            )}
           </BarChart>
         </ResponsiveContainer>
       </div>

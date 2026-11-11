@@ -2,7 +2,7 @@
 
 import React from "react";
 
-export type StatusKey = "yes" | "no";
+export type StatusKey = 1 | 0;
 
 export interface StatusMappingEntry {
   label: string;
@@ -10,8 +10,8 @@ export interface StatusMappingEntry {
 }
 
 export interface StatusMapping {
-  yes: StatusMappingEntry;
-  no: StatusMappingEntry;
+  1: StatusMappingEntry;
+  0: StatusMappingEntry;
 }
 
 export interface ScorecardItem {
@@ -33,27 +33,25 @@ export interface ScorecardTableProps {
 }
 
 const defaultStatusMapping: StatusMapping = {
-  yes: { label: "Yes", colorClass: "bg-green-600" },
-  no: { label: "No", colorClass: "bg-red-500" },
+  1: { label: "Yes", colorClass: "bg-green-600" },
+  0: { label: "No", colorClass: "bg-red-500" },
 };
 
 interface StatusCircleProps {
-  status?: string;
+  value?: number;
   mapping: StatusMapping;
 }
 
 const StatusCircle: React.FC<StatusCircleProps> = ({
-  status,
+  value,
   mapping = defaultStatusMapping,
 }) => {
-  const key: StatusKey = status?.toLowerCase() === "yes" ? "yes" : "no";
+  const key: StatusKey = value === 1 ? 1 : 0;
   const { label, colorClass } = mapping[key];
 
   return (
     <div className="flex items-center justify-center">
-      <span
-        className={`inline-block h-4 w-4 rounded-full ${colorClass}`}
-      />
+      <span className={`inline-block h-4 w-4 rounded-full ${colorClass}`} />
       <span className="sr-only">{label}</span>
     </div>
   );
@@ -68,9 +66,9 @@ const NationalScorecardTable: React.FC<ScorecardTableProps> = ({
   const uniqueIndicators = Array.from(
     new Set(
       Object.values(data).flatMap((records) =>
-        records.map((r) => r.indicator?.trim())
-      )
-    )
+        records.map((r) => r.indicator?.trim()),
+      ),
+    ),
   ).filter(Boolean) as string[];
 
   // 2) define columns: first column is "State", rest are indicators
@@ -88,7 +86,7 @@ const NationalScorecardTable: React.FC<ScorecardTableProps> = ({
     const row: Record<string, any> = { state };
     records.forEach((r) => {
       const key = r.indicator?.trim().replace(/\s+/g, "_").toLowerCase();
-      if (key) row[key] = r.status;
+      if (key) row[key] = r.value;
     });
     return row;
   });
@@ -102,10 +100,7 @@ const NationalScorecardTable: React.FC<ScorecardTableProps> = ({
           <thead>
             <tr className="bg-green-800 text-white">
               {columns.map((col) => (
-                <th
-                  key={col.key}
-                  className="px-4 py-3 text-left font-semibold"
-                >
+                <th key={col.key} className="px-4 py-3 text-left font-semibold">
                   {col.label}
                 </th>
               ))}
@@ -124,7 +119,7 @@ const NationalScorecardTable: React.FC<ScorecardTableProps> = ({
                   >
                     {col.type === "status" ? (
                       <StatusCircle
-                        status={row[col.key]}
+                        value={row[col.key]}
                         mapping={statusMapping}
                       />
                     ) : (

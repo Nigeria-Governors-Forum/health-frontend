@@ -58,11 +58,11 @@ const HealthTrainingTable: React.FC<HealthTrainingTableProps> = ({
     const total = totalCount ?? data.length;
 
     return (
-        <div className="w-full rounded-3xl border border-gray-100 bg-white p-6 shadow-sm md:p-7">
+        <div className="w-full min-w-0 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm sm:rounded-3xl sm:p-6 md:p-7">
             {/* Header */}
-            <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex items-center gap-1.5">
-                    <h2 className="text-base font-bold text-green-700 sm:text-lg">
+            <div className="mb-5 flex min-w-0 flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex min-w-0 flex-wrap items-center gap-1.5">
+                    <h2 className="min-w-0 text-base font-bold leading-snug text-green-700 sm:text-lg">
                         {title}
                     </h2>
                     <div className="group relative flex items-center">
@@ -74,7 +74,7 @@ const HealthTrainingTable: React.FC<HealthTrainingTableProps> = ({
                     </div>
                 </div>
 
-                <div className="relative w-full sm:w-64">
+                <div className="relative w-full sm:w-64 sm:shrink-0">
                     <input
                         type="text"
                         value={search}
@@ -90,11 +90,11 @@ const HealthTrainingTable: React.FC<HealthTrainingTableProps> = ({
             </div>
 
             {/* Column headers */}
-            <div className="mb-2.5 flex gap-2.5">
-                <div className="flex w-[340px] shrink-0 items-center gap-3 rounded-lg bg-green-700 px-5 py-3 text-sm font-semibold text-white">
+            <div className="mb-2.5 hidden gap-2.5 md:grid md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.8fr)]">
+                <div className="flex min-w-0 items-center gap-3 rounded-lg bg-green-700 px-5 py-3 text-sm font-semibold text-white">
                     <span>Institution</span>
                 </div>
-                <div className="flex flex-1 items-center justify-center rounded-lg bg-green-700 px-5 py-3 text-sm font-semibold text-white">
+                <div className="flex min-w-0 items-center justify-center rounded-lg bg-green-700 px-5 py-3 text-sm font-semibold text-white">
                     Admission Quota
                 </div>
             </div>
@@ -110,27 +110,35 @@ const HealthTrainingTable: React.FC<HealthTrainingTableProps> = ({
                         return (
                             <div
                                 key={row.id ?? `${row.institution}-${i}`}
-                                className="flex gap-2.5"
+                                className="grid min-w-0 grid-cols-1 gap-2.5 md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.8fr)]"
                             >
                                 {/* Institution cell — stretches to cover all its program rows */}
-                                <div className="flex w-[340px] shrink-0 items-center gap-3 self-stretch rounded-lg bg-green-50 px-5 py-4">
-
-                                    <span className="text-sm font-semibold text-gray-700">
+                                <div className="flex min-w-0 items-start gap-2 rounded-lg bg-green-50 px-4 py-3 md:items-center md:self-stretch md:px-5 md:py-4">
+                                    <span className="shrink-0 text-xs font-medium text-gray-500 md:hidden">
+                                        Institution:
+                                    </span>
+                                    <span className="min-w-0 break-words text-sm font-semibold text-gray-700">
                                         {row.institution}
                                     </span>
                                 </div>
 
                                 {/* Stacked program + quota pill rows */}
-                                <div className="flex flex-1 flex-col gap-2">
+                                <div className="flex min-w-0 flex-col gap-2">
                                     {row.programs.map((prog, j) => (
                                         <div
                                             key={`${prog.program}-${j}`}
-                                            className="flex gap-2.5"
+                                            className="grid min-w-0 grid-cols-[minmax(0,1fr)_5.5rem] gap-2 sm:grid-cols-[minmax(0,1fr)_7rem] sm:gap-2.5"
                                         >
-                                            <div className="flex flex-1 items-center justify-center rounded-lg bg-green-50 px-5 py-3 text-sm font-medium text-gray-700">
+                                            <div className="flex min-w-0 flex-col items-start justify-center rounded-lg bg-green-50 px-3 py-2 text-sm font-medium text-gray-700 sm:px-5 sm:py-3 md:items-center">
+                                                <span className="text-[10px] font-medium text-gray-500 md:hidden">
+                                                    Program
+                                                </span>
                                                 {prog.program}
                                             </div>
-                                            <div className="flex w-[200px] shrink-0 items-center justify-center rounded-lg bg-green-50 px-5 py-3 text-sm font-bold text-gray-800">
+                                            <div className="flex min-w-0 flex-col items-center justify-center rounded-lg bg-green-50 px-2 py-2 text-sm font-bold text-gray-800 sm:px-4 sm:py-3">
+                                                <span className="text-[10px] font-medium text-gray-500 md:hidden">
+                                                    Quota
+                                                </span>
                                                 {formatNumber(prog.quota)}
                                             </div>
                                         </div>

@@ -1,10 +1,9 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
+import React, { useCallback, useEffect, useState, useRef } from "react";
 import { getZoneByState } from "nigerian-geopolitical-zones";
 import State from "naija-state-local-government";
 import toast from "react-hot-toast";
-import StateBarChart from "../../components/StateBarChart";
 import { useTopbarFilters } from "@/app/context/TopbarFiltersContext";
 import LoadingScreen from "@/app/components/LoadingScreen";
 import { Endpoints, httpClient } from "@/app/api-client/src";
@@ -13,63 +12,83 @@ import ComparisonFilterPanel, {
   type ComparisonMode,
 } from "@/app/components/ComparisonFilter";
 import { NigeriaStatesChoropleth } from "@/app/components/ng-maps";
+import { normalizeStateName } from "@/app/components/ng-maps/slugs";
 import TrendAreaChart from "@/app/components/TrendAreaChart";
 import ZonalBarChart from "@/app/components/Zonalbarchart";
 
+type HumanResourceState = {
+  state?: string;
+  [metric: string]: number | string | undefined;
+};
+
+type TrainingInstitutionCategory = {
+  states?: Array<{ state?: string; total?: number | string }>;
+  total?: number | string;
+};
+
+type HumanResourceData = {
+  zones?: Array<{ zone?: string; states?: HumanResourceState[] }>;
+  health_training_institutions?: Record<
+    string,
+    Record<string, TrainingInstitutionCategory>
+  >;
+  trend?: Array<Record<string, number | string | undefined>>;
+};
+
 const ZonalHumanResource = () => {
   const [loading, setLoading] = useState(false);
-  const [stateData, setStateData] = useState<any>();
-  const [selectedZone, setSelectedZone] = useState<any>();
+  const [stateData, setStateData] = useState<HumanResourceData | null>(null);
+  const [selectedZone, setSelectedZone] = useState<string | undefined>();
   const [mode, setMode] = useState<ComparisonMode>("zonal");
   const [indicator, setIndicator] = useState<string>("total_hrh");
   const { selectedState, setSelectedState, selectedYear, setSelectedYear } =
     useTopbarFilters();
   const router = useRouter();
 
-  const lastFetched = useRef<{ state: string; year: number; zone: string; indicator: string } | null>(null);
+  const lastFetched = useRef<{
+    state: string;
+    year: number;
+    zone: string;
+  } | null>(null);
 
-  const fetchData = async (zoneParam?: string) => {
-    const activeZone = zoneParam || selectedZone;
-    if (!selectedState || !selectedYear || !activeZone) return;
+  const fetchData = useCallback(
+    async (activeZone: string) => {
+      if (!selectedState || !selectedYear || !activeZone) return;
 
-    // Avoid double API calls
-    if (
-      lastFetched.current &&
-      lastFetched.current.state === selectedState &&
-      lastFetched.current.year === selectedYear &&
-      lastFetched.current.zone === activeZone &&
-      lastFetched.current.indicator === indicator
-    ) {
-      return;
-    }
-    lastFetched.current = {
-      state: selectedState,
-      year: selectedYear,
-      zone: activeZone,
-      indicator
-    };
+      if (
+        lastFetched.current?.state === selectedState &&
+        lastFetched.current.year === selectedYear &&
+        lastFetched.current.zone === activeZone
+      ) {
+        return;
+      }
+      lastFetched.current = {
+        state: selectedState,
+        year: selectedYear,
+        zone: activeZone,
+      };
 
-    setLoading(true);
-    const stateParam =
-      selectedState === "Federal Capital Territory"
-        ? "FCT"
-        : selectedState === "Nassarawa"
-          ? "Nasarawa"
-          : selectedState;
-    try {
-      const stats = await httpClient.get(
-        `${Endpoints.healthFacilities.zone}/${activeZone}/${stateParam}/${selectedYear}`,
-      );
-      // console.log(stats);
-      // @ts-ignore
-      setStateData(stats?.data);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      toast.error("Invalid Credentials");
-    } finally {
-      setLoading(false);
-    }
-  };
+      setLoading(true);
+      const stateParam =
+        selectedState === "Federal Capital Territory"
+          ? "FCT"
+          : selectedState === "Nassarawa"
+            ? "Nasarawa"
+            : selectedState;
+      try {
+        const stats = await httpClient.get<HumanResourceData>(
+          `${Endpoints.humanResource.zone}/${activeZone}/${stateParam}/${selectedYear}`,
+        );
+        setStateData(stats);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        toast.error("Invalid Credentials");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [selectedState, selectedYear],
+  );
 
   useEffect(() => {
     if (!selectedState || !selectedYear) return;
@@ -77,14 +96,151 @@ const ZonalHumanResource = () => {
     const zone = zoneArea?.zone.toLocaleLowerCase() as string;
     setSelectedZone(zone);
     fetchData(zone);
-  }, [selectedState, selectedYear, indicator]);
+  }, [selectedState, selectedYear, fetchData]);
 
   useEffect(() => {
     if (!selectedState || !selectedYear || !selectedZone) return;
     fetchData(selectedZone);
-  }, [selectedZone]);
+  }, [fetchData, selectedState, selectedYear, selectedZone]);
 
-  const sampleData = stateData?.zoneWithin;
+  const sampleData = stateData?.zones;
+
+  const normalize = (value: string) =>
+    value?.trim().toLowerCase().replace(/\s+/g, " ");
+
+  const chartData = (sampleData ?? [])
+    .filter((zone) => normalize(zone.zone ?? "") === normalize(selectedZone ?? ""))
+    .flatMap((zone) =>
+      (zone.states ?? []).map((item) => ({
+        label: item.state ?? "",
+        value: Number(item[indicator] ?? 0),
+      })),
+    )
+    .filter((item) => item.label !== "");
+
+  const htiCategories = [
+    { sources: ["College of Medicine"], key: "college" },
+    {
+      sources: [
+        "Schools of Nursing and Midwifery",
+        "School of Nursing and Midwifery",
+      ],
+      key: "nursing",
+    },
+    {
+      sources: [
+        "Schools of Health Technology",
+        "School of Health Technology",
+      ],
+      key: "health",
+    },
+    {
+      sources: ["Schools of Pharmacy", "Faculty/Dept of Pharmacy"],
+      key: "pharmacy",
+    },
+  ] as const;
+  const htiByState = new Map<
+    string,
+    {
+      label: string;
+      college: number;
+      nursing: number;
+      health: number;
+      pharmacy: number;
+    }
+  >();
+  const selectedZoneHti =
+    stateData?.health_training_institutions?.[normalize(selectedZone ?? "")];
+
+  htiCategories.forEach(({ sources, key }) => {
+    const stateEntries = sources
+      .map((source) => selectedZoneHti?.[source]?.states)
+      .find(Array.isArray);
+    if (!Array.isArray(stateEntries)) return;
+
+    stateEntries.forEach(
+      (entry: { state?: string; total?: number | string }) => {
+        const stateName = String(entry.state ?? "");
+        if (!stateName) return;
+
+        const stateValues = htiByState.get(stateName) ?? {
+          label: stateName,
+          college: 0,
+          nursing: 0,
+          health: 0,
+          pharmacy: 0,
+        };
+        stateValues[key] = Number(entry.total ?? 0);
+        htiByState.set(stateName, stateValues);
+      },
+    );
+  });
+  const htiChartData = Array.from(htiByState.values());
+
+  const nationalValuesByState = new Map<string, number>();
+  if (indicator === "hti") {
+    const trainingInstitutions = stateData?.health_training_institutions;
+    if (trainingInstitutions && typeof trainingInstitutions === "object") {
+      Object.values(trainingInstitutions).forEach((zone) => {
+        htiCategories.forEach(({ sources }) => {
+          const stateEntries = sources
+            .map((source) => zone?.[source]?.states)
+            .find(Array.isArray);
+          stateEntries?.forEach(
+            (entry: { state?: string; total?: number | string }) => {
+              const stateSlug = normalizeStateName(entry.state ?? "");
+              const total = Number(entry.total ?? 0);
+              if (!stateSlug || !Number.isFinite(total)) return;
+              nationalValuesByState.set(
+                stateSlug,
+                (nationalValuesByState.get(stateSlug) ?? 0) + total,
+              );
+            },
+          );
+        });
+      });
+    }
+  } else {
+    (sampleData ?? []).forEach((zone) => {
+      (zone.states ?? []).forEach((entry) => {
+        const stateSlug = normalizeStateName(entry.state ?? "");
+        const value = Number(entry[indicator] ?? 0);
+        if (stateSlug && Number.isFinite(value)) {
+          nationalValuesByState.set(stateSlug, value);
+        }
+      });
+    });
+  }
+
+  const valueLabel =
+    indicator === "hti"
+      ? "Health Training Institutions"
+      : indicator === "total_hrh"
+        ? "Total HRH"
+        : indicator === "hrh_density"
+          ? "HRH Density"
+          : "Admissions Quota";
+
+  const trendData = (Array.isArray(stateData?.trend) ? stateData.trend : [])
+    .map((point) => {
+      const metric =
+        indicator === "hti"
+          ? point.training_institutions
+          : point[indicator] ?? point.value;
+      const value = Number(metric);
+      return {
+        label: String(point.year ?? ""),
+        value,
+      };
+    })
+    .filter(
+      (point: { label: string; value: number }) =>
+        point.label && Number.isFinite(point.value),
+    )
+    .sort(
+      (a: { label: string }, b: { label: string }) =>
+        Number(a.label) - Number(b.label),
+    );
 
   return (
     <>
@@ -107,7 +263,7 @@ const ZonalHumanResource = () => {
             { value: "south east", label: "South East" },
             { value: "south south", label: "South South" },
           ]}
-          states={State.states().map((state: any) => ({
+          states={State.states().map((state: string) => ({
             value: state,
             label: state,
           }))}
@@ -119,7 +275,7 @@ const ZonalHumanResource = () => {
             { label: "Total HRH", value: "total_hrh" },
             { label: "HRH Density", value: "hrh_density" },
             { label: "Health Training Institutions", value: "hti" },
-            { label: "Admissions Quota", value: "admissions_quota" },
+            { label: "Admissions Quota", value: "admission_quota" },
           ]}
           selectedIndicator={indicator}
           onIndicatorChange={setIndicator}
@@ -129,37 +285,45 @@ const ZonalHumanResource = () => {
         {mode === "zonal" && (
           <div className="grid grid-cols-1">
             <div className="flex flex-col gap-6">
-              <ZonalBarChart
-                title="North Central"
-                variant="simple"
-                simpleColor="#2563EB"
-                data={[
-                  { label: "Bauchi", value: 18 },
-                  { label: "Adamawa", value: 20 },
-                  { label: "Taraba", value: 32 },
-                  { label: "Gombe", value: 14 },
-                  { label: "Yobe", value: 22 },
-                  { label: "Borno", value: 6 },
-                  { label: "Jigawa", value: 16 },
-                ]}
-              />
-              <ZonalBarChart
-                title="North Central"
-                variant="stacked"
-                series={[
-                  { key: "college", label: "College of Medicine", color: "#2563EB" },
-                  { key: "nursing", label: "School of Nursing and Midwifery", color: "#7C3AED" },
-                  { key: "health", label: "School of Health Technology", color: "#F9A8C9" },
-                  { key: "pharmacy", label: "Faculty/Dept of Pharmacy", color: "#FBBF24" },
-                ]}
-                data={[
-                  { label: "Bauchi", college: 4, nursing: 4, health: 4, pharmacy: 4 },
-                  { label: "Adamawa", college: 2, nursing: 3, health: 3, pharmacy: 1 },
-                  { label: "Taraba", college: 3, nursing: 2, health: 2, pharmacy: 2 },
-                  { label: "Gombe", college: 6, nursing: 2, health: 2, pharmacy: 2 },
-                  // ...
-                ]}
-              />
+              {indicator !== "hti" ? (
+                <ZonalBarChart
+                  title="North Central"
+                  variant="simple"
+                  simpleColor="#2563EB"
+                  data={chartData}
+                />
+              ) : (
+                <ZonalBarChart
+                  title={selectedZone
+                    ?.split(" ")
+                    .map((word: string) => word[0].toUpperCase() + word.slice(1))
+                    .join(" ")}
+                  variant="stacked"
+                  series={[
+                    {
+                      key: "college",
+                      label: "College of Medicine",
+                      color: "#2563EB",
+                    },
+                    {
+                      key: "nursing",
+                      label: "School of Nursing and Midwifery",
+                      color: "#7C3AED",
+                    },
+                    {
+                      key: "health",
+                      label: "School of Health Technology",
+                      color: "#F9A8C9",
+                    },
+                    {
+                      key: "pharmacy",
+                      label: "Faculty/Dept of Pharmacy",
+                      color: "#FBBF24",
+                    },
+                  ]}
+                  data={htiChartData}
+                />
+              )}
             </div>
           </div>
         )}
@@ -167,20 +331,16 @@ const ZonalHumanResource = () => {
           <div className="bg-white rounded-2xl shadow p-4">
             <NigeriaStatesChoropleth
               valueForState={(slug: string) => {
-                const value = stateData?.[slug];
-                return typeof value === "number" ? value : 50;
+                return nationalValuesByState.get(slug) ?? 0;
               }}
-              valueLabel="Score"
+              valueLabel={valueLabel}
             />
           </div>
         )}
         {mode === "trend" && (
           <div className="bg-white rounded-2xl shadow p-4">
             <TrendAreaChart
-              data={stateData?.trend?.map((point: any) => ({
-                label: point.year,
-                value: point.value,
-              }))}
+              data={trendData}
             />
           </div>
         )}

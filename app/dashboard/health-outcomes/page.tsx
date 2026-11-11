@@ -52,7 +52,7 @@ const HealthOutcomes = () => {
                     : selectedState;
         try {
             const stats = await httpClient.get(
-                `${Endpoints.healthFinance.zone}/${activeZone}/${stateParam}/${selectedYear}`,
+                `${Endpoints.healthOutcomes.summary}/${stateParam}/${selectedYear}`,
             );
             // console.log(stats);
             // @ts-ignore

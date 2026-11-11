@@ -3,11 +3,13 @@ import React, { useState } from "react";
 interface ToggleSwitchProps {
   initial?: boolean;
   onToggle: (value: boolean) => void;
+  className?: string;
 }
 
 const ToggleSwitch: React.FC<ToggleSwitchProps> = ({
   initial = false,
   onToggle,
+  className,
 }) => {
   const [enabled, setEnabled] = useState(initial);
 
@@ -23,7 +25,7 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({
       onClick={handleToggle}
       className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ml-4 ${
         enabled ? "bg-green-500" : "bg-gray-300"
-      }`}
+      } ${className || ""}`}
     >
       <span
         className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${

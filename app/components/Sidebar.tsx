@@ -80,12 +80,12 @@ export const navItem: NavItem[] = [
         label: "Health Finance",
         roles: ["user", "h-admin", "s-admin"],
       },
-      {
-        href: "/dashboard/zonal-health-finance",
-        icon: <FaMoneyCheck />,
-        label: "Zonal Health Finance",
-        roles: ["user", "h-admin", "s-admin"],
-      },
+      // {
+      //   href: "/dashboard/zonal-health-finance",
+      //   icon: <FaMoneyCheck />,
+      //   label: "Zonal Health Finance",
+      //   roles: ["user", "h-admin", "s-admin"],
+      // },
       {
         href: "/dashboard/score-card",
         icon: <FaMoneyCheck />,
@@ -116,12 +116,12 @@ export const navItem: NavItem[] = [
         label: "Partners Mapping",
         roles: ["user", "h-admin", "s-admin"],
       },
-      {
-        href: "/dashboard/africa-map",
-        icon: <FaGlobeAfrica />,
-        label: "Africa Map",
-        roles: ["user", "h-admin", "s-admin"],
-      },
+      // {
+      //   href: "/dashboard/africa-map",
+      //   icon: <FaGlobeAfrica />,
+      //   label: "Africa Map",
+      //   roles: ["user", "h-admin", "s-admin"],
+      // },
       {
         href: "/dashboard/upload-data",
         icon: <FaMoneyCheck />,

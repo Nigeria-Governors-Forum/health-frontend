@@ -138,9 +138,9 @@ export default function ZonalBarChart({
     const displayLabels = showLabels ?? isStacked;
 
     return (
-        <div className={`w-full bg-white ${className}`}>
+        <div className={`w-full bg-white ${className} rounded`}>
             {title && (
-                <p className="mb-3 text-sm font-bold text-green-700">{title}</p>
+                <p className="mb-3 text-sm font-bold text-green-700 p-2">{title}</p>
             )}
 
             <ResponsiveContainer width="100%" height={height}>
