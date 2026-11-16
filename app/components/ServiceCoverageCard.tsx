@@ -1,12 +1,16 @@
 "use client";
 
 import React from "react";
+import { formatNumber } from "../lib/formatNumber";
+
 
 interface ServiceCoverageCardProps {
   title: string;
   value: number;
   target: number;
   color: "green" | "red";
+  showPercentage?: boolean;
+  showTarget?: boolean;
 }
 
 const ServiceCoverageCard: React.FC<ServiceCoverageCardProps> = ({
@@ -14,6 +18,8 @@ const ServiceCoverageCard: React.FC<ServiceCoverageCardProps> = ({
   value,
   target,
   color,
+  showPercentage = false,
+  showTarget = true,
 }) => {
   const barColor = color === "green" ? "bg-[#00A141]" : "bg-[#EF4444]";
 
@@ -33,14 +39,16 @@ const ServiceCoverageCard: React.FC<ServiceCoverageCardProps> = ({
           />
         </div>
         <span className="text-xs font-bold text-gray-700 shrink-0">
-          {value}%
+          {formatNumber(value)} {showPercentage && "%"}
         </span>
       </div>
-
+    
       {/* Target Label */}
-      <span className="text-xs font-bold text-gray-500">
-        Target : {target}%
-      </span>
+      {showTarget && (
+        <span className="text-xs font-bold text-gray-500">
+          Target : {target}%
+        </span>
+      )}
     </div>
   );
 };

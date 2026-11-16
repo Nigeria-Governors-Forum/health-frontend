@@ -36,7 +36,13 @@ export function TopbarFiltersProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    const userProfile = sessionStorage.getItem("user");
+    let userProfile = sessionStorage.getItem("user");
+    if (!userProfile) {
+      userProfile = localStorage.getItem("user");
+      if (userProfile) {
+        sessionStorage.setItem("user", userProfile);
+      }
+    }
     if (!userProfile) {
       router.push("/");
       return;

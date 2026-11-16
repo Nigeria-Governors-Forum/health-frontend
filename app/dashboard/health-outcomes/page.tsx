@@ -85,13 +85,14 @@ const HealthOutcomes = () => {
                 {/* Main Grid Content */}
                 <div className="w-full bg-white rounded-3xl border border-gray-100 p-5 shadow-sm">
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                        {healthOutcomesData.map((card, index) => (
+                        {stateData?.outcomes.map((card: any, index:number) => (
                             <ServiceCoverageCard
                                 key={index}
-                                title={card.title}
+                                title={card.indicator}
                                 value={card.value}
                                 target={card.target}
-                                color={card.color}
+                                color="green"
+                                showTarget={card.target !== 0}
                             />
                         ))}
                     </div>

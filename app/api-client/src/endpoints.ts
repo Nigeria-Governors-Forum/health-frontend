@@ -39,6 +39,15 @@ export const Endpoints = {
     summary: "/service-coverage",
     zonal: "/service-coverage/zonal",
   },
+  threatAssessment: {
+    all: "/threat-assessment",
+    summary: "/threat-assessment/summary",
+    upload: (year: number) => `/threat-assessment/upload/${year}`,
+    byState: (state: string) => `/threat-assessment/state/${state}`,
+    byZone: (zone: string) => `/threat-assessment/zone/${zone}`,
+    byLga: (lga: string) => `/threat-assessment/lga/${lga}`,
+    lgas: "/threat-assessment/lgas",
+  },
   users: {
     list: "/user",
     email: (id: string) => `/user/${id}`,

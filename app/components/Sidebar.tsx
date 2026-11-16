@@ -11,7 +11,7 @@ import {
   FaSignOutAlt,
   FaTimes,
   FaChevronDown,
-  FaGlobeAfrica,
+  FaLock,
 } from "react-icons/fa";
 import { usePathname } from "next/navigation";
 import { useTopbarFilters } from "../context/TopbarFiltersContext";
@@ -80,12 +80,6 @@ export const navItem: NavItem[] = [
         label: "Health Finance",
         roles: ["user", "h-admin", "s-admin"],
       },
-      // {
-      //   href: "/dashboard/zonal-health-finance",
-      //   icon: <FaMoneyCheck />,
-      //   label: "Zonal Health Finance",
-      //   roles: ["user", "h-admin", "s-admin"],
-      // },
       {
         href: "/dashboard/score-card",
         icon: <FaMoneyCheck />,
@@ -136,19 +130,52 @@ export const navItem: NavItem[] = [
       },
     ],
   },
-  {
-    // href: "https://ngf-frontend-agric.vercel.app/",
-    href: "https://asc.education.gov.ng/dhis/dhis-web-commons/security/login.action",
-    icon: AgricIcon,
-    label: "Agriculture",
-    roles: ["user", "acct", "audit", "h-admin", "s-admin"],
-  },
-  {
-    href: "https://ngf-frontend-agric.vercel.app/",
-    icon: EducationIcon,
-    label: "Education",
-    roles: ["user", "acct", "audit", "h-admin", "s-admin"],
-  },
+  // {
+  //   // href: "https://ngf-frontend-agric.vercel.app/",
+  //   href: "https://asc.education.gov.ng/dhis/dhis-web-commons/security/login.action",
+  //   icon: AgricIcon,
+  //   label: "Agriculture",
+  //   roles: ["user", "acct", "audit", "h-admin", "s-admin"],
+  // },
+  // {
+  //   href: "https://ngf-frontend-agric.vercel.app/",
+  //   icon: EducationIcon,
+  //   label: "Education",
+  //   roles: ["user", "acct", "audit", "h-admin", "s-admin"],
+  // },
+  // {
+  //   href: "/dashboard/security",
+  //   icon: <FaLock />,
+  //   label: "Security",
+  //   roles: ["user", "h-admin", "s-admin"],
+  //   children: [
+  //     {
+  //       label: "Security",
+  //       icon: <FaLock />,
+  //       roles: ["user", "h-admin", "s-admin"],
+  //       children: [
+  //         {
+  //           href: "/dashboard/security",
+  //           icon: <FaLock />,
+  //           label: "Security Dashboard",
+  //           roles: ["user", "h-admin", "s-admin"],
+  //         },
+  //         {
+  //           href: "/dashboard/security/upload-data",
+  //           icon: <FaMoneyCheck />,
+  //           label: "Upload Data",
+  //           roles: ["h-admin", "s-admin"],
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       href: "/dashboard/security/upload-data",
+  //       icon: <FaLock />,
+  //       label: "Data Upload",
+  //       roles: ["user", "h-admin", "s-admin"],
+  //     },
+  //   ],
+  // },
 ];
 
 interface SidebarProps {
@@ -282,7 +309,13 @@ const Sidebar: React.FC<SidebarProps> = ({
         <div className="flex-1 overflow-y-auto space-y-1 pr-1 scrollbar-thin">
           {filteredNav.map((item) => {
             if (item.children && item.children.length > 0) {
-              const isOpen = expanded[item.label];
+              const isActiveChild = item.children.some(
+                (child) =>
+                  child.href &&
+                  (pathname === child.href ||
+                    pathname.startsWith(`${child.href}/`)),
+              );
+              const isOpen = expanded[item.label] ?? isActiveChild;
               return (
                 <div key={item.label} className="space-y-1">
                   {/* Parent item */}
@@ -355,9 +388,11 @@ const Sidebar: React.FC<SidebarProps> = ({
 
             // Normal single item
             const isActive = pathname === item.href;
+            const isExternal = item.href?.startsWith("http");
             return (
               <Link
-                target="_blank"
+                target={isExternal ? "_blank" : undefined}
+                rel={isExternal ? "noopener noreferrer" : undefined}
                 key={item.label}
                 href={item.href!}
                 className={`p-2 rounded flex items-center space-x-2 hover:bg-[#009B72] hover:text-white ${isActive ? "bg-[#009B72] text-white" : ""

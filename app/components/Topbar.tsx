@@ -76,6 +76,8 @@ const Topbar: React.FC<TopbarProps> = ({
       "/dashboard/zonal-health-outcomes": `${computedZone} Health Outcomes Dashboard (${selectedYear})`,
       "/dashboard/flagship-projects": `${selectedState} State Flagship Projects (${selectedYear})`,
       "/dashboard/partners-mapping": `${selectedState} State Partners Mapping`,
+      "/dashboard/security": `Threat & Security Vulnerability Assessment`,
+      "/dashboard/security/upload-data": `Upload Security Data`,
       "/dashboard/africa-map": `Africa Map View`,
       "/dashboard/upload-data": `Data Upload Management`,
       "/dashboard/register": `Register User Accounts`,

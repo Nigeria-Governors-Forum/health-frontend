@@ -42,6 +42,8 @@ export default function Home() {
       });
       sessionStorage.setItem("token", stats.access_token);
       sessionStorage.setItem("user", JSON.stringify(stats.user));
+      localStorage.setItem("token", stats.access_token);
+      localStorage.setItem("user", JSON.stringify(stats.user));
 
       router.push("/dashboard");
       toast.success(`Welcome, ${username}!`);
