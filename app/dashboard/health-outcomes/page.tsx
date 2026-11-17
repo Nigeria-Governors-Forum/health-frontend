@@ -1,111 +1,159 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
-import { getZoneByState } from "nigerian-geopolitical-zones";
+import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 import { useTopbarFilters } from "@/app/context/TopbarFiltersContext";
 import LoadingScreen from "@/app/components/LoadingScreen";
+import ServiceCoverageCard from "@/app/components/ServiceCoverageCard";
 import { Endpoints, httpClient } from "@/app/api-client/src";
-import { useRouter } from "next/navigation";
-import ServiceCoverageCard from "../../components/ServiceCoverageCard";
 
-const healthOutcomesData = [
-    { title: "Zero Dose Children (12–23Months)", value: 40, target: 60, color: "green" as const },
-    { title: "Children with Stunting", value: 40, target: 60, color: "red" as const },
-    { title: "Children with Wasting", value: 40, target: 60, color: "green" as const },
-    { title: "Children Underweight", value: 40, target: 60, color: "green" as const },
-    { title: "Neonatal Mortality", value: 40, target: 60, color: "green" as const },
-    { title: "Infant Mortality", value: 40, target: 60, color: "green" as const },
-    { title: "Under-5 Mortality", value: 40, target: 60, color: "green" as const },
-];
+interface HealthOutcome {
+    id?: number;
+    indicator: string;
+    source?: string | null;
+    value: number | null;
+    target: number | null;
+}
+
+interface HealthOutcomesResponse {
+    data?: {
+        state: string;
+        year: number;
+        outcomes: HealthOutcome[];
+    };
+}
 
 const HealthOutcomes = () => {
     const [loading, setLoading] = useState(false);
-    const [stateData, setStateData] = useState<any>();
-    const { selectedState, selectedYear, setSelectedZone, selectedZone } =
-        useTopbarFilters();
+    const [outcomes, setOutcomes] = useState<HealthOutcome[] | null>(null);
+    const [error, setError] = useState(false);
+    const { selectedState, selectedYear } = useTopbarFilters();
     const router = useRouter();
 
-    const lastFetched = useRef<{ state: string; year: number; zone: string } | null>(null);
+    const stateParam =
+        selectedState === "Federal Capital Territory"
+            ? "FCT"
+            : selectedState === "Nassarawa"
+                ? "Nasarawa"
+                : selectedState;
 
-    const fetchData = async (zoneParam?: string) => {
-        const activeZone = zoneParam || selectedZone;
-        if (!selectedState || !selectedYear || !activeZone) return;
-
-        // Avoid double API calls
-        if (
-            lastFetched.current &&
-            lastFetched.current.state === selectedState &&
-            lastFetched.current.year === selectedYear &&
-            lastFetched.current.zone === activeZone
-        ) {
+    useEffect(() => {
+        if (!stateParam || !selectedYear) {
+            setOutcomes(null);
+            setError(false);
+            setLoading(false);
             return;
         }
-        lastFetched.current = { state: selectedState, year: selectedYear, zone: activeZone };
 
-        setLoading(true);
-        const stateParam =
-            selectedState === "Federal Capital Territory"
-                ? "FCT"
-                : selectedState === "Nassarawa"
-                    ? "Nasarawa"
-                    : selectedState;
-        try {
-            const stats = await httpClient.get(
-                `${Endpoints.healthOutcomes.summary}/${stateParam}/${selectedYear}`,
-            );
-            // console.log(stats);
-            // @ts-ignore
-            setStateData(stats?.data);
-        } catch (error) {
-            console.error("Error fetching data:", error);
-            toast.error("Invalid Credentials");
-        } finally {
-            setLoading(false);
-        }
-    };
+        let isCurrentRequest = true;
+        const fetchData = async () => {
+            setLoading(true);
+            setOutcomes(null);
+            setError(false);
+            try {
+                const response = await httpClient.get<HealthOutcomesResponse>(
+                    `${Endpoints.healthOutcomes.summary}/${stateParam}/${selectedYear}`,
+                );
+                if (!Array.isArray(response.data?.outcomes)) {
+                    throw new Error("Health outcomes API returned an invalid response");
+                }
+                if (isCurrentRequest) setOutcomes(response.data.outcomes);
+            } catch (error) {
+                console.error("Failed to fetch health outcomes:", error);
+                if (isCurrentRequest) {
+                    setOutcomes([]);
+                    setError(true);
+                    toast.error("Failed to load health outcomes");
+                }
+            } finally {
+                if (isCurrentRequest) setLoading(false);
+            }
+        };
 
-    useEffect(() => {
-        if (!selectedState || !selectedYear) return;
-        const zoneArea = getZoneByState(selectedState.toLocaleLowerCase());
-        const zone = zoneArea?.zone as string;
-        setSelectedZone(zone);
-        fetchData(zone);
-    }, [selectedState, selectedYear]);
-
-    useEffect(() => {
-        if (!selectedState || !selectedYear || !selectedZone) return;
-        fetchData(selectedZone);
-    }, [selectedZone]);
+        void fetchData();
+        return () => {
+            isCurrentRequest = false;
+        };
+    }, [stateParam, selectedYear]);
 
     return (
         <>
-            {loading && <LoadingScreen text="Please wait..." />}
+            {loading && <LoadingScreen text="Loading health outcomes..." />}
             <div className="flex flex-col gap-8 w-full text-black">
-                {/* Main Grid Content */}
-                <div className="w-full bg-white rounded-3xl border border-gray-100 p-5 shadow-sm">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                        {stateData?.outcomes.map((card: any, index:number) => (
-                            <ServiceCoverageCard
-                                key={index}
-                                title={card.indicator}
-                                value={card.value}
-                                target={card.target}
-                                color="green"
-                                showTarget={card.target !== 0}
-                            />
-                        ))}
+                {!selectedState ? (
+                    <div className="w-full rounded-3xl border border-gray-100 bg-white p-8 text-center text-gray-600 shadow-sm">
+                        Select a state to view health outcomes.
                     </div>
-                </div>
+                ) : outcomes && outcomes.length > 0 ? (
+                    <div className="w-full rounded-3xl border border-gray-100 bg-white p-5 shadow-sm">
+                        <div className="mb-5">
+                            <h2 className="text-lg font-bold text-gray-800">
+                                {selectedState} Health Outcomes
+                            </h2>
+                            <p className="text-sm text-gray-500">{selectedYear}</p>
+                        </div>
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+                            {outcomes.map((outcome, index) => {
+                                const hasNonzeroTarget =
+                                    outcome.target !== null &&
+                                    outcome.target !== undefined &&
+                                    Number(outcome.target) !== 0;
+                                const value =
+                                    outcome.value === null
+                                        ? null
+                                        : Number(outcome.value);
 
-                <div className="flex justify-center pt-4">
+                                return (
+                                    <ServiceCoverageCard
+                                        key={
+                                            outcome.id ??
+                                            `${outcome.indicator}-${outcome.source ?? ""}-${index}`
+                                        }
+                                        title={
+                                            outcome.source
+                                                ? `${outcome.indicator} — ${outcome.source}`
+                                                : outcome.indicator
+                                        }
+                                        value={
+                                            value !== null && Number.isFinite(value)
+                                                ? value
+                                                : null
+                                        }
+                                        target={
+                                            hasNonzeroTarget
+                                                ? Number(outcome.target)
+                                                : 0
+                                        }
+                                        color="green"
+                                        showPercentage={hasNonzeroTarget}
+                                        showTarget={hasNonzeroTarget}
+                                        formatAsNumber={!hasNonzeroTarget}
+                                    />
+                                );
+                            })}
+                        </div>
+                    </div>
+                ) : error ? (
+                    <div className="w-full rounded-3xl border border-red-100 bg-white p-8 text-center text-red-600 shadow-sm">
+                        Unable to load health outcomes. Please try again.
+                    </div>
+                ) : (
+                    !loading && (
+                        <div className="w-full rounded-3xl border border-gray-100 bg-white p-8 text-center text-gray-600 shadow-sm">
+                            No health outcomes found for {selectedState} in {selectedYear}.
+                        </div>
+                    )
+                )}
+
+                {/* <div className="flex justify-center pt-4">
                     <button
                         onClick={() => router.push("/dashboard/zonal-health-outcomes")}
                         className="text-[#00A141] px-8 py-2 border border-[#00A141] text-lg font-semibold rounded-full cursor-pointer hover:bg-green-50 transition-colors"
                     >
                         View Zonal / National Comparison
                     </button>
-                </div>
+                </div> */}
             </div>
         </>
     );

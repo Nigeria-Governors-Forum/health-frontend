@@ -1,12 +1,15 @@
 "use client";
 
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
+import Link from "next/link";
 import {
   FiMaximize2,
   FiMinimize2,
   FiAlertTriangle,
   FiFilter,
   FiLayers,
+  FiEdit3,
+  FiRefreshCw,
 } from "react-icons/fi";
 import { FaShieldAlt, FaGlobeAfrica, FaMapMarkedAlt } from "react-icons/fa";
 import { Endpoints, httpClient } from "@/app/api-client/src";
@@ -91,14 +94,15 @@ function parseLgas(str: string): string[] {
     .map((s) => s.charAt(0).toUpperCase() + s.slice(1));
 }
 
-// Colors for threat levels: Red (Critical/High), Orange (Elevated), Yellow (Moderate), Soft Green (Low-Moderate)
+// Colors for threat levels: Red (Critical), Maroon (High), Crimson (Elevated), Blue (Moderate), Brown (Low-Moderate)
 const THREAT_COLORS = {
-  CRITICAL: "#dc2626", // Deep Red
-  HIGH: "#ef4444", // Red
-  ELEVATED: "#f59e0b", // Amber / Orange
-  MODERATE: "#eab308", // Yellow / Gold
-  "LOW-MODERATE": "#84cc16", // Lime / Yellow-Green
-  DEFAULT: "#e2e8f0", // Slate gray
+  CRITICAL: "#dc2626", // Red
+  HIGH: "#e11d48", // Maroon
+  ELEVATED: "#ef4444", // Crimson
+  MODERATE: "#3b82f6", // Blue
+  "LOW-MODERATE": "#964B00", // Brown
+  "LOW MODERATE": "#964B00", // Brown
+  DEFAULT: "#e2e8f0", // Grey
 };
 
 const THREAT_SCORE_MAP: Record<string, number> = {
@@ -107,13 +111,18 @@ const THREAT_SCORE_MAP: Record<string, number> = {
   ELEVATED: 55,
   MODERATE: 35,
   "LOW-MODERATE": 15,
+  "LOW MODERATE": 15,
 };
 
 function getThreatColor(risk: string | undefined): string {
   if (!risk) return THREAT_COLORS.DEFAULT;
   const key = risk.trim().toUpperCase();
+  const hyphenKey = key.replace(/\s+/g, "-");
+  const spaceKey = key.replace(/-/g, " ");
   return (
-    Object.entries(THREAT_COLORS).find(([level]) => level === key)?.[1] ??
+    THREAT_COLORS[key as keyof typeof THREAT_COLORS] ??
+    THREAT_COLORS[hyphenKey as keyof typeof THREAT_COLORS] ??
+    THREAT_COLORS[spaceKey as keyof typeof THREAT_COLORS] ??
     THREAT_COLORS.DEFAULT
   );
 }
@@ -159,33 +168,30 @@ const SecurityPage = () => {
   }, [isFullscreen]);
 
   // Fetch the selected year's threat assessment data from the backend.
-  useEffect(() => {
-    let isMounted = true;
-    const fetchSecurityData = async () => {
-      try {
-        setLoading(true);
-        const response = await httpClient.get<ThreatAssessmentResponse>(
-          `${Endpoints.threatAssessment.all}?year=${selectedYear}`,
-        );
-        if (!Array.isArray(response.data)) {
-          throw new Error("Threat assessment API returned an invalid response");
-        }
-        if (isMounted) setData(response.data);
-      } catch (error) {
-        console.error("Failed to fetch threat assessment data:", error);
-        if (isMounted) {
-          setData([]);
-          toast.error("Failed to load security assessment data");
-        }
-      } finally {
-        if (isMounted) setLoading(false);
-      }
-    };
-    fetchSecurityData();
-    return () => {
-      isMounted = false;
-    };
+  const fetchSecurityData = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await httpClient.get<any>(
+        `${Endpoints.threatAssessment.all}?year=${selectedYear}`,
+      );
+      const rows = Array.isArray(response)
+        ? response
+        : Array.isArray(response?.data)
+          ? response.data
+          : [];
+      setData(rows);
+    } catch (error) {
+      console.error("Failed to fetch threat assessment data:", error);
+      setData([]);
+      toast.error("Failed to load security assessment data");
+    } finally {
+      setLoading(false);
+    }
   }, [selectedYear]);
+
+  useEffect(() => {
+    fetchSecurityData();
+  }, [fetchSecurityData]);
 
   // Current state assessment record (if state selected)
   const currentStateRecord = useMemo(() => {
@@ -195,7 +201,7 @@ const SecurityPage = () => {
       (item) =>
         item.state?.trim().toLowerCase() === norm ||
         normalizeStateName(item.state ?? "") ===
-          normalizeStateName(selectedState),
+        normalizeStateName(selectedState),
     );
   }, [data, selectedState]);
 
@@ -292,7 +298,8 @@ const SecurityPage = () => {
       "LOW-MODERATE": 0,
     };
     for (const item of data) {
-      const r = (item.risk || "").toUpperCase().trim();
+      let r = (item.risk || "").toUpperCase().trim();
+      if (r === "LOW MODERATE") r = "LOW-MODERATE";
       if (counts[r] !== undefined) counts[r]++;
     }
     return counts;
@@ -301,8 +308,9 @@ const SecurityPage = () => {
   const statesByRisk = useMemo(() => {
     const groups: Record<string, string[]> = {};
     for (const item of data) {
-      const risk = item.risk?.toUpperCase().trim();
+      let risk = item.risk?.toUpperCase().trim();
       if (!risk || !item.state) continue;
+      if (risk === "LOW MODERATE") risk = "LOW-MODERATE";
       groups[risk] ??= [];
       groups[risk].push(item.state);
     }
@@ -323,7 +331,7 @@ const SecurityPage = () => {
         const highestRisk = items.reduce(
           (highest, item) =>
             (THREAT_SCORE_MAP[item.risk?.toUpperCase() ?? ""] ?? 0) >
-            (THREAT_SCORE_MAP[highest] ?? 0)
+              (THREAT_SCORE_MAP[highest] ?? 0)
               ? item.risk?.toUpperCase() ?? highest
               : highest,
           "LOW-MODERATE",
@@ -374,12 +382,12 @@ const SecurityPage = () => {
           </p>
         </div>
 
-        <div className="bg-white p-4 rounded-2xl border border-orange-100 shadow-sm">
+        <div className="bg-white p-4 rounded-2xl border border-rose-100 shadow-sm">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-orange-600">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#e11d48]">
               High Risk
             </span>
-            <span className="w-3 h-3 rounded-full bg-orange-500" />
+            <span className="w-3 h-3 rounded-full bg-[#e11d48]" />
           </div>
           <p className="text-2xl font-black text-slate-800 mt-2">
             {summaryCounts.HIGH}
@@ -389,12 +397,12 @@ const SecurityPage = () => {
           </p>
         </div>
 
-        <div className="bg-white p-4 rounded-2xl border border-amber-100 shadow-sm">
+        <div className="bg-white p-4 rounded-2xl border border-red-100 shadow-sm">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-amber-600">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#ef4444]">
               Elevated Risk
             </span>
-            <span className="w-3 h-3 rounded-full bg-amber-500" />
+            <span className="w-3 h-3 rounded-full bg-[#ef4444]" />
           </div>
           <p className="text-2xl font-black text-slate-800 mt-2">
             {summaryCounts.ELEVATED}
@@ -404,12 +412,12 @@ const SecurityPage = () => {
           </p>
         </div>
 
-        <div className="bg-white p-4 rounded-2xl border border-yellow-100 shadow-sm">
+        <div className="bg-white p-4 rounded-2xl border border-blue-100 shadow-sm">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-yellow-600">
+            <span className="text-xs font-bold uppercase tracking-wider text-blue-600">
               Moderate Risk
             </span>
-            <span className="w-3 h-3 rounded-full bg-yellow-500" />
+            <span className="w-3 h-3 rounded-full bg-[#3b82f6]" />
           </div>
           <p className="text-2xl font-black text-slate-800 mt-2">
             {summaryCounts.MODERATE}
@@ -419,12 +427,12 @@ const SecurityPage = () => {
           </p>
         </div>
 
-        <div className="bg-white p-4 rounded-2xl border border-lime-100 shadow-sm col-span-2 md:col-span-1">
+        <div className="bg-white p-4 rounded-2xl border border-[#964B00]/20 shadow-sm col-span-2 md:col-span-1">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-lime-700">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#964B00]">
               Low-Moderate
             </span>
-            <span className="w-3 h-3 rounded-full bg-lime-500" />
+            <span className="w-3 h-3 rounded-full bg-[#964B00]" />
           </div>
           <p className="text-2xl font-black text-slate-800 mt-2">
             {summaryCounts["LOW-MODERATE"]}
@@ -455,7 +463,7 @@ const SecurityPage = () => {
           </div>
         </div>
 
-        {/* CONTROLS: INDICATOR SELECTOR & VIEW MODE */}
+        {/* CONTROLS: INDICATOR SELECTOR, REFRESH, EDIT & VIEW MODE */}
         <div className="flex flex-wrap items-center gap-3">
           {/* Indicator Button */}
           <button
@@ -469,26 +477,47 @@ const SecurityPage = () => {
             </span>
           </button>
 
+          {/* Refresh Button */}
+          <button
+            onClick={() => {
+              fetchSecurityData();
+              toast.success("Refreshed security assessments from backend");
+            }}
+            disabled={loading}
+            title="Refresh data from backend"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all cursor-pointer border border-slate-200"
+          >
+            <FiRefreshCw size={13} className={loading ? "animate-spin" : ""} />
+            Refresh
+          </button>
+
+          {/* Edit / Upload Security Data */}
+          <Link
+            href="/dashboard/security/upload-data"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-bold bg-emerald-50 hover:bg-emerald-100 text-emerald-800 transition-all cursor-pointer border border-emerald-200 shadow-xs"
+          >
+            <FiEdit3 size={13} />
+            Edit Data
+          </Link>
+
           {/* Toggle National vs State View */}
           <div className="flex items-center bg-slate-100 p-1 rounded-full border border-slate-200">
             <button
               onClick={() => setSelectedState("")}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
-                !selectedState
-                  ? "bg-emerald-600 text-white shadow-sm"
-                  : "text-slate-600 hover:text-slate-900"
-              }`}
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${!selectedState
+                ? "bg-emerald-600 text-white shadow-sm"
+                : "text-slate-600 hover:text-slate-900"
+                }`}
             >
               <FaGlobeAfrica size={13} />
               National
             </button>
             <button
               disabled={!selectedState}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all ${
-                selectedState
-                  ? "bg-emerald-600 text-white shadow-sm cursor-pointer"
-                  : "text-slate-400 cursor-not-allowed"
-              }`}
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all ${selectedState
+                ? "bg-emerald-600 text-white shadow-sm cursor-pointer"
+                : "text-slate-400 cursor-not-allowed"
+                }`}
             >
               <FaMapMarkedAlt size={13} />
               {selectedState ? `${selectedState} State` : "Select State"}
@@ -556,6 +585,7 @@ const SecurityPage = () => {
                 colorForValue={colorForValue}
                 valueLabel="Threat Level"
                 height={mapHeight}
+                showLabels
                 onSelect={(slug) => {
                   const matched = data.find(
                     (d) => normalizeStateName(d.state || "") === slug,
@@ -605,10 +635,10 @@ const SecurityPage = () => {
                 {currentStateHotspotLgas.some(
                   (l) => l.toLowerCase() === hoveredLGA.name.toLowerCase(),
                 ) && (
-                  <p className="text-[11px] text-slate-300 border-t border-white/10 pt-1.5 mt-1">
-                    {currentStateRecord?.primary_threats}
-                  </p>
-                )}
+                    <p className="text-[11px] text-slate-300 border-t border-white/10 pt-1.5 mt-1">
+                      {currentStateRecord?.primary_threats}
+                    </p>
+                  )}
               </div>
             )}
 
@@ -648,24 +678,24 @@ const SecurityPage = () => {
             </span>
             <div className="flex items-center gap-4 flex-wrap">
               <div className="flex items-center gap-1.5">
-                <span className="w-3.5 h-3.5 rounded-md bg-red-600" />
+                <span className="w-3.5 h-3.5 rounded-md bg-[#dc2626]" />
                 <span>Critical (Red)</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="w-3.5 h-3.5 rounded-md bg-orange-500" />
-                <span>High (Orange-Red)</span>
+                <span className="w-3.5 h-3.5 rounded-md bg-[#e11d48]" />
+                <span>High (Maroon)</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="w-3.5 h-3.5 rounded-md bg-amber-500" />
-                <span>Elevated (Amber)</span>
+                <span className="w-3.5 h-3.5 rounded-md bg-[#ef4444]" />
+                <span>Elevated</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="w-3.5 h-3.5 rounded-md bg-yellow-500" />
-                <span>Moderate (Yellow)</span>
+                <span className="w-3.5 h-3.5 rounded-md bg-[#3b82f6]" />
+                <span>Moderate (Blue)</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="w-3.5 h-3.5 rounded-md bg-lime-500" />
-                <span>Low-Moderate (Lime)</span>
+                <span className="w-3.5 h-3.5 rounded-md bg-[#964B00]" />
+                <span>Low-Moderate (Brown)</span>
               </div>
             </div>
           </div>
@@ -813,22 +843,34 @@ const SecurityPage = () => {
                 <tr>
                   <td
                     colSpan={6}
-                    className="py-8 px-4 text-center text-slate-500"
+                    className="py-10 px-4 text-center text-slate-500"
                   >
-                    {loading
-                      ? "Loading security assessments..."
-                      : `No security assessments found for ${selectedYear}.`}
+                    {loading ? (
+                      "Loading security assessments from backend..."
+                    ) : (
+                      <div className="flex flex-col items-center justify-center gap-2.5">
+                        <p className="font-semibold text-slate-700">
+                          No security assessments found for {selectedYear}.
+                        </p>
+                        <Link
+                          href="/dashboard/security/upload-data"
+                          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-emerald-700 text-white hover:bg-emerald-800 transition shadow-sm"
+                        >
+                          <FiEdit3 size={13} />
+                          Add or Upload Security Data for {selectedYear}
+                        </Link>
+                      </div>
+                    )}
                   </td>
                 </tr>
               ) : (
                 filteredTableData.map((row) => (
                   <tr
                     key={row.id ?? row.state}
-                    className={`hover:bg-slate-50/80 transition-colors ${
-                      selectedState?.toLowerCase() === row.state.toLowerCase()
-                        ? "bg-emerald-50/50"
-                        : ""
-                    }`}
+                    className={`hover:bg-slate-50/80 transition-colors ${selectedState?.toLowerCase() === row.state.toLowerCase()
+                      ? "bg-emerald-50/50"
+                      : ""
+                      }`}
                   >
                     <td className="py-3 px-4 font-bold text-slate-800">
                       {row.state}
@@ -900,11 +942,10 @@ const SecurityPage = () => {
                     setShowIndicatorModal(false);
                     toast.success(`Active indicator: ${opt.label}`);
                   }}
-                  className={`p-3.5 rounded-2xl border transition-all cursor-pointer flex items-start gap-3 ${
-                    selectedIndicator === opt.id
-                      ? "border-emerald-500 bg-emerald-50/40 ring-1 ring-emerald-500"
-                      : "border-slate-100 hover:border-slate-200 hover:bg-slate-50"
-                  }`}
+                  className={`p-3.5 rounded-2xl border transition-all cursor-pointer flex items-start gap-3 ${selectedIndicator === opt.id
+                    ? "border-emerald-500 bg-emerald-50/40 ring-1 ring-emerald-500"
+                    : "border-slate-100 hover:border-slate-200 hover:bg-slate-50"
+                    }`}
                 >
                   <span className="text-2xl">{opt.icon}</span>
                   <div>

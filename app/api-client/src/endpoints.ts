@@ -42,11 +42,16 @@ export const Endpoints = {
   threatAssessment: {
     all: "/threat-assessment",
     summary: "/threat-assessment/summary",
+    years: "/threat-assessment/years",
+    bulk: "/threat-assessment/bulk",
+    seed: (year?: number) =>
+      year ? `/threat-assessment/seed?year=${year}` : "/threat-assessment/seed",
     upload: (year: number) => `/threat-assessment/upload/${year}`,
     byState: (state: string) => `/threat-assessment/state/${state}`,
     byZone: (zone: string) => `/threat-assessment/zone/${zone}`,
     byLga: (lga: string) => `/threat-assessment/lga/${lga}`,
     lgas: "/threat-assessment/lgas",
+    byId: (id: number) => `/threat-assessment/${id}`,
   },
   users: {
     list: "/user",

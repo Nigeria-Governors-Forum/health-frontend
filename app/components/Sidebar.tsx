@@ -86,24 +86,24 @@ export const navItem: NavItem[] = [
         label: "Score Cards",
         roles: ["user", "h-admin", "s-admin"],
       },
-      {
-        href: "/dashboard/service-coverage",
-        icon: <FaMoneyCheck />,
-        label: "Service Coverage",
-        roles: ["user", "h-admin", "s-admin"],
-      },
+      // {
+      //   href: "/dashboard/service-coverage",
+      //   icon: <FaMoneyCheck />,
+      //   label: "Service Coverage",
+      //   roles: ["user", "h-admin", "s-admin"],
+      // },
       {
         href: "/dashboard/health-outcomes",
         icon: <FaMoneyCheck />,
         label: "Health Outcomes",
         roles: ["user", "h-admin", "s-admin"],
       },
-      {
-        href: "/dashboard/flagship-projects",
-        icon: <FaMoneyCheck />,
-        label: "Flagship Projects",
-        roles: ["user", "h-admin", "s-admin"],
-      },
+      // {
+      //   href: "/dashboard/flagship-projects",
+      //   icon: <FaMoneyCheck />,
+      //   label: "Flagship Projects",
+      //   roles: ["user", "h-admin", "s-admin"],
+      // },
       {
         href: "/dashboard/partners-mapping",
         icon: <FaMoneyCheck />,
@@ -116,18 +116,19 @@ export const navItem: NavItem[] = [
       //   label: "Africa Map",
       //   roles: ["user", "h-admin", "s-admin"],
       // },
-      {
-        href: "/dashboard/upload-data",
-        icon: <FaMoneyCheck />,
-        label: "Data Upload",
-        roles: ["h-admin", "s-admin", "s-admin"],
-      },
-      {
-        href: "/dashboard/register",
-        icon: <FaMoneyCheck />,
-        label: "Register User",
-        roles: ["h-admin", "s-admin", "s-admin"],
-      },
+
+      // {
+      //   href: "/dashboard/upload-data",
+      //   icon: <FaMoneyCheck />,
+      //   label: "Data Upload",
+      //   roles: ["h-admin", "s-admin", "s-admin"],
+      // },
+      // {
+      //   href: "/dashboard/register",
+      //   icon: <FaMoneyCheck />,
+      //   label: "Register User",
+      //   roles: ["h-admin", "s-admin", "s-admin"],
+      // },
     ],
   },
   // {
@@ -150,29 +151,16 @@ export const navItem: NavItem[] = [
   //   roles: ["user", "h-admin", "s-admin"],
   //   children: [
   //     {
-  //       label: "Security",
+  //       href: "/dashboard/security",
   //       icon: <FaLock />,
+  //       label: "Security Dashboard",
   //       roles: ["user", "h-admin", "s-admin"],
-  //       children: [
-  //         {
-  //           href: "/dashboard/security",
-  //           icon: <FaLock />,
-  //           label: "Security Dashboard",
-  //           roles: ["user", "h-admin", "s-admin"],
-  //         },
-  //         {
-  //           href: "/dashboard/security/upload-data",
-  //           icon: <FaMoneyCheck />,
-  //           label: "Upload Data",
-  //           roles: ["h-admin", "s-admin"],
-  //         },
-  //       ],
   //     },
   //     {
   //       href: "/dashboard/security/upload-data",
-  //       icon: <FaLock />,
-  //       label: "Data Upload",
-  //       roles: ["user", "h-admin", "s-admin"],
+  //       icon: <FaMoneyCheck />,
+  //       label: "Upload Data",
+  //       roles: ["h-admin", "s-admin"],
   //     },
   //   ],
   // },
@@ -352,6 +340,8 @@ const Sidebar: React.FC<SidebarProps> = ({
                   {isOpen && !collapsed && (
                     <div className="ml-6 flex flex-col space-y-1">
                       {item.children.map((child) => {
+                        if (!child.href) return null;
+
                         const isActive =
                           pathname === child.href ||
                           pathname.startsWith(child.href + "/");
@@ -387,6 +377,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             }
 
             // Normal single item
+            if (!item.href) return null;
             const isActive = pathname === item.href;
             const isExternal = item.href?.startsWith("http");
             return (
