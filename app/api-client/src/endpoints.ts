@@ -24,6 +24,10 @@ export const Endpoints = {
     summary: "/human-resource",
     zone: "/human-resource/zonal",
   },
+  partnersMapping: {
+    summary: "/partners-mapping",
+    zone: "/partners-mapping/zonal",
+  },
   scorecard: {
     summary: "/scorecard",
   },
