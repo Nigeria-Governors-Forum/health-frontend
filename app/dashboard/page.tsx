@@ -48,7 +48,7 @@ export default function DashboardHome() {
 
   const fetchData = async () => {
     if (!selectedState || !selectedYear) return;
-    
+
     // Avoid double API calls
     if (
       lastFetched.current &&
@@ -206,6 +206,7 @@ export default function DashboardHome() {
             title="Land Mass"
             value={formatNumber(stateData?.land_mass || "N/A") as any}
             icon={<Image src={land} alt="Land" width={24} height={24} />}
+            showSqm
           />
           <DemographyCard
             title="Political Wards"
@@ -230,9 +231,9 @@ export default function DashboardHome() {
                 height={24}
               />
             }
-            percentage="100%"
-            trend="down"
-            comparisonText="vs last year"
+          // percentage="100%"
+          // trend="down"
+          // comparisonText="vs last year"
           />
           <DemographyCard
             title="Health Workers"
@@ -245,9 +246,9 @@ export default function DashboardHome() {
                 height={24}
               />
             }
-            percentage="100%"
-            trend="up"
-            comparisonText="vs last year"
+          // percentage="100%"
+          // trend="up"
+          // comparisonText="vs last year"
           />
           <DemographyCard
             title="Health Training Institutions"
@@ -260,9 +261,9 @@ export default function DashboardHome() {
                 height={24}
               />
             }
-            percentage="100%"
-            trend="up"
-            comparisonText="vs last year"
+          // percentage="100%"
+          // trend="up"
+          // comparisonText="vs last year"
           />
 
           <DemographyCard
@@ -276,9 +277,9 @@ export default function DashboardHome() {
                 height={24}
               />
             }
-            percentage="100%"
-            trend="up"
-            comparisonText="vs last year"
+          // percentage="100%"
+          // trend="up"
+          // comparisonText="vs last year"
           />
         </div>
 

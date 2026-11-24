@@ -14,6 +14,7 @@ interface DemographyCardProps {
   comparisonText?: string; // e.g. "vs last month"
   subtitle?: string;
   showPerCapita?: boolean;
+  showSqm?: boolean;
 }
 
 const DemographyCard: React.FC<DemographyCardProps> = ({
@@ -25,6 +26,7 @@ const DemographyCard: React.FC<DemographyCardProps> = ({
   comparisonText = "vs last month",
   subtitle,
   showPerCapita = false,
+  showSqm = false,
 }) => {
   const ArrowUp = "/svg/arrowUp.svg";
   const ArrowDown = "/svg/arrowDown.svg";
@@ -58,6 +60,11 @@ const DemographyCard: React.FC<DemographyCardProps> = ({
           {showPerCapita && (
             <span className="text-sm text-gray-500 italic font-normal">
               Per 10,000
+            </span>
+          )}
+          {showSqm && (
+            <span className="text-sm text-gray-500 italic">
+              sqm
             </span>
           )}
         </span>
