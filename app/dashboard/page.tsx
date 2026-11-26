@@ -10,7 +10,11 @@ import LoadingScreen from "../components/LoadingScreen";
 import { useTopbarFilters } from "../context/TopbarFiltersContext";
 import Image from "next/image";
 import ToggleSwitch from "../components/ToggleSwitch";
-import { StateLGAChoropleth, normalizeStateName, slugify } from "../components/ng-maps";
+import {
+  StateLGAChoropleth,
+  normalizeStateName,
+  slugify,
+} from "../components/ng-maps";
 import { FiInfo, FiMaximize2, FiMinimize2 } from "react-icons/fi";
 import { formatNumber } from "../lib/formatNumber";
 
@@ -19,7 +23,10 @@ export default function DashboardHome() {
   const { selectedState, selectedYear } = useTopbarFilters();
   const [titlecaption, setTitlecaption] = useState("Population Spread");
   const [isPopulationMode, setIsPopulationMode] = useState(true);
-  const [hoveredLGA, setHoveredLGA] = useState<{ name: string; key: string } | null>(null);
+  const [hoveredLGA, setHoveredLGA] = useState<{
+    name: string;
+    key: string;
+  } | null>(null);
 
   const [stateData, setStateData] = useState<any>();
   const lastFetched = useRef<{ state: string; year: number } | null>(null);
@@ -100,7 +107,9 @@ export default function DashboardHome() {
     if (lgaList.length === 0) return colors;
 
     if (isPopulationMode) {
-      const populations = lgaList.map((item: any) => Number(item.lga_population) || 0);
+      const populations = lgaList.map(
+        (item: any) => Number(item.lga_population) || 0,
+      );
       const minPop = Math.min(...populations);
       const maxPop = Math.max(...populations);
       const popRange = maxPop - minPop || 1;
@@ -112,12 +121,15 @@ export default function DashboardHome() {
         // Denser -> darker blue (lightness: 25%), less populated -> lighter blue (lightness: 92%)
         const lightness = 92 - ratio * (92 - 25);
         const saturation = 35 + ratio * (85 - 35);
-        colors[key] = `hsl(215, ${saturation.toFixed(0)}%, ${lightness.toFixed(0)}%)`;
+        colors[key] =
+          `hsl(215, ${saturation.toFixed(0)}%, ${lightness.toFixed(0)}%)`;
       });
     } else {
       lgaList.forEach((item: any) => {
         const key = slugify(item.lga);
-        const isHard = (item.hard_to_reach_lgas || "").toString().trim().toLowerCase() === "yes";
+        const isHard =
+          (item.hard_to_reach_lgas || "").toString().trim().toLowerCase() ===
+          "yes";
         colors[key] = isHard ? "#EF4444" : "#22C55E";
       });
     }
@@ -133,44 +145,31 @@ export default function DashboardHome() {
     },
   ];
 
-  const data = [
-    {
-      year: stateData?.graph_data[0].year,
-      anc: parseFloat(
-        Number(stateData?.graph_data[0]?.data[0]?.value * 100).toFixed(1),
-      ),
-      stunting: parseFloat(
-        Number(stateData?.graph_data[0]?.data[2]?.value * 100).toFixed(1),
-      ),
-      zeroDose: parseFloat(
-        Number(stateData?.graph_data[0]?.data[3]?.value * 100).toFixed(1),
-      ),
-    },
-    {
-      year: stateData?.graph_data[1].year,
-      anc: parseFloat(
-        Number(stateData?.graph_data[1]?.data[0]?.value * 100).toFixed(1),
-      ),
-      stunting: parseFloat(
-        Number(stateData?.graph_data[1]?.data[2]?.value * 100).toFixed(1),
-      ),
-      zeroDose: parseFloat(
-        Number(stateData?.graph_data[1]?.data[3]?.value * 100).toFixed(1),
-      ),
-    },
-    {
-      year: stateData?.graph_data[2]?.year,
-      anc: parseFloat(
-        Number(stateData?.graph_data[2]?.data[0]?.value * 100).toFixed(1),
-      ),
-      stunting: parseFloat(
-        Number(stateData?.graph_data[2]?.data[2]?.value * 100).toFixed(1),
-      ),
-      zeroDose: parseFloat(
-        Number(stateData?.graph_data[2]?.data[3]?.value * 100).toFixed(1),
-      ),
-    },
-  ];
+  const formatGraphData = (population: number) => {
+    return (stateData?.graph_data ?? []).map((item: any) => ({
+      year: item.year,
+
+      // ANC is already a proportion
+      anc:
+        item.fourth_anc_visit != null
+          ? Number((item.fourth_anc_visit * 100).toFixed(1))
+          : null,
+
+      // Convert stunting count to percentage
+      stunting:
+        item.stunting != null && population > 0
+          ? Number(((item.stunting / population) * 100).toFixed(1))
+          : null,
+
+      // Convert zero-dose count to percentage
+      zeroDose:
+        item.zero_dose != null && population > 0
+          ? Number(((item.zero_dose / population) * 100).toFixed(1))
+          : null,
+    }));
+  };
+
+  const data = formatGraphData(stateData?.total_population || 0);
 
   const lines = [
     { key: "anc", name: "4th ANC", color: "#155DFC" },
@@ -189,7 +188,9 @@ export default function DashboardHome() {
 
   const handleToggle = (value: boolean) => {
     setIsPopulationMode(value);
-    setTitlecaption(value ? "Population Spread" : "Population by Accessibility");
+    setTitlecaption(
+      value ? "Population Spread" : "Population by Accessibility",
+    );
   };
 
   return (
@@ -231,13 +232,10 @@ export default function DashboardHome() {
                 height={24}
               />
             }
-          // percentage="100%"
-          // trend="down"
-          // comparisonText="vs last year"
           />
           <DemographyCard
             title="Health Workers"
-            value={formatNumber(stateData?.hRH_Professions || "N/A")}
+            value={formatNumber(stateData?.total_HRH || "N/A")}
             icon={
               <Image
                 src={healthWorkers}
@@ -246,13 +244,12 @@ export default function DashboardHome() {
                 height={24}
               />
             }
-          // percentage="100%"
-          // trend="up"
-          // comparisonText="vs last year"
           />
           <DemographyCard
             title="Health Training Institutions"
-            value={formatNumber(stateData?.hRH || "N/A")}
+            value={formatNumber(
+              stateData?.health_training_institutions || "N/A",
+            )}
             icon={
               <Image
                 src={healthTraining}
@@ -261,14 +258,11 @@ export default function DashboardHome() {
                 height={24}
               />
             }
-          // percentage="100%"
-          // trend="up"
-          // comparisonText="vs last year"
           />
 
           <DemographyCard
             title="Health Allocation"
-            value={formatNumber(stateData?.partners_mapping || "N/A")}
+            value={formatNumber(stateData?.healthFin?.value || "N/A")}
             icon={
               <Image
                 src={healthAllocation}
@@ -277,9 +271,6 @@ export default function DashboardHome() {
                 height={24}
               />
             }
-          // percentage="100%"
-          // trend="up"
-          // comparisonText="vs last year"
           />
         </div>
 
@@ -291,16 +282,22 @@ export default function DashboardHome() {
             lines={lines}
           />
 
-          <div className={isFullscreen
-            ? "fixed inset-0 z-50 bg-[#F8FAFC] p-6 flex flex-col space-y-4 overflow-y-auto"
-            : "space-y-2"
-          }>
+          <div
+            className={
+              isFullscreen
+                ? "fixed inset-0 z-50 bg-[#F8FAFC] p-6 flex flex-col space-y-4 overflow-y-auto"
+                : "space-y-2"
+            }
+          >
             <div className="bg-white rounded-xl shadow-md p-4 w-auto mb-2 border border-gray-100">
               <div className="flex justify-between">
                 <h2 className="text-lg font-semibold text-[#07923F] mb-3 text-center flex items-center gap-2">
                   {titlecaption}
                   <div className="group relative flex items-center">
-                    <FiInfo className="cursor-pointer text-green-900" size={20} />
+                    <FiInfo
+                      className="cursor-pointer text-green-900"
+                      size={20}
+                    />
                     <span className="pointer-events-none absolute bottom-full left-1/2 mb-2 w-max max-w-xs -translate-x-1/2 scale-95 rounded-lg bg-gray-900 px-3 py-1.5 text-center text-xs font-medium text-white opacity-0 shadow-lg transition-all duration-200 group-hover:scale-100 group-hover:opacity-100 z-50 normal-case font-normal">
                       {isPopulationMode
                         ? "Geographic distribution of population across the state's LGAs."
@@ -309,7 +306,10 @@ export default function DashboardHome() {
                     </span>
                   </div>
                 </h2>
-                <ToggleSwitch initial={isPopulationMode} onToggle={handleToggle} />
+                <ToggleSwitch
+                  initial={isPopulationMode}
+                  onToggle={handleToggle}
+                />
               </div>
               {!isPopulationMode && (
                 <div className="flex justify-between text-sm gap-4 text-gray-700">
@@ -333,7 +333,11 @@ export default function DashboardHome() {
                 className="absolute top-4 right-4 z-20 p-2.5 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-black transition-all shadow-sm cursor-pointer"
                 title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
               >
-                {isFullscreen ? <FiMinimize2 size={20} /> : <FiMaximize2 size={20} />}
+                {isFullscreen ? (
+                  <FiMinimize2 size={20} />
+                ) : (
+                  <FiMaximize2 size={20} />
+                )}
               </button>
 
               <StateLGAChoropleth
@@ -345,20 +349,35 @@ export default function DashboardHome() {
               />
               {hoveredLGA && (
                 <div className="absolute top-2 left-2 bg-black/85 backdrop-blur-sm text-white px-3 py-2 rounded-xl shadow-lg pointer-events-none z-10 text-xs border border-white/10 min-w-44">
-                  <p className="font-bold text-[#38bdf8] text-sm mb-1">{hoveredLGA.name}</p>
+                  <p className="font-bold text-[#38bdf8] text-sm mb-1">
+                    {hoveredLGA.name}
+                  </p>
                   {(() => {
-                    const item = lgaList.find((x: any) => slugify(x.lga) === hoveredLGA.key);
-                    if (!item) return <p className="text-gray-300 italic">No data available</p>;
+                    const item = lgaList.find(
+                      (x: any) => slugify(x.lga) === hoveredLGA.key,
+                    );
+                    if (!item)
+                      return (
+                        <p className="text-gray-300 italic">
+                          No data available
+                        </p>
+                      );
                     return (
                       <div className="space-y-1">
                         <p className="flex justify-between gap-4">
                           <span className="text-gray-400">Population:</span>
-                          <span className="font-semibold text-white">{formatNumber(item.lga_population)}</span>
+                          <span className="font-semibold text-white">
+                            {formatNumber(item.lga_population)}
+                          </span>
                         </p>
                         <p className="flex justify-between gap-4">
                           <span className="text-gray-400">Status:</span>
-                          <span className={`font-semibold ${item.hard_to_reach_lgas === "Yes" ? "text-red-400" : "text-green-400"}`}>
-                            {item.hard_to_reach_lgas === "Yes" ? "Hard to Reach" : "Safe"}
+                          <span
+                            className={`font-semibold ${item.hard_to_reach_lgas === "Yes" ? "text-red-400" : "text-green-400"}`}
+                          >
+                            {item.hard_to_reach_lgas === "Yes"
+                              ? "Hard to Reach"
+                              : "Safe"}
                           </span>
                         </p>
                       </div>
